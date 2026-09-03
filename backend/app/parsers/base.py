@@ -19,6 +19,7 @@ class ParsedTransactionResult:
     description: Optional[str] = None
     parse_success: bool = False
     parse_status_message: str = "Unparsed"
+    is_financial_event: bool = True
 
 
 class TransactionParser(ABC):

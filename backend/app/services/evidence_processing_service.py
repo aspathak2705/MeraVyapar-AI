@@ -4,7 +4,7 @@ from app.repositories.evidence_repository import EvidenceRepository
 from app.repositories.transaction_candidate_repository import TransactionCandidateRepository
 from app.parsers.rule_based_transaction_parser import RuleBasedTransactionParser
 from app.services.transaction_normalization_service import TransactionNormalizationService
-from app.models.financial_evidence import FinancialEvidence, ProcessingStatus
+from app.models.financial_evidence import FinancialEvidence, ProcessingStatus, EvidenceType, EvidenceSource
 from app.models.transaction_candidate import (
     TransactionCandidate,
     NormalizationStatus,
@@ -24,6 +24,25 @@ class EvidenceProcessingService:
 
         # Step 1: Parse evidence using selected parser
         parsed_result = self.parser.parse(evidence)
+
+        # Step 1.1: Check if non-financial event (OTP, Cashback, Promo)
+        if not parsed_result.is_financial_event:
+            evidence.processing_status = ProcessingStatus.NOT_FINANCIAL_EVENT
+            evidence.processed_at = datetime.now(timezone.utc)
+            self.db.commit()
+            self.db.refresh(evidence)
+            return evidence
+
+        # Step 1.2: Check if file evidence awaiting extraction
+        if (
+            evidence.evidence_type in (EvidenceType.PAYMENT_SCREENSHOT, EvidenceType.PAYMENT_RECEIPT) or
+            evidence.evidence_source == EvidenceSource.USER_SHARED_FILE
+        ):
+            evidence.processing_status = ProcessingStatus.AWAITING_EXTRACTION
+            evidence.processed_at = datetime.now(timezone.utc)
+            self.db.commit()
+            self.db.refresh(evidence)
+            return evidence
 
         # Step 2: Normalize parsed result
         normalized_result = TransactionNormalizationService.normalize_parsed_result(parsed_result)
@@ -50,7 +69,6 @@ class EvidenceProcessingService:
                 )
             status = ProcessingStatus.PARSED if normalized_result.parse_success else ProcessingStatus.REQUIRES_REVIEW
         else:
-            # File evidence or ambiguous text requiring future extraction/review
             status = ProcessingStatus.REQUIRES_REVIEW
 
         evidence.processing_status = status

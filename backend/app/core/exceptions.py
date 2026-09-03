@@ -59,8 +59,18 @@ class ConflictError(BaseAPIException):
 class ValidationError(BaseAPIException):
     def __init__(self, message: str = "Validation failed", details: Optional[Dict[str, Any]] = None):
         super().__init__(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_400_BAD_REQUEST,
             error_code="VALIDATION_FAILED",
+            message=message,
+            details=details,
+        )
+
+
+class InfrastructureError(BaseAPIException):
+    def __init__(self, message: str = "Infrastructure service unavailable", details: Optional[Dict[str, Any]] = None):
+        super().__init__(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            error_code="INFRASTRUCTURE_ERROR",
             message=message,
             details=details,
         )

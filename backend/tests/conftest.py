@@ -14,6 +14,7 @@ from app.models.idempotency_record import IdempotencyRecord
 from app.models.canonical_transaction import CanonicalTransaction
 from app.models.transaction_candidate_link import TransactionCandidateLink
 from app.models.reconciliation_attempt import ReconciliationAttempt
+from app.models.capture_source_setting import CaptureSourceSetting
 
 
 class MockDBQuery:
@@ -48,7 +49,6 @@ class MockDBQuery:
                     val = getattr(right, "value", right)
                     if attr_name:
                         item_val = getattr(item, attr_name, None)
-                        # Normalize comparison for UUID / str
                         if isinstance(item_val, uuid.UUID) or isinstance(val, uuid.UUID):
                             if str(item_val) != str(val):
                                 match = False
@@ -75,7 +75,8 @@ class MockDBSession:
             IdempotencyRecord: [],
             CanonicalTransaction: [],
             TransactionCandidateLink: [],
-            ReconciliationAttempt: []
+            ReconciliationAttempt: [],
+            CaptureSourceSetting: []
         }
 
     def query(self, model_cls):

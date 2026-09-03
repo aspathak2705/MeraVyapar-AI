@@ -1,7 +1,6 @@
 import re
 from decimal import Decimal, InvalidOperation
 from datetime import datetime, timezone
-from typing import Optional
 from app.parsers.base import TransactionParser, ParsedTransactionResult
 from app.models.financial_evidence import FinancialEvidence, EvidenceType
 from app.models.transaction_candidate import TransactionType, PaymentMode
@@ -9,107 +8,113 @@ from app.models.transaction_candidate import TransactionType, PaymentMode
 
 class RuleBasedTransactionParser(TransactionParser):
     def parse(self, evidence: FinancialEvidence) -> ParsedTransactionResult:
-        # Case 1: Manual Entry with structured metadata
-        if evidence.evidence_type == EvidenceType.MANUAL_ENTRY:
-            return self._parse_manual_entry(evidence)
+        if evidence.evidence_type in (EvidenceType.PAYMENT_SCREENSHOT, EvidenceType.PAYMENT_RECEIPT):
+            return ParsedTransactionResult(
+                parse_success=False,
+                parse_status_message="Awaiting OCR/TFLite extraction",
+                is_financial_event=True
+            )
 
-        # Case 2: Text Evidence (Bank SMS / Notification text)
-        if evidence.raw_text:
-            return self._parse_text_evidence(evidence.raw_text)
+        if evidence.evidence_type == EvidenceType.MANUAL_ENTRY and evidence.metadata_info:
+            meta = evidence.metadata_info
+            amount_str = meta.get("amount")
+            amount_val = None
+            if amount_str:
+                try:
+                    amount_val = Decimal(str(amount_str))
+                except InvalidOperation:
+                    amount_val = None
 
-        # Case 3: File Evidence (Screenshot / Receipt) - No OCR in Phase 1
-        return ParsedTransactionResult(
-            parse_success=False,
-            parse_status_message="File evidence stored; awaiting future OCR/extraction model"
-        )
+            tt = TransactionType.UNKNOWN
+            if meta.get("transaction_type") == "MONEY_IN":
+                tt = TransactionType.MONEY_IN
+            elif meta.get("transaction_type") == "MONEY_OUT":
+                tt = TransactionType.MONEY_OUT
 
-    def _parse_manual_entry(self, evidence: FinancialEvidence) -> ParsedTransactionResult:
-        meta = evidence.metadata_info or {}
-        raw_amount = meta.get("amount")
-        amount = None
+            pm = PaymentMode.UNKNOWN
+            pm_str = meta.get("payment_mode")
+            if pm_str in [e.value for e in PaymentMode]:
+                pm = PaymentMode(pm_str)
 
-        if raw_amount:
-            try:
-                # Clean amount string and convert to Decimal for strict precision
-                clean_amt = str(raw_amount).replace(",", "").strip()
-                amount = Decimal(clean_amt)
-            except (InvalidOperation, ValueError):
-                amount = None
+            return ParsedTransactionResult(
+                amount=amount_val,
+                currency=meta.get("currency", "INR"),
+                transaction_type=tt,
+                counterparty_name=meta.get("counterparty_name"),
+                payment_mode=pm,
+                description=meta.get("description"),
+                parse_success=True,
+                parse_status_message="Parsed from manual entry metadata",
+                is_financial_event=True
+            )
 
-        tx_type_str = meta.get("transaction_type", "UNKNOWN")
-        try:
-            tx_type = TransactionType(tx_type_str)
-        except ValueError:
-            tx_type = TransactionType.UNKNOWN
+        text = evidence.raw_text or ""
+        if not text.strip():
+            return ParsedTransactionResult(
+                parse_success=False,
+                parse_status_message="Empty raw text",
+                is_financial_event=False
+            )
 
-        mode_str = meta.get("payment_mode", "UNKNOWN")
-        try:
-            payment_mode = PaymentMode(mode_str)
-        except ValueError:
-            payment_mode = PaymentMode.UNKNOWN
+        lower_text = text.lower()
 
-        tx_timestamp = None
-        raw_ts = meta.get("transaction_timestamp")
-        if raw_ts:
-            try:
-                tx_timestamp = datetime.fromisoformat(raw_ts.replace("Z", "+00:00"))
-            except ValueError:
-                tx_timestamp = None
+        # Non-transaction filter: OTP, Promotional rewards, Loan offers
+        non_tx_patterns = [
+            r"\botp\b",
+            r"verification code",
+            r"cashback",
+            r"won\b",
+            r"scratch card",
+            r"special offer",
+            r"instant loan",
+            r"reward points",
+            r"rate your"
+        ]
+        for pattern in non_tx_patterns:
+            if re.search(pattern, lower_text):
+                return ParsedTransactionResult(
+                    parse_success=False,
+                    parse_status_message=f"Non-transaction text detected (matched pattern: {pattern})",
+                    is_financial_event=False
+                )
 
-        return ParsedTransactionResult(
-            amount=amount,
-            currency=meta.get("currency", "INR"),
-            transaction_type=tx_type,
-            counterparty_name=meta.get("counterparty_name"),
-            payment_mode=payment_mode,
-            transaction_timestamp=tx_timestamp or evidence.received_at,
-            description=evidence.raw_text,
-            parse_success=True if amount is not None else False,
-            parse_status_message="Manual entry parsed successfully"
-        )
-
-    def _parse_text_evidence(self, text: str) -> ParsedTransactionResult:
-        # Conservative deterministic text parsing
-        # Example 1: "Rs. 1,250 debited" / "INR 500 credited"
-        debited_match = re.search(r'(?:Rs\.?|INR)\s*([\d,]+\.?\d*)\s*(?:debited|paid|sent)', text, re.IGNORECASE)
-        credited_match = re.search(r'(?:Rs\.?|INR)\s*([\d,]+\.?\d*)\s*(?:credited|received)', text, re.IGNORECASE)
-
-        amount: Optional[Decimal] = None
+        # Money direction check
         tx_type = TransactionType.UNKNOWN
-        parse_success = False
+        if any(w in lower_text for w in ["debited", "paid", "sent", "spent", "withdrawn", "debit"]):
+            tx_type = TransactionType.MONEY_OUT
+        elif any(w in lower_text for w in ["credited", "received", "deposited", "credit"]):
+            tx_type = TransactionType.MONEY_IN
 
-        if debited_match:
+        # Amount extraction
+        amount_match = re.search(r"(?:rs\.?|inr|₹)\s*([\d,]+(?:\.\d{1,2})?)", text, re.IGNORECASE)
+        amount_val = None
+        if amount_match:
+            raw_amt = amount_match.group(1).replace(",", "")
             try:
-                clean_amt = debited_match.group(1).replace(",", "")
-                amount = Decimal(clean_amt)
-                tx_type = TransactionType.MONEY_OUT
-                parse_success = True
-            except (InvalidOperation, ValueError):
-                pass
-        elif credited_match:
-            try:
-                clean_amt = credited_match.group(1).replace(",", "")
-                amount = Decimal(clean_amt)
-                tx_type = TransactionType.MONEY_IN
-                parse_success = True
-            except (InvalidOperation, ValueError):
-                pass
+                amount_val = Decimal(raw_amt)
+            except InvalidOperation:
+                amount_val = None
 
-        # Extract payment mode if explicitly stated
-        payment_mode = PaymentMode.UNKNOWN
-        if "UPI" in text.upper():
-            payment_mode = PaymentMode.UPI
-        elif "NEFT" in text.upper() or "RTGS" in text.upper() or "IMPS" in text.upper():
-            payment_mode = PaymentMode.BANK_TRANSFER
-        elif "CARD" in text.upper():
-            payment_mode = PaymentMode.CARD
+        # Payment mode check
+        pm = PaymentMode.UNKNOWN
+        if "upi" in lower_text:
+            pm = PaymentMode.UPI
+        elif "bank" in lower_text or "neft" in lower_text or "imps" in lower_text:
+            pm = PaymentMode.BANK_TRANSFER
+
+        # Counterparty check
+        cp_match = re.search(r"(?:to|from)\s+([A-Za-z0-9\s]{2,30})", text, re.IGNORECASE)
+        cp_name = cp_match.group(1).strip() if cp_match else None
+
+        parse_success = amount_val is not None and tx_type != TransactionType.UNKNOWN
 
         return ParsedTransactionResult(
-            amount=amount,
+            amount=amount_val,
             currency="INR",
             transaction_type=tx_type,
-            payment_mode=payment_mode,
-            description=text,
+            counterparty_name=cp_name,
+            payment_mode=pm,
             parse_success=parse_success,
-            parse_status_message="Deterministic text rule match" if parse_success else "Ambiguous text; requires review"
+            parse_status_message="Parsed via conservative text rules" if parse_success else "Partial text extraction",
+            is_financial_event=True
         )
