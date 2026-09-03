@@ -8,6 +8,8 @@ from app.features.reconciliation.services.reconciliation_rule_engine import Reco
 from app.models.canonical_transaction import CanonicalTransaction, ReconciliationStatus
 from app.models.transaction_candidate_link import LinkRelationshipType
 from app.models.reconciliation_attempt import ReconciliationDecision
+from app.models.financial_evidence import FinancialEvidence, EvidenceStrength
+from app.models.transaction_candidate import TransactionType
 from app.schemas.reconciliation import ReconciliationRunResponse
 
 
@@ -19,10 +21,8 @@ class ReconciliationService:
         self.audit_repo = ReconciliationRepository(db)
 
     def run_reconciliation(self, merchant_id: UUID) -> ReconciliationRunResponse:
-        # Fetch all candidates for authenticated merchant
         all_candidates = self.cand_repo.list_by_merchant(merchant_id, skip=0, limit=200)
 
-        # Filter out candidates already linked to a canonical transaction
         unlinked_candidates = [
             c for c in all_candidates
             if not self.canonical_repo.is_candidate_linked(c.id)
@@ -44,7 +44,6 @@ class ReconciliationService:
             matched_b = None
             review_b = None
 
-            # Pairwise compare against other unlinked candidates
             for j in range(i + 1, len(unlinked_candidates)):
                 cand_b = unlinked_candidates[j]
                 if cand_b.id in processed_ids:
@@ -59,13 +58,13 @@ class ReconciliationService:
                     review_b = (cand_b, reasons, snapshot)
 
             if matched_b:
+                # 1. Strong Match -> Create Canonical Transaction (RECONCILED)
                 cand_b, reasons, snapshot = matched_b
-                # Create RECONCILED Canonical Transaction combining values
                 canonical_tx = self.canonical_repo.create(
                     merchant_id=merchant_id,
                     amount=cand_a.amount or cand_b.amount,
                     currency=cand_a.currency or cand_b.currency,
-                    transaction_type=cand_a.transaction_type if cand_a.transaction_type != "UNKNOWN" else cand_b.transaction_type,
+                    transaction_type=cand_a.transaction_type if cand_a.transaction_type != TransactionType.UNKNOWN else cand_b.transaction_type,
                     payment_mode=cand_a.payment_mode if cand_a.payment_mode != "UNKNOWN" else cand_b.payment_mode,
                     counterparty_name=cand_a.counterparty_name or cand_b.counterparty_name,
                     transaction_reference=cand_a.reference_number or cand_b.reference_number,
@@ -73,7 +72,6 @@ class ReconciliationService:
                     reconciliation_status=ReconciliationStatus.RECONCILED
                 )
 
-                # Link both candidates
                 self.canonical_repo.link_candidate(
                     merchant_id, canonical_tx.id, cand_a.id, LinkRelationshipType.PRIMARY
                 )
@@ -97,30 +95,14 @@ class ReconciliationService:
                 reconciled_count += 2
 
             elif review_b:
+                # 2. Ambiguous / Conflicting Candidates -> Log Reconciliation Attempt (REQUIRES_REVIEW), NO Canonical Transaction created
                 cand_b, reasons, snapshot = review_b
-                canonical_tx = self.canonical_repo.create(
-                    merchant_id=merchant_id,
-                    amount=cand_a.amount,
-                    currency=cand_a.currency,
-                    transaction_type=cand_a.transaction_type,
-                    payment_mode=cand_a.payment_mode,
-                    counterparty_name=cand_a.counterparty_name,
-                    transaction_reference=cand_a.reference_number,
-                    occurred_at=cand_a.transaction_timestamp,
-                    reconciliation_status=ReconciliationStatus.REQUIRES_REVIEW
-                )
-                self.canonical_repo.link_candidate(
-                    merchant_id, canonical_tx.id, cand_a.id, LinkRelationshipType.PRIMARY
-                )
-                self.canonical_repo.link_candidate(
-                    merchant_id, canonical_tx.id, cand_b.id, LinkRelationshipType.CONFLICTING
-                )
 
                 self.audit_repo.record_attempt(
                     merchant_id=merchant_id,
                     transaction_candidate_id=cand_a.id,
                     compared_candidate_id=cand_b.id,
-                    canonical_transaction_id=canonical_tx.id,
+                    canonical_transaction_id=None,
                     decision=ReconciliationDecision.REQUIRES_REVIEW,
                     reason_codes=reasons,
                     comparison_snapshot=snapshot
@@ -128,37 +110,63 @@ class ReconciliationService:
 
                 processed_ids.add(cand_a.id)
                 processed_ids.add(cand_b.id)
-                canonical_created += 1
                 review_count += 2
 
             else:
-                # Single unlinked candidate -> Canonical Transaction (UNRESOLVED)
-                canonical_tx = self.canonical_repo.create(
-                    merchant_id=merchant_id,
-                    amount=cand_a.amount,
-                    currency=cand_a.currency,
-                    transaction_type=cand_a.transaction_type,
-                    payment_mode=cand_a.payment_mode,
-                    counterparty_name=cand_a.counterparty_name,
-                    transaction_reference=cand_a.reference_number,
-                    occurred_at=cand_a.transaction_timestamp,
-                    reconciliation_status=ReconciliationStatus.UNRESOLVED
-                )
-                self.canonical_repo.link_candidate(
-                    merchant_id, canonical_tx.id, cand_a.id, LinkRelationshipType.PRIMARY
+                # 3. Single candidate evaluation:
+                # Strong Standalone Candidate -> Canonical Transaction
+                # Weak Candidate -> Remains Unresolved in candidates table; NO Canonical Transaction
+                evidence = cand_a.primary_evidence or self.db.query(FinancialEvidence).filter(
+                    FinancialEvidence.id == cand_a.primary_evidence_id
+                ).first()
+                evidence_strength = evidence.evidence_strength if evidence else None
+
+                is_strong_standalone = (
+                    cand_a.amount is not None and
+                    cand_a.transaction_type != TransactionType.UNKNOWN and
+                    evidence_strength in (
+                        EvidenceStrength.VERIFIED,
+                        EvidenceStrength.STRONG,
+                        EvidenceStrength.MERCHANT_DECLARED
+                    )
                 )
 
-                self.audit_repo.record_attempt(
-                    merchant_id=merchant_id,
-                    transaction_candidate_id=cand_a.id,
-                    canonical_transaction_id=canonical_tx.id,
-                    decision=ReconciliationDecision.SKIPPED,
-                    reason_codes=["SINGLE_UNMATCHED_CANDIDATE"]
-                )
+                if is_strong_standalone:
+                    canonical_tx = self.canonical_repo.create(
+                        merchant_id=merchant_id,
+                        amount=cand_a.amount,
+                        currency=cand_a.currency,
+                        transaction_type=cand_a.transaction_type,
+                        payment_mode=cand_a.payment_mode,
+                        counterparty_name=cand_a.counterparty_name,
+                        transaction_reference=cand_a.reference_number,
+                        occurred_at=cand_a.transaction_timestamp,
+                        reconciliation_status=ReconciliationStatus.UNRESOLVED
+                    )
+                    self.canonical_repo.link_candidate(
+                        merchant_id, canonical_tx.id, cand_a.id, LinkRelationshipType.PRIMARY
+                    )
+
+                    self.audit_repo.record_attempt(
+                        merchant_id=merchant_id,
+                        transaction_candidate_id=cand_a.id,
+                        canonical_transaction_id=canonical_tx.id,
+                        decision=ReconciliationDecision.SKIPPED,
+                        reason_codes=["STRONG_STANDALONE_CANDIDATE"]
+                    )
+
+                    canonical_created += 1
+                    unresolved_count += 1
+                else:
+                    self.audit_repo.record_attempt(
+                        merchant_id=merchant_id,
+                        transaction_candidate_id=cand_a.id,
+                        canonical_transaction_id=None,
+                        decision=ReconciliationDecision.SKIPPED,
+                        reason_codes=["WEAK_CANDIDATE_INELIGIBLE"]
+                    )
 
                 processed_ids.add(cand_a.id)
-                canonical_created += 1
-                unresolved_count += 1
 
         return ReconciliationRunResponse(
             candidates_examined=candidates_examined,

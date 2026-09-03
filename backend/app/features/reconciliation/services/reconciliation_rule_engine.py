@@ -16,27 +16,29 @@ class ReconciliationRuleEngine:
             "cand_b_id": str(cand_b.id),
             "cand_a_amount": str(cand_a.amount) if cand_a.amount is not None else None,
             "cand_b_amount": str(cand_b.amount) if cand_b.amount is not None else None,
-            "cand_a_type": cand_a.transaction_type.value,
-            "cand_b_type": cand_b.transaction_type.value,
+            "cand_a_type": cand_a.transaction_type.value if hasattr(cand_a.transaction_type, "value") else str(cand_a.transaction_type),
+            "cand_b_type": cand_b.transaction_type.value if hasattr(cand_b.transaction_type, "value") else str(cand_b.transaction_type),
             "cand_a_counterparty": cand_a.counterparty_name,
             "cand_b_counterparty": cand_b.counterparty_name,
         }
 
         # 1. Amount Conflict Check
+        amount_conflict = False
         if cand_a.amount is not None and cand_b.amount is not None:
             if cand_a.amount != cand_b.amount:
+                amount_conflict = True
                 reason_codes.append("AMOUNT_CONFLICT")
-                return ReconciliationDecision.NOT_MATCHED, reason_codes, snapshot
             else:
                 reason_codes.append("EXACT_AMOUNT_MATCH")
         else:
             reason_codes.append("MISSING_AMOUNT")
 
         # 2. Transaction Type Conflict Check
+        type_conflict = False
         if cand_a.transaction_type != TransactionType.UNKNOWN and cand_b.transaction_type != TransactionType.UNKNOWN:
             if cand_a.transaction_type != cand_b.transaction_type:
+                type_conflict = True
                 reason_codes.append("TYPE_CONFLICT")
-                return ReconciliationDecision.NOT_MATCHED, reason_codes, snapshot
             else:
                 reason_codes.append("SAME_TRANSACTION_TYPE")
 
@@ -61,7 +63,7 @@ class ReconciliationRuleEngine:
                 reference_match = True
                 reason_codes.append("REFERENCE_MATCH")
 
-        # 6. Time Proximity Check (within 24 hours)
+        # 6. Time Proximity Check
         time_proximity = False
         if cand_a.transaction_timestamp and cand_b.transaction_timestamp:
             diff = abs(cand_a.transaction_timestamp - cand_b.transaction_timestamp)
@@ -69,7 +71,10 @@ class ReconciliationRuleEngine:
                 time_proximity = True
                 reason_codes.append("TIME_PROXIMITY")
 
-        # Decision Matrix:
+        # Conflicting context check
+        if (amount_conflict or type_conflict) and (counterparty_match or reference_match or time_proximity):
+            return ReconciliationDecision.REQUIRES_REVIEW, reason_codes, snapshot
+
         # Strong Match Requires: EXACT_AMOUNT_MATCH + SAME_TRANSACTION_TYPE + (COUNTERPARTY_MATCH OR REFERENCE_MATCH OR (SAME_PAYMENT_MODE AND TIME_PROXIMITY))
         if "EXACT_AMOUNT_MATCH" in reason_codes and "SAME_TRANSACTION_TYPE" in reason_codes:
             if counterparty_match or reference_match or ("SAME_PAYMENT_MODE" in reason_codes and time_proximity):

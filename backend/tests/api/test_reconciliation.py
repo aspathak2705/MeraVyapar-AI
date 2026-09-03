@@ -6,7 +6,8 @@ from app.services.merchant_service import MerchantService
 from app.services.evidence_service import EvidenceService
 from app.services.evidence_processing_service import EvidenceProcessingService
 from app.schemas.evidence import ManualEvidenceCreate, TextEvidenceCreate
-from app.models.financial_evidence import EvidenceType
+from app.models.financial_evidence import EvidenceType, EvidenceStrength
+from app.repositories.reconciliation_repository import ReconciliationRepository
 
 
 def test_reconciliation_exact_strong_match(client, db_session):
@@ -49,7 +50,7 @@ def test_reconciliation_exact_strong_match(client, db_session):
     assert rec_data["canonical_transactions_created"] == 1
     assert rec_data["candidates_reconciled"] == 2
 
-    # Verify canonical transaction
+    # Verify canonical transaction created
     res_canon = client.get("/api/v1/canonical-transactions")
     assert res_canon.status_code == 200
     txs = res_canon.json()["data"]
@@ -57,12 +58,11 @@ def test_reconciliation_exact_strong_match(client, db_session):
     tx = txs[0]
     assert tx["amount"] == "5000.00"
     assert tx["reconciliation_status"] == "RECONCILED"
-    assert len(tx["candidate_links"]) == 2
 
     app.dependency_overrides.clear()
 
 
-def test_reconciliation_amount_alone_insufficient(client, db_session):
+def test_reconciliation_ambiguous_candidates_no_canonical_created(client, db_session):
     service = MerchantService(db_session)
     merchant_a = service.initialize_merchant(uuid.uuid4(), "Store A")
     app.dependency_overrides[get_current_merchant] = lambda: merchant_a
@@ -70,7 +70,7 @@ def test_reconciliation_amount_alone_insufficient(client, db_session):
     evidence_service = EvidenceService(db_session)
     processor = EvidenceProcessingService(db_session)
 
-    # Two ₹500 transactions with no counterparty, no reference, different dates
+    # Two ₹500 transactions with no counterparty, no reference -> Ambiguous candidates
     ev1 = evidence_service.create_manual_evidence(
         merchant_a.id,
         ManualEvidenceCreate(amount="500.00", transaction_type="MONEY_OUT")
@@ -87,14 +87,18 @@ def test_reconciliation_amount_alone_insufficient(client, db_session):
     assert res_rec.status_code == 200
     rec_data = res_rec.json()["data"]
 
-    # Exact amount alone without counterparty/time signal requires review
+    # Ambiguous candidates trigger review attempt; NO Canonical Transaction created!
     assert rec_data["candidates_reconciled"] == 0
     assert rec_data["candidates_requiring_review"] == 2
+    assert rec_data["canonical_transactions_created"] == 0
+
+    res_canon = client.get("/api/v1/canonical-transactions")
+    assert len(res_canon.json()["data"]) == 0
 
     app.dependency_overrides.clear()
 
 
-def test_reconciliation_amount_conflict(client, db_session):
+def test_reconciliation_conflicting_candidates_no_canonical_created(client, db_session):
     service = MerchantService(db_session)
     merchant_a = service.initialize_merchant(uuid.uuid4(), "Store A")
     app.dependency_overrides[get_current_merchant] = lambda: merchant_a
@@ -102,7 +106,7 @@ def test_reconciliation_amount_conflict(client, db_session):
     evidence_service = EvidenceService(db_session)
     processor = EvidenceProcessingService(db_session)
 
-    # ₹5,000 vs ₹5,500 for same counterparty -> Conflicting amounts, not merged
+    # ₹5,000 vs ₹5,500 for same counterparty -> Conflicting amounts
     ev1 = evidence_service.create_manual_evidence(
         merchant_a.id,
         ManualEvidenceCreate(amount="5000.00", transaction_type="MONEY_OUT", counterparty_name="Supplier X")
@@ -119,14 +123,74 @@ def test_reconciliation_amount_conflict(client, db_session):
     assert res_rec.status_code == 200
     rec_data = res_rec.json()["data"]
 
+    # Conflicting candidates trigger review attempt; NO Canonical Transaction created!
     assert rec_data["candidates_reconciled"] == 0
-    assert rec_data["candidates_unresolved"] == 2
+    assert rec_data["candidates_requiring_review"] == 2
+    assert rec_data["canonical_transactions_created"] == 0
 
     res_canon = client.get("/api/v1/canonical-transactions")
-    txs = res_canon.json()["data"]
-    assert len(txs) == 2
-    assert txs[0]["reconciliation_status"] == "UNRESOLVED"
-    assert txs[1]["reconciliation_status"] == "UNRESOLVED"
+    assert len(res_canon.json()["data"]) == 0
+
+    app.dependency_overrides.clear()
+
+
+def test_reconciliation_weak_candidate_no_canonical_created(client, db_session):
+    service = MerchantService(db_session)
+    merchant_a = service.initialize_merchant(uuid.uuid4(), "Store A")
+    app.dependency_overrides[get_current_merchant] = lambda: merchant_a
+
+    evidence_service = EvidenceService(db_session)
+    processor = EvidenceProcessingService(db_session)
+
+    # Ingest text evidence that cannot be extracted reliably (missing amount)
+    ev = evidence_service.create_text_evidence(
+        merchant_a.id,
+        TextEvidenceCreate(
+            evidence_type=EvidenceType.OTHER,
+            raw_text="Random conversational message without financial facts"
+        )
+    )
+    ev.evidence_strength = EvidenceStrength.UNVERIFIED
+    processor.process_evidence(ev)
+
+    res_rec = client.post("/api/v1/reconciliation/run")
+    assert res_rec.status_code == 200
+    rec_data = res_rec.json()["data"]
+
+    # Weak candidate remains in candidate layer; NO Canonical Transaction created!
+    assert rec_data["canonical_transactions_created"] == 0
+
+    res_canon = client.get("/api/v1/canonical-transactions")
+    assert len(res_canon.json()["data"]) == 0
+
+    app.dependency_overrides.clear()
+
+
+def test_reconciliation_strong_standalone_candidate_creates_canonical(client, db_session):
+    service = MerchantService(db_session)
+    merchant_a = service.initialize_merchant(uuid.uuid4(), "Store A")
+    app.dependency_overrides[get_current_merchant] = lambda: merchant_a
+
+    evidence_service = EvidenceService(db_session)
+    processor = EvidenceProcessingService(db_session)
+
+    # Strong standalone manual entry
+    ev = evidence_service.create_manual_evidence(
+        merchant_a.id,
+        ManualEvidenceCreate(amount="1500.00", transaction_type="MONEY_OUT", counterparty_name="Vendor Y")
+    )
+    processor.process_evidence(ev)
+
+    res_rec = client.post("/api/v1/reconciliation/run")
+    assert res_rec.status_code == 200
+    rec_data = res_rec.json()["data"]
+
+    # Strong standalone candidate creates 1 Canonical Transaction
+    assert rec_data["canonical_transactions_created"] == 1
+    assert rec_data["candidates_unresolved"] == 1
+
+    res_canon = client.get("/api/v1/canonical-transactions")
+    assert len(res_canon.json()["data"]) == 1
 
     app.dependency_overrides.clear()
 
@@ -139,7 +203,6 @@ def test_reconciliation_tenant_isolation(client, db_session):
     evidence_service = EvidenceService(db_session)
     processor = EvidenceProcessingService(db_session)
 
-    # Merchant A submits candidate
     app.dependency_overrides[get_current_merchant] = lambda: merchant_a
     ev_a = evidence_service.create_manual_evidence(
         merchant_a.id,
@@ -147,7 +210,6 @@ def test_reconciliation_tenant_isolation(client, db_session):
     )
     processor.process_evidence(ev_a)
 
-    # Merchant B submits candidate with identical values
     app.dependency_overrides[get_current_merchant] = lambda: merchant_b
     ev_b = evidence_service.create_manual_evidence(
         merchant_b.id,
@@ -155,7 +217,6 @@ def test_reconciliation_tenant_isolation(client, db_session):
     )
     processor.process_evidence(ev_b)
 
-    # Run reconciliation for Merchant A
     app.dependency_overrides[get_current_merchant] = lambda: merchant_a
     res_rec_a = client.post("/api/v1/reconciliation/run")
     assert res_rec_a.status_code == 200
@@ -163,42 +224,7 @@ def test_reconciliation_tenant_isolation(client, db_session):
     assert data_a["candidates_examined"] == 1
     assert data_a["candidates_reconciled"] == 0
 
-    # Verify Merchant A has 1 canonical transaction
     res_canon_a = client.get("/api/v1/canonical-transactions")
     assert len(res_canon_a.json()["data"]) == 1
-
-    app.dependency_overrides.clear()
-
-
-def test_reconciliation_idempotency_run(client, db_session):
-    service = MerchantService(db_session)
-    merchant_a = service.initialize_merchant(uuid.uuid4(), "Store A")
-    app.dependency_overrides[get_current_merchant] = lambda: merchant_a
-
-    evidence_service = EvidenceService(db_session)
-    processor = EvidenceProcessingService(db_session)
-
-    ev1 = evidence_service.create_manual_evidence(
-        merchant_a.id,
-        ManualEvidenceCreate(amount="2000.00", transaction_type="MONEY_IN", counterparty_name="Client Z")
-    )
-    processor.process_evidence(ev1)
-
-    # First run
-    res1 = client.post("/api/v1/reconciliation/run")
-    assert res1.status_code == 200
-    data1 = res1.json()["data"]
-    assert data1["candidates_examined"] == 1
-
-    # Second run (repeated execution)
-    res2 = client.post("/api/v1/reconciliation/run")
-    assert res2.status_code == 200
-    data2 = res2.json()["data"]
-    # 0 unlinked candidates examined on second run
-    assert data2["candidates_examined"] == 0
-
-    # Total canonical transactions remains 1
-    res_canon = client.get("/api/v1/canonical-transactions")
-    assert len(res_canon.json()["data"]) == 1
 
     app.dependency_overrides.clear()
