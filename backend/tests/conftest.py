@@ -6,9 +6,14 @@ from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 from app.main import app
 from app.db.session import get_db
-from app.dependencies.auth import get_current_user_id, get_current_merchant
 from app.models.merchant import Merchant
 from app.models.business_profile import BusinessProfile
+from app.models.financial_evidence import FinancialEvidence
+from app.models.transaction_candidate import TransactionCandidate
+from app.models.idempotency_record import IdempotencyRecord
+from app.models.canonical_transaction import CanonicalTransaction
+from app.models.transaction_candidate_link import TransactionCandidateLink
+from app.models.reconciliation_attempt import ReconciliationAttempt
 
 
 class MockDBQuery:
@@ -21,29 +26,56 @@ class MockDBQuery:
         self.filters.extend(criterion)
         return self
 
-    def first(self):
+    def order_by(self, *args):
+        return self
+
+    def offset(self, skip: int):
+        return self
+
+    def limit(self, limit: int):
+        return self
+
+    def all(self):
         items = self.data_store.get(self.model_cls, [])
+        result = []
         for item in items:
             match = True
             for crit in self.filters:
                 left = getattr(crit, "left", None)
                 right = getattr(crit, "right", None)
                 if left is not None and right is not None:
-                    attr_name = left.name
+                    attr_name = getattr(left, "name", None)
                     val = getattr(right, "value", right)
-                    if getattr(item, attr_name, None) != val:
-                        match = False
-                        break
+                    if attr_name:
+                        item_val = getattr(item, attr_name, None)
+                        # Normalize comparison for UUID / str
+                        if isinstance(item_val, uuid.UUID) or isinstance(val, uuid.UUID):
+                            if str(item_val) != str(val):
+                                match = False
+                                break
+                        elif item_val != val:
+                            match = False
+                            break
             if match:
-                return item
-        return None
+                result.append(item)
+        return result
+
+    def first(self):
+        matches = self.all()
+        return matches[0] if matches else None
 
 
 class MockDBSession:
     def __init__(self):
         self.store = {
             Merchant: [],
-            BusinessProfile: []
+            BusinessProfile: [],
+            FinancialEvidence: [],
+            TransactionCandidate: [],
+            IdempotencyRecord: [],
+            CanonicalTransaction: [],
+            TransactionCandidateLink: [],
+            ReconciliationAttempt: []
         }
 
     def query(self, model_cls):

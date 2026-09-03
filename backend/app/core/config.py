@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     # Supabase Auth
     SUPABASE_URL: Optional[str] = None
+    SUPABASE_PUBLISHABLE_KEY: Optional[str] = None
     SUPABASE_JWT_SECRET: str = "dev-secret-change-in-production-min-32-chars!!"
 
     # Redis
