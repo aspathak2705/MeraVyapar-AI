@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/env.dart';
@@ -19,11 +20,16 @@ import '../../features/transactions/data/canonical_transaction_repository.dart';
 import '../../features/transactions/domain/canonical_transaction_model.dart';
 import '../../features/transactions/presentation/canonical_transactions_screen.dart';
 import '../../features/transactions/presentation/canonical_transaction_detail_screen.dart';
+import '../../features/capture/data/capture_repository.dart';
+import '../../features/capture/domain/capture_setting_model.dart';
+import '../../features/capture/presentation/capture_center_screen.dart';
+import '../../features/capture/presentation/capture_settings_screen.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository());
 final profileRepositoryProvider = Provider((ref) => BusinessProfileRepository());
 final evidenceRepositoryProvider = Provider((ref) => EvidenceRepository());
 final canonicalTransactionRepositoryProvider = Provider((ref) => CanonicalTransactionRepository());
+final captureRepositoryProvider = Provider((ref) => CaptureRepository());
 
 class AppRouter extends ConsumerStatefulWidget {
   const AppRouter({super.key});
@@ -222,6 +228,60 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     }
   }
 
+  void _openCaptureSettings(BuildContext context, String title, String sourceType) async {
+    final repo = ref.read(captureRepositoryProvider);
+    List<CaptureSourceSettingModel> settings = [];
+    try {
+      settings = await repo.getCaptureSettings();
+    } catch (_) {}
+
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => StatefulBuilder(
+            builder: (ctxState, setModalState) {
+              return CaptureSettingsScreen(
+                title: title,
+                sourceType: sourceType,
+                settings: settings,
+                onToggleSetting: (provider, enabled) async {
+                  await repo.updateCaptureSetting(
+                    sourceType: sourceType,
+                    providerIdentifier: provider,
+                    enabled: enabled,
+                  );
+                  final updated = await repo.getCaptureSettings();
+                  setModalState(() {
+                    settings = updated;
+                  });
+                },
+              );
+            },
+          ),
+        ),
+      );
+    }
+  }
+
+  void _openCaptureCenter(BuildContext context) {
+    final isAndroid = defaultTargetPlatform == TargetPlatform.android;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => CaptureCenterScreen(
+          isAndroidPlatform: isAndroid,
+          onAddManual: () => _openManualEntry(context, 'MONEY_OUT'),
+          onShareProof: () => _openFileUpload(context),
+          onOpenNotificationSettings: () => _openCaptureSettings(
+            context, 'Payment Notification Settings', 'NOTIFICATION_CAPTURE'
+          ),
+          onOpenSmsSettings: () => _openCaptureSettings(
+            context, 'Banking SMS Settings', 'SMS_CAPTURE'
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!Env.isConfigured) {
@@ -254,6 +314,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onUploadProof: () => _openFileUpload(context),
           onViewHistory: () => _openHistory(context),
           onViewReconciledTransactions: () => _openCanonicalTransactions(context),
+          onOpenCaptureCenter: () => _openCaptureCenter(context),
         );
     }
   }

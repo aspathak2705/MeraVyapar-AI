@@ -7,6 +7,7 @@ class HomeShellScreen extends StatelessWidget {
   final VoidCallback? onUploadProof;
   final VoidCallback? onViewHistory;
   final VoidCallback? onViewReconciledTransactions;
+  final VoidCallback? onOpenCaptureCenter;
 
   const HomeShellScreen({
     super.key,
@@ -16,6 +17,7 @@ class HomeShellScreen extends StatelessWidget {
     this.onUploadProof,
     this.onViewHistory,
     this.onViewReconciledTransactions,
+    this.onOpenCaptureCenter,
   });
 
   @override
@@ -24,6 +26,11 @@ class HomeShellScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('MeraVyapar AI'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.center_focus_strong),
+            tooltip: 'Capture Center',
+            onPressed: onOpenCaptureCenter,
+          ),
           IconButton(
             icon: const Icon(Icons.history),
             tooltip: 'Activity History',
@@ -75,7 +82,7 @@ class HomeShellScreen extends StatelessWidget {
                   color: Color(0xFF64748B),
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
               ElevatedButton.icon(
                 icon: const Icon(Icons.add_circle_outline),
                 label: const Text('+ Add Payment Received'),
@@ -95,9 +102,9 @@ class HomeShellScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
-                icon: const Icon(Icons.receipt_long),
-                label: const Text('Share / Upload Payment Proof'),
-                onPressed: onUploadProof,
+                icon: const Icon(Icons.center_focus_strong),
+                label: const Text('Evidence Capture Center'),
+                onPressed: onOpenCaptureCenter,
               ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
