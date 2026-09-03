@@ -15,6 +15,14 @@ from app.models.canonical_transaction import CanonicalTransaction
 from app.models.transaction_candidate_link import TransactionCandidateLink
 from app.models.reconciliation_attempt import ReconciliationAttempt
 from app.models.capture_source_setting import CaptureSourceSetting
+from app.models.financial_counterparty import (
+    FinancialCounterparty,
+    CounterpartyAlias,
+    MerchantCounterpartyRelationship,
+    TransactionCounterpartyLink as MemoryTransactionCounterpartyLink,
+    FinancialRelationshipEvent
+)
+from app.models.payment_promise import PaymentPromise, PaymentPromiseEvent
 
 
 class MockDBQuery:
@@ -76,7 +84,14 @@ class MockDBSession:
             CanonicalTransaction: [],
             TransactionCandidateLink: [],
             ReconciliationAttempt: [],
-            CaptureSourceSetting: []
+            CaptureSourceSetting: [],
+            FinancialCounterparty: [],
+            CounterpartyAlias: [],
+            MerchantCounterpartyRelationship: [],
+            MemoryTransactionCounterpartyLink: [],
+            FinancialRelationshipEvent: [],
+            PaymentPromise: [],
+            PaymentPromiseEvent: []
         }
 
     def query(self, model_cls):

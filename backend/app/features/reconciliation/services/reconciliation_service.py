@@ -5,6 +5,7 @@ from app.repositories.transaction_candidate_repository import TransactionCandida
 from app.repositories.canonical_transaction_repository import CanonicalTransactionRepository
 from app.repositories.reconciliation_repository import ReconciliationRepository
 from app.features.reconciliation.services.reconciliation_rule_engine import ReconciliationRuleEngine
+from app.features.memory.services.financial_memory_service import FinancialMemoryService
 from app.models.canonical_transaction import CanonicalTransaction, ReconciliationStatus
 from app.models.transaction_candidate_link import LinkRelationshipType
 from app.models.reconciliation_attempt import ReconciliationDecision
@@ -19,6 +20,7 @@ class ReconciliationService:
         self.cand_repo = TransactionCandidateRepository(db)
         self.canonical_repo = CanonicalTransactionRepository(db)
         self.audit_repo = ReconciliationRepository(db)
+        self.memory_service = FinancialMemoryService(db)
 
     def run_reconciliation(self, merchant_id: UUID) -> ReconciliationRunResponse:
         all_candidates = self.cand_repo.list_by_merchant(merchant_id, skip=0, limit=200)
@@ -89,6 +91,9 @@ class ReconciliationService:
                     comparison_snapshot=snapshot
                 )
 
+                # Process Financial Memory Graph
+                self.memory_service.process_canonical_transaction(canonical_tx)
+
                 processed_ids.add(cand_a.id)
                 processed_ids.add(cand_b.id)
                 canonical_created += 1
@@ -114,8 +119,6 @@ class ReconciliationService:
 
             else:
                 # 3. Single candidate evaluation:
-                # Strong Standalone Candidate -> Canonical Transaction
-                # Weak Candidate -> Remains Unresolved in candidates table; NO Canonical Transaction
                 evidence = cand_a.primary_evidence or self.db.query(FinancialEvidence).filter(
                     FinancialEvidence.id == cand_a.primary_evidence_id
                 ).first()
@@ -154,6 +157,9 @@ class ReconciliationService:
                         decision=ReconciliationDecision.SKIPPED,
                         reason_codes=["STRONG_STANDALONE_CANDIDATE"]
                     )
+
+                    # Process Financial Memory Graph
+                    self.memory_service.process_canonical_transaction(canonical_tx)
 
                     canonical_created += 1
                     unresolved_count += 1

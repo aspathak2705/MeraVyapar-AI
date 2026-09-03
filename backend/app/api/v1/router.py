@@ -7,7 +7,9 @@ from app.api.v1.endpoints import (
     transaction_candidates,
     canonical_transactions,
     reconciliation,
-    capture
+    capture,
+    counterparties,
+    payment_promises
 )
 
 api_router = APIRouter()
@@ -19,3 +21,5 @@ api_router.include_router(transaction_candidates.router, tags=["transaction-cand
 api_router.include_router(canonical_transactions.router, tags=["canonical-transactions"])
 api_router.include_router(reconciliation.router, tags=["reconciliation"])
 api_router.include_router(capture.router, tags=["capture"])
+api_router.include_router(counterparties.router, tags=["counterparties"])
+api_router.include_router(payment_promises.router, tags=["payment-promises"])
