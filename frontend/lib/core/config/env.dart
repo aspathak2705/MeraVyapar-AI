@@ -9,15 +9,15 @@ class Env {
     defaultValue: '',
   );
 
-  static const String supabaseAnonKey = String.fromEnvironment(
-    'SUPABASE_ANON_KEY',
+  static const String supabasePublishableKey = String.fromEnvironment(
+    'SUPABASE_PUBLISHABLE_KEY',
     defaultValue: '',
   );
 
   static bool get isConfigured {
     return supabaseUrl.isNotEmpty &&
         !supabaseUrl.contains('your-supabase-project') &&
-        supabaseAnonKey.isNotEmpty &&
-        !supabaseAnonKey.contains('your-supabase-anon-key');
+        supabasePublishableKey.isNotEmpty &&
+        !supabasePublishableKey.contains('your-supabase-publishable-key');
   }
 }

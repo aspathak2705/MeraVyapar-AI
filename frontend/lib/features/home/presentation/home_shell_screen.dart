@@ -2,10 +2,20 @@ import 'package:flutter/material.dart';
 
 class HomeShellScreen extends StatelessWidget {
   final VoidCallback onSignOut;
+  final VoidCallback? onAddPaymentReceived;
+  final VoidCallback? onAddExpense;
+  final VoidCallback? onUploadProof;
+  final VoidCallback? onViewHistory;
+  final VoidCallback? onViewReconciledTransactions;
 
   const HomeShellScreen({
     super.key,
     required this.onSignOut,
+    this.onAddPaymentReceived,
+    this.onAddExpense,
+    this.onUploadProof,
+    this.onViewHistory,
+    this.onViewReconciledTransactions,
   });
 
   @override
@@ -14,6 +24,11 @@ class HomeShellScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('MeraVyapar AI'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'Activity History',
+            onPressed: onViewHistory,
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sign Out',
@@ -26,24 +41,24 @@ class HomeShellScreen extends StatelessWidget {
           padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
                 width: 72,
                 height: 72,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFEFF6FF),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFEFF6FF),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.shield_outlined,
+                  Icons.account_balance_wallet_outlined,
                   size: 36,
                   color: Color(0xFF2563EB),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               Text(
-                'Your financial workspace is ready.',
+                'Financial Evidence Workspace',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -52,37 +67,49 @@ class HomeShellScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'Connect or add financial activity to begin building your business financial context.',
+                'Record payments, expenses, or share payment proofs to build your merchant financial context.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 14,
                   height: 1.5,
                   color: Color(0xFF64748B),
                 ),
               ),
-              const SizedBox(height: 32),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
+              const SizedBox(height: 28),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.add_circle_outline),
+                label: const Text('+ Add Payment Received'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF166534),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Icon(Icons.check_circle_outline, size: 18, color: Color(0xFF10B981)),
-                    SizedBox(width: 8),
-                    Text(
-                      'Phase 0 Foundation & Identity Active',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF334155),
-                      ),
-                    ),
-                  ],
+                onPressed: onAddPaymentReceived,
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.remove_circle_outline),
+                label: const Text('+ Add Expense / Payment Sent'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF991B1B),
                 ),
+                onPressed: onAddExpense,
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.receipt_long),
+                label: const Text('Share / Upload Payment Proof'),
+                onPressed: onUploadProof,
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.compare_arrows),
+                label: const Text('Reconciled Transactions'),
+                onPressed: onViewReconciledTransactions,
+              ),
+              const SizedBox(height: 8),
+              TextButton.icon(
+                icon: const Icon(Icons.list_alt),
+                label: const Text('View Financial Evidence Activity'),
+                onPressed: onViewHistory,
               ),
             ],
           ),

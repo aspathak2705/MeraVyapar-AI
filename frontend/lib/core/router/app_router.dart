@@ -9,9 +9,21 @@ import '../../features/onboarding/data/business_profile_repository.dart';
 import '../../features/onboarding/domain/business_profile_model.dart';
 import '../../features/onboarding/presentation/onboarding_screen.dart';
 import '../../features/home/presentation/home_shell_screen.dart';
+import '../../features/evidence/data/evidence_repository.dart';
+import '../../features/evidence/domain/evidence_model.dart';
+import '../../features/evidence/domain/transaction_candidate_model.dart';
+import '../../features/evidence/presentation/manual_entry_screen.dart';
+import '../../features/evidence/presentation/file_upload_screen.dart';
+import '../../features/evidence/presentation/evidence_history_screen.dart';
+import '../../features/transactions/data/canonical_transaction_repository.dart';
+import '../../features/transactions/domain/canonical_transaction_model.dart';
+import '../../features/transactions/presentation/canonical_transactions_screen.dart';
+import '../../features/transactions/presentation/canonical_transaction_detail_screen.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository());
 final profileRepositoryProvider = Provider((ref) => BusinessProfileRepository());
+final evidenceRepositoryProvider = Provider((ref) => EvidenceRepository());
+final canonicalTransactionRepositoryProvider = Provider((ref) => CanonicalTransactionRepository());
 
 class AppRouter extends ConsumerStatefulWidget {
   const AppRouter({super.key});
@@ -84,7 +96,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
     try {
       final model = BusinessProfileModel(
-        merchantId: '', // Set by backend context
+        merchantId: '',
         businessName: profileData['business_name']!,
         businessType: profileData['business_type'],
         phoneNumber: profileData['phone_number'],
@@ -111,6 +123,103 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     setState(() {
       _status = AuthStatus.unauthenticated;
     });
+  }
+
+  void _openManualEntry(BuildContext context, String direction) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ManualEntryScreen(
+          initialDirection: direction,
+          onSubmit: (data) async {
+            final repo = ref.read(evidenceRepositoryProvider);
+            await repo.submitManualEvidence(
+              amount: data['amount']!,
+              transactionType: data['transaction_type']!,
+              description: data['description'],
+              counterpartyName: data['counterparty_name'],
+              paymentMode: data['payment_mode'],
+            );
+            if (context.mounted) {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Financial evidence recorded successfully')),
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  void _openFileUpload(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => FileUploadScreen(
+          onUploadPressed: () {
+            if (context.mounted) {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Payment proof queued for evidence processing')),
+              );
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  void _openHistory(BuildContext context) async {
+    final repo = ref.read(evidenceRepositoryProvider);
+    List<EvidenceModel> list = [];
+    List<TransactionCandidateModel> cands = [];
+    try {
+      list = await repo.getEvidenceList();
+      cands = await repo.getCandidateList();
+    } catch (_) {}
+
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => EvidenceHistoryScreen(
+            evidenceList: list,
+            candidateList: cands,
+          ),
+        ),
+      );
+    }
+  }
+
+  void _openCanonicalTransactions(BuildContext context) async {
+    final repo = ref.read(canonicalTransactionRepositoryProvider);
+    List<CanonicalTransactionModel> list = [];
+    try {
+      list = await repo.getCanonicalTransactions();
+    } catch (_) {}
+
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => CanonicalTransactionsScreen(
+            transactions: list,
+            onRunReconciliation: () async {
+              await repo.runReconciliation();
+              if (ctx.mounted) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(content: Text('Reconciliation pass complete')),
+                );
+              }
+            },
+            onTransactionTap: (tx) {
+              Navigator.of(ctx).push(
+                MaterialPageRoute(
+                  builder: (_) => CanonicalTransactionDetailScreen(transaction: tx),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -140,6 +249,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
       case AuthStatus.authenticated:
         return HomeShellScreen(
           onSignOut: _handleSignOut,
+          onAddPaymentReceived: () => _openManualEntry(context, 'MONEY_IN'),
+          onAddExpense: () => _openManualEntry(context, 'MONEY_OUT'),
+          onUploadProof: () => _openFileUpload(context),
+          onViewHistory: () => _openHistory(context),
+          onViewReconciledTransactions: () => _openCanonicalTransactions(context),
         );
     }
   }
