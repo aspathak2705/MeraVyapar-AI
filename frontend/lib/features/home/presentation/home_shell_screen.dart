@@ -8,6 +8,8 @@ class HomeShellScreen extends StatelessWidget {
   final VoidCallback? onViewHistory;
   final VoidCallback? onViewReconciledTransactions;
   final VoidCallback? onOpenCaptureCenter;
+  final VoidCallback? onOpenRelationships;
+  final VoidCallback? onOpenPromises;
 
   const HomeShellScreen({
     super.key,
@@ -18,6 +20,8 @@ class HomeShellScreen extends StatelessWidget {
     this.onViewHistory,
     this.onViewReconciledTransactions,
     this.onOpenCaptureCenter,
+    this.onOpenRelationships,
+    this.onOpenPromises,
   });
 
   @override
@@ -26,6 +30,16 @@ class HomeShellScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('MeraVyapar AI'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.people),
+            tooltip: 'Relationships',
+            onPressed: onOpenRelationships,
+          ),
+          IconButton(
+            icon: const Icon(Icons.event_available),
+            tooltip: 'Promises',
+            onPressed: onOpenPromises,
+          ),
           IconButton(
             icon: const Icon(Icons.center_focus_strong),
             tooltip: 'Capture Center',
@@ -111,6 +125,18 @@ class HomeShellScreen extends StatelessWidget {
                 icon: const Icon(Icons.compare_arrows),
                 label: const Text('Reconciled Transactions'),
                 onPressed: onViewReconciledTransactions,
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.people_outline),
+                label: const Text('Financial Relationships'),
+                onPressed: onOpenRelationships,
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.event_available),
+                label: const Text('Payment Promises Memory'),
+                onPressed: onOpenPromises,
               ),
               const SizedBox(height: 8),
               TextButton.icon(

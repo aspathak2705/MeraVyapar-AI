@@ -24,12 +24,19 @@ import '../../features/capture/data/capture_repository.dart';
 import '../../features/capture/domain/capture_setting_model.dart';
 import '../../features/capture/presentation/capture_center_screen.dart';
 import '../../features/capture/presentation/capture_settings_screen.dart';
+import '../../features/memory/data/memory_repository.dart';
+import '../../features/memory/domain/counterparty_model.dart';
+import '../../features/memory/domain/payment_promise_model.dart';
+import '../../features/memory/presentation/financial_relationships_screen.dart';
+import '../../features/memory/presentation/counterparty_detail_screen.dart';
+import '../../features/memory/presentation/payment_promises_screen.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository());
 final profileRepositoryProvider = Provider((ref) => BusinessProfileRepository());
 final evidenceRepositoryProvider = Provider((ref) => EvidenceRepository());
 final canonicalTransactionRepositoryProvider = Provider((ref) => CanonicalTransactionRepository());
 final captureRepositoryProvider = Provider((ref) => CaptureRepository());
+final memoryRepositoryProvider = Provider((ref) => MemoryRepository());
 
 class AppRouter extends ConsumerStatefulWidget {
   const AppRouter({super.key});
@@ -282,6 +289,82 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     );
   }
 
+  void _openRelationships(BuildContext context) async {
+    final repo = ref.read(memoryRepositoryProvider);
+    List<CounterpartyModel> cps = [];
+    try {
+      cps = await repo.getCounterparties();
+    } catch (_) {}
+
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => FinancialRelationshipsScreen(
+            counterparties: cps,
+            onCounterpartyTap: (cp) async {
+              List<FinancialRelationshipEventModel> timeline = [];
+              try {
+                timeline = await repo.getCounterpartyTimeline(cp.id);
+              } catch (_) {}
+              if (ctx.mounted) {
+                Navigator.of(ctx).push(
+                  MaterialPageRoute(
+                    builder: (_) => CounterpartyDetailScreen(counterparty: cp, timeline: timeline),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      );
+    }
+  }
+
+  void _openPromises(BuildContext context) async {
+    final repo = ref.read(memoryRepositoryProvider);
+    List<PaymentPromiseModel> promises = [];
+    List<CounterpartyModel> cps = [];
+    try {
+      promises = await repo.getPaymentPromises();
+      cps = await repo.getCounterparties();
+    } catch (_) {}
+
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => StatefulBuilder(
+            builder: (ctxState, setModalState) {
+              return PaymentPromisesScreen(
+                promises: promises,
+                counterparties: cps,
+                onCreatePromise: (data) async {
+                  await repo.createPaymentPromise(
+                    counterpartyId: data['counterparty_id'],
+                    description: data['description']!,
+                    promisedAmount: data['promised_amount']!,
+                    promiseDirection: data['promise_direction']!,
+                    dueAt: data['due_at']!,
+                  );
+                  final updated = await repo.getPaymentPromises();
+                  setModalState(() {
+                    promises = updated;
+                  });
+                },
+                onFulfillPromise: (promiseId) async {
+                  await repo.fulfillPromise(promiseId);
+                  final updated = await repo.getPaymentPromises();
+                  setModalState(() {
+                    promises = updated;
+                  });
+                },
+              );
+            },
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!Env.isConfigured) {
@@ -315,6 +398,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onViewHistory: () => _openHistory(context),
           onViewReconciledTransactions: () => _openCanonicalTransactions(context),
           onOpenCaptureCenter: () => _openCaptureCenter(context),
+          onOpenRelationships: () => _openRelationships(context),
+          onOpenPromises: () => _openPromises(context),
         );
     }
   }
