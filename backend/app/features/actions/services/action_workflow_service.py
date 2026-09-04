@@ -27,13 +27,15 @@ class ActionWorkflowService:
         if not action:
             raise ValueError(f"Action {action_id} not found")
 
-        if action.status not in [ActionStatus.DRAFT, ActionStatus.READY_FOR_REVIEW]:
-            raise ValueError(f"Cannot edit action in status {action.status.value}")
-
         prev_status = action.status.value
         action.final_content = final_content
+        if recipient_info and "recipient_identifier" in recipient_info:
+            action.recipient_identifier = recipient_info["recipient_identifier"]
+
+        # If previously confirmed or draft, editing content or recipient resets state to READY_FOR_REVIEW
         action.status = ActionStatus.READY_FOR_REVIEW
         action.updated_at = datetime.now(timezone.utc)
+
 
         self.db.commit()
         self.db.refresh(action)

@@ -25,7 +25,13 @@ class ActionDispatchService:
         if not action:
             raise ValueError(f"Action {action_id} not found")
 
-        if action.status != ActionStatus.CONFIRMED_BY_MERCHANT:
+        if action.status == ActionStatus.SENT:
+            return action
+
+        if action.status == ActionStatus.DISPATCH_REQUESTED:
+            return action
+
+        if action.status not in [ActionStatus.CONFIRMED_BY_MERCHANT, ActionStatus.FAILED]:
             raise ValueError(
                 f"Cannot dispatch action in status {action.status.value}. "
                 f"Action must be explicitly confirmed by merchant first."
@@ -34,6 +40,7 @@ class ActionDispatchService:
         prev_status = action.status.value
         action.status = ActionStatus.DISPATCH_REQUESTED
         action.updated_at = datetime.now(timezone.utc)
+
         self.db.commit()
 
         self.repo.record_audit_event(
