@@ -11,9 +11,10 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '009_communication_and_merchant_actions'
-down_revision = '008_market_intelligence'
+down_revision = '008_market_intelligence_foundation'
 branch_labels = None
 depends_on = None
+
 
 
 def upgrade() -> None:
@@ -26,7 +27,8 @@ def upgrade() -> None:
         sa.Column('status', sa.String(30), nullable=False),
         sa.Column('draft_content', sa.Text(), nullable=False),
         sa.Column('final_content', sa.Text(), nullable=True),
-        sa.Column('recipient_info', postgresql.JSONB(as_text=True), nullable=True),
+        sa.Column('recipient_info', postgresql.JSONB(), nullable=True),
+
         sa.Column('target_entity_id', postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column('target_entity_type', sa.String(50), nullable=True),
         sa.Column('promise_id', postgresql.UUID(as_uuid=True), sa.ForeignKey('payment_promises.id'), nullable=True),
@@ -52,7 +54,8 @@ def upgrade() -> None:
         sa.Column('new_status', sa.String(30), nullable=False),
         sa.Column('actor', sa.String(50), nullable=False),
         sa.Column('reason', sa.Text(), nullable=True),
-        sa.Column('event_metadata', postgresql.JSONB(as_text=True), nullable=True),
+        sa.Column('event_metadata', postgresql.JSONB(), nullable=True),
+
         sa.Column('timestamp', sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
     )
     op.create_index('ix_communication_action_events_action_id', 'communication_action_events', ['action_id'])

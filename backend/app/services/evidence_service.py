@@ -114,15 +114,25 @@ class EvidenceService:
             "content_type": content_type
         }
 
-        return self.repo.create(
-            merchant_id=merchant_id,
-            evidence_type=evidence_type,
-            evidence_source=EvidenceSource.UPLOAD,
-            evidence_strength=EvidenceStrength.STRONG,
-            metadata_info=meta,
-            storage_object_key=stored_key,
-            content_type=content_type,
-            original_filename=filename,
-            idempotency_key=idempotency_key,
-            processing_status=ProcessingStatus.RECEIVED
-        )
+        try:
+            return self.repo.create(
+                merchant_id=merchant_id,
+                evidence_type=evidence_type,
+                evidence_source=EvidenceSource.UPLOAD,
+                evidence_strength=EvidenceStrength.STRONG,
+                metadata_info=meta,
+                storage_object_key=stored_key,
+                content_type=content_type,
+                original_filename=filename,
+                idempotency_key=idempotency_key,
+                processing_status=ProcessingStatus.RECEIVED
+            )
+        except Exception as e:
+            # Compensating action: attempt to delete uploaded object to avoid orphan files
+            try:
+                self.storage.delete(stored_key)
+            except Exception as cleanup_err:
+                from app.core.logging import logger
+                logger.warning(f"Failed compensating storage cleanup for {stored_key}: {cleanup_err}")
+            raise e
+

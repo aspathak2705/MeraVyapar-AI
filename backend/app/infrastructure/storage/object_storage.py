@@ -37,7 +37,11 @@ class LocalDevObjectStorage(ObjectStorage):
         return False
 
 
+from app.infrastructure.storage.supabase_storage import SupabaseObjectStorage
+
+
 def get_object_storage() -> ObjectStorage:
-    # Phase 1: Uses LocalDevObjectStorage adapter
-    # R2ObjectStorage can be plugged in when CLOUDFLARE_R2_ENDPOINT is configured
+    if settings.SUPABASE_URL:
+        return SupabaseObjectStorage()
     return LocalDevObjectStorage()
+

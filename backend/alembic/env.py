@@ -14,7 +14,8 @@ from app.models.business_profile import BusinessProfile
 from app.core.config import settings
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
+
 
 if config.config_file_name:
     fileConfig(config.config_file_name)
@@ -29,7 +30,9 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        version_num_dim=255,
     )
+
 
     with context.begin_transaction():
         context.run_migrations()
@@ -44,8 +47,11 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            version_num_dim=255
         )
+
 
         with context.begin_transaction():
             context.run_migrations()

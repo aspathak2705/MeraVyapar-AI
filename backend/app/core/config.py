@@ -19,17 +19,23 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: Optional[str] = "redis://localhost:6379/0"
 
+    # Supabase Storage & Service Key (Backend Only)
+    SUPABASE_STORAGE_BUCKET: str = "financial-evidence"
+    SUPABASE_SERVICE_ROLE_KEY: Optional[str] = None
+
     # Cloudflare R2
     CLOUDFLARE_R2_ENDPOINT: Optional[str] = None
     CLOUDFLARE_R2_ACCESS_KEY_ID: Optional[str] = None
     CLOUDFLARE_R2_SECRET_ACCESS_KEY: Optional[str] = None
     CLOUDFLARE_R2_BUCKET_NAME: Optional[str] = None
 
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=[".env", "../.env"],
         env_file_encoding="utf-8",
         extra="ignore"
     )
+
 
 
 settings = Settings()
