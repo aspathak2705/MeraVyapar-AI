@@ -28,6 +28,8 @@ from app.models.generated_insight import GeneratedInsight
 from app.models.market_source import MarketSource
 from app.models.market_event import MarketEvent
 from app.models.merchant_market_relevance import MerchantMarketRelevance
+from app.models.communication_action import CommunicationAction
+from app.models.communication_action_event import CommunicationAuditEvent
 
 
 class MockDBQuery:
@@ -101,7 +103,9 @@ class MockDBSession:
             GeneratedInsight: [],
             MarketSource: [],
             MarketEvent: [],
-            MerchantMarketRelevance: []
+            MerchantMarketRelevance: [],
+            CommunicationAction: [],
+            CommunicationAuditEvent: []
         }
 
     def query(self, model_cls):

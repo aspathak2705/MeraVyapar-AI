@@ -13,7 +13,8 @@ from app.api.v1.endpoints import (
     events,
     receivables,
     financial_intelligence,
-    market_intelligence
+    market_intelligence,
+    communication_actions
 )
 
 api_router = APIRouter()
@@ -31,3 +32,5 @@ api_router.include_router(events.router, tags=["events"])
 api_router.include_router(receivables.router, tags=["receivables"])
 api_router.include_router(financial_intelligence.router, tags=["financial-intelligence"])
 api_router.include_router(market_intelligence.router, tags=["market-intelligence"])
+api_router.include_router(communication_actions.router, tags=["communication-actions"])
+
