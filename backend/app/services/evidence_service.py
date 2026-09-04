@@ -105,8 +105,11 @@ class EvidenceService:
             if existing:
                 return existing
 
-        object_key = f"merchants/{merchant_id}/evidence/{filename}"
+        evidence_id = uuid.uuid4()
+        ext = os.path.splitext(filename)[1] if filename and "." in filename else ""
+        object_key = f"merchants/{merchant_id}/evidence/{evidence_id}{ext}"
         stored_key = self.storage.upload(file_obj, object_key, content_type)
+
 
         meta = {
             "submission_method": "file_upload",
@@ -116,6 +119,7 @@ class EvidenceService:
 
         try:
             return self.repo.create(
+                evidence_id=evidence_id,
                 merchant_id=merchant_id,
                 evidence_type=evidence_type,
                 evidence_source=EvidenceSource.UPLOAD,
@@ -127,6 +131,7 @@ class EvidenceService:
                 idempotency_key=idempotency_key,
                 processing_status=ProcessingStatus.RECEIVED
             )
+
         except Exception as e:
             # Compensating action: attempt to delete uploaded object to avoid orphan files
             try:

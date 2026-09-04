@@ -1,5 +1,7 @@
 from uuid import UUID
+import uuid
 from typing import List, Optional
+
 from sqlalchemy.orm import Session
 from app.models.financial_evidence import (
     FinancialEvidence,
@@ -48,10 +50,13 @@ class EvidenceRepository:
         content_type: Optional[str] = None,
         original_filename: Optional[str] = None,
         idempotency_key: Optional[str] = None,
-        processing_status: ProcessingStatus = ProcessingStatus.RECEIVED
+        processing_status: ProcessingStatus = ProcessingStatus.RECEIVED,
+        evidence_id: Optional[UUID] = None
     ) -> FinancialEvidence:
         evidence = FinancialEvidence(
+            id=evidence_id or uuid.uuid4(),
             merchant_id=merchant_id,
+
             evidence_type=evidence_type,
             evidence_source=evidence_source,
             evidence_strength=evidence_strength,

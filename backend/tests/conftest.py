@@ -24,13 +24,6 @@ from app.models.financial_counterparty import (
 )
 from app.models.payment_promise import PaymentPromise, PaymentPromiseEvent
 from app.models.financial_event import FinancialEvent
-from app.models.generated_insight import GeneratedInsight
-from app.models.market_source import MarketSource
-from app.models.market_event import MarketEvent
-from app.models.merchant_market_relevance import MerchantMarketRelevance
-from app.models.communication_action import CommunicationAction
-from app.models.communication_action_event import CommunicationAuditEvent
-
 
 
 class MockDBQuery:
@@ -100,15 +93,8 @@ class MockDBSession:
             FinancialRelationshipEvent: [],
             PaymentPromise: [],
             PaymentPromiseEvent: [],
-            FinancialEvent: [],
-            GeneratedInsight: [],
-            MarketSource: [],
-            MarketEvent: [],
-            MerchantMarketRelevance: [],
-            CommunicationAction: [],
-            CommunicationAuditEvent: []
+            FinancialEvent: []
         }
-
 
     def query(self, model_cls):
         return MockDBQuery(self.store, model_cls)
