@@ -5,6 +5,7 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.repositories.payment_promise_repository import PaymentPromiseRepository
 from app.repositories.counterparty_repository import CounterpartyRepository
+from app.features.financial_context.services.insight_staleness_service import InsightStalenessService
 from app.models.payment_promise import PaymentPromise, PromiseDirection, PromiseStatus, PromiseSource
 from app.models.financial_counterparty import FinancialEventType
 from app.schemas.payment_promise import PaymentPromiseCreateRequest, PaymentPromiseUpdateRequest
@@ -16,6 +17,7 @@ class PaymentPromiseService:
         self.db = db
         self.repo = PaymentPromiseRepository(db)
         self.cp_repo = CounterpartyRepository(db)
+        self.staleness_service = InsightStalenessService(db)
 
     def create_promise(self, merchant_id: UUID, req: PaymentPromiseCreateRequest) -> PaymentPromise:
         if req.promised_amount <= Decimal("0"):
@@ -66,6 +68,7 @@ class PaymentPromiseService:
                 metadata_info={"fulfillment_reference": fulfillment_ref}
             )
 
+        self.staleness_service.on_payment_promise_changed(merchant_id, promise_id)
         return fulfilled_promise
 
     def cancel_promise(self, merchant_id: UUID, promise_id: UUID) -> PaymentPromise:
@@ -73,4 +76,6 @@ class PaymentPromiseService:
         if not promise:
             raise NotFoundError("Payment promise not found")
 
-        return self.repo.cancel(promise)
+        cancelled_promise = self.repo.cancel(promise)
+        self.staleness_service.on_payment_promise_changed(merchant_id, promise_id)
+        return cancelled_promise

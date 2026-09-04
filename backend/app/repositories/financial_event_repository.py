@@ -53,7 +53,10 @@ class FinancialEventRepository:
         if deduplication_key:
             existing = self.get_by_deduplication_key(merchant_id, deduplication_key)
             if existing:
-                if existing.status in (EventStatus.RESOLVED, EventStatus.DISMISSED):
+                if existing.status == EventStatus.DISMISSED:
+                    # Preserve explicit merchant dismissal decision
+                    return existing, False
+                if existing.status == EventStatus.RESOLVED:
                     existing.status = EventStatus.ACTIVE
                 existing.severity = severity
                 existing.title = title
@@ -85,7 +88,7 @@ class FinancialEventRepository:
 
     def resolve_event_by_key(self, merchant_id: UUID, dedup_key: str) -> bool:
         event = self.get_by_deduplication_key(merchant_id, dedup_key)
-        if event and event.status == EventStatus.ACTIVE:
+        if event and event.status in (EventStatus.ACTIVE, EventStatus.ACKNOWLEDGED):
             event.status = EventStatus.RESOLVED
             event.updated_at = datetime.now(timezone.utc)
             self.db.commit()

@@ -24,6 +24,7 @@ from app.models.financial_counterparty import (
 )
 from app.models.payment_promise import PaymentPromise, PaymentPromiseEvent
 from app.models.financial_event import FinancialEvent
+from app.models.generated_insight import GeneratedInsight
 
 
 class MockDBQuery:
@@ -93,7 +94,8 @@ class MockDBSession:
             FinancialRelationshipEvent: [],
             PaymentPromise: [],
             PaymentPromiseEvent: [],
-            FinancialEvent: []
+            FinancialEvent: [],
+            GeneratedInsight: []
         }
 
     def query(self, model_cls):

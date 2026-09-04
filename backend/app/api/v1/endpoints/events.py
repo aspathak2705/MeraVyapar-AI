@@ -6,6 +6,7 @@ from app.db.session import get_db
 from app.dependencies.auth import get_current_merchant
 from app.repositories.financial_event_repository import FinancialEventRepository
 from app.features.events.services.financial_event_evaluation_service import FinancialEventEvaluationService
+from app.features.financial_context.services.insight_staleness_service import InsightStalenessService
 from app.schemas.financial_event import FinancialEventResponse, FinancialEventEvaluationResponse
 from app.schemas.common import APIResponse
 from app.models.merchant import Merchant
@@ -82,6 +83,9 @@ def acknowledge_event(
     db.commit()
     db.refresh(event)
 
+    staleness_service = InsightStalenessService(db)
+    staleness_service.on_event_changed(merchant.id, id)
+
     event_data = FinancialEventResponse.model_validate(event).model_dump(mode="json")
     return APIResponse(
         success=True,
@@ -105,6 +109,9 @@ def dismiss_event(
     db.commit()
     db.refresh(event)
 
+    staleness_service = InsightStalenessService(db)
+    staleness_service.on_event_changed(merchant.id, id)
+
     event_data = FinancialEventResponse.model_validate(event).model_dump(mode="json")
     return APIResponse(
         success=True,
@@ -127,6 +134,9 @@ def resolve_event(
     event.status = EventStatus.RESOLVED
     db.commit()
     db.refresh(event)
+
+    staleness_service = InsightStalenessService(db)
+    staleness_service.on_event_changed(merchant.id, id)
 
     event_data = FinancialEventResponse.model_validate(event).model_dump(mode="json")
     return APIResponse(
