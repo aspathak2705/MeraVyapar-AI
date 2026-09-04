@@ -1,0 +1,39 @@
+# Secrets & Local Config
+.env
+.env.local
+*.env
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Flutter / Dart
+frontend/.dart_tool/
+frontend/.fvm/
+frontend/.idea/
+frontend/.pub-cache/
+frontend/.pub/
+frontend/build/
+frontend/ios/Runner.xcworkspace
+frontend/ios/Pods/
+frontend/android/.gradle/
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+tests
+test
