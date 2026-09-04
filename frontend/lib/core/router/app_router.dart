@@ -30,6 +30,13 @@ import '../../features/memory/domain/payment_promise_model.dart';
 import '../../features/memory/presentation/financial_relationships_screen.dart';
 import '../../features/memory/presentation/counterparty_detail_screen.dart';
 import '../../features/memory/presentation/payment_promises_screen.dart';
+import '../../features/events/data/event_repository.dart';
+import '../../features/events/domain/financial_event_model.dart';
+import '../../features/events/domain/receivable_model.dart';
+import '../../features/events/presentation/important_events_screen.dart';
+import '../../features/events/presentation/event_detail_screen.dart';
+import '../../features/events/presentation/receivables_screen.dart';
+import '../../features/events/presentation/receivable_detail_screen.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository());
 final profileRepositoryProvider = Provider((ref) => BusinessProfileRepository());
@@ -37,6 +44,7 @@ final evidenceRepositoryProvider = Provider((ref) => EvidenceRepository());
 final canonicalTransactionRepositoryProvider = Provider((ref) => CanonicalTransactionRepository());
 final captureRepositoryProvider = Provider((ref) => CaptureRepository());
 final memoryRepositoryProvider = Provider((ref) => MemoryRepository());
+final eventRepositoryProvider = Provider((ref) => EventRepository());
 
 class AppRouter extends ConsumerStatefulWidget {
   const AppRouter({super.key});
@@ -365,6 +373,93 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     }
   }
 
+  void _openEvents(BuildContext context) async {
+    final repo = ref.read(eventRepositoryProvider);
+    List<FinancialEventModel> events = [];
+    try {
+      await repo.evaluateEvents();
+      events = await repo.getEvents();
+    } catch (_) {}
+
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => StatefulBuilder(
+            builder: (ctxState, setModalState) {
+              return ImportantEventsScreen(
+                events: events,
+                onRunEvaluation: () async {
+                  await repo.evaluateEvents();
+                  final updated = await repo.getEvents();
+                  setModalState(() {
+                    events = updated;
+                  });
+                },
+                onEventTap: (ev) {
+                  Navigator.of(ctx).push(
+                    MaterialPageRoute(
+                      builder: (_) => EventDetailScreen(
+                        event: ev,
+                        onAcknowledge: () async {
+                          await repo.acknowledgeEvent(ev.id);
+                          final updated = await repo.getEvents();
+                          setModalState(() {
+                            events = updated;
+                          });
+                          if (ctx.mounted) Navigator.of(ctx).pop();
+                        },
+                        onDismiss: () async {
+                          await repo.dismissEvent(ev.id);
+                          final updated = await repo.getEvents();
+                          setModalState(() {
+                            events = updated;
+                          });
+                          if (ctx.mounted) Navigator.of(ctx).pop();
+                        },
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      );
+    }
+  }
+
+  void _openReceivables(BuildContext context) async {
+    final repo = ref.read(eventRepositoryProvider);
+    List<ReceivableModel> receivables = [];
+    try {
+      receivables = await repo.getPrioritizedReceivables();
+    } catch (_) {}
+
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => ReceivablesScreen(
+            receivables: receivables,
+            onReceivableTap: (item) {
+              Navigator.of(ctx).push(
+                MaterialPageRoute(
+                  builder: (_) => ReceivableDetailScreen(
+                    receivable: item,
+                    onReviewFollowUp: () {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        const SnackBar(content: Text('Follow-up context reviewed')),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!Env.isConfigured) {
@@ -400,6 +495,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onOpenCaptureCenter: () => _openCaptureCenter(context),
           onOpenRelationships: () => _openRelationships(context),
           onOpenPromises: () => _openPromises(context),
+          onOpenEvents: () => _openEvents(context),
+          onOpenReceivables: () => _openReceivables(context),
         );
     }
   }

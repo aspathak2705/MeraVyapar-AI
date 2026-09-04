@@ -10,6 +10,8 @@ class HomeShellScreen extends StatelessWidget {
   final VoidCallback? onOpenCaptureCenter;
   final VoidCallback? onOpenRelationships;
   final VoidCallback? onOpenPromises;
+  final VoidCallback? onOpenEvents;
+  final VoidCallback? onOpenReceivables;
 
   const HomeShellScreen({
     super.key,
@@ -22,6 +24,8 @@ class HomeShellScreen extends StatelessWidget {
     this.onOpenCaptureCenter,
     this.onOpenRelationships,
     this.onOpenPromises,
+    this.onOpenEvents,
+    this.onOpenReceivables,
   });
 
   @override
@@ -31,24 +35,24 @@ class HomeShellScreen extends StatelessWidget {
         title: const Text('MeraVyapar AI'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.notifications_active_outlined),
+            tooltip: 'Attention Events',
+            onPressed: onOpenEvents,
+          ),
+          IconButton(
+            icon: const Icon(Icons.monetization_on_outlined),
+            tooltip: 'Receivables',
+            onPressed: onOpenReceivables,
+          ),
+          IconButton(
             icon: const Icon(Icons.people),
             tooltip: 'Relationships',
             onPressed: onOpenRelationships,
           ),
           IconButton(
-            icon: const Icon(Icons.event_available),
-            tooltip: 'Promises',
-            onPressed: onOpenPromises,
-          ),
-          IconButton(
             icon: const Icon(Icons.center_focus_strong),
             tooltip: 'Capture Center',
             onPressed: onOpenCaptureCenter,
-          ),
-          IconButton(
-            icon: const Icon(Icons.history),
-            tooltip: 'Activity History',
-            onPressed: onViewHistory,
           ),
           IconButton(
             icon: const Icon(Icons.logout),
@@ -98,21 +102,21 @@ class HomeShellScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(
-                icon: const Icon(Icons.add_circle_outline),
-                label: const Text('+ Add Payment Received'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF166534),
-                ),
-                onPressed: onAddPaymentReceived,
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.remove_circle_outline),
-                label: const Text('+ Add Expense / Payment Sent'),
+                icon: const Icon(Icons.notifications_active),
+                label: const Text('Things Needing Attention'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF991B1B),
                 ),
-                onPressed: onAddExpense,
+                onPressed: onOpenEvents,
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.monetization_on),
+                label: const Text('Prioritized Receivables'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF166534),
+                ),
+                onPressed: onOpenReceivables,
               ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
