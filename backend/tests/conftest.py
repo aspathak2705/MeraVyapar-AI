@@ -23,6 +23,7 @@ from app.models.financial_counterparty import (
     FinancialRelationshipEvent
 )
 from app.models.payment_promise import PaymentPromise, PaymentPromiseEvent
+from app.models.financial_event import FinancialEvent
 
 
 class MockDBQuery:
@@ -91,7 +92,8 @@ class MockDBSession:
             MemoryTransactionCounterpartyLink: [],
             FinancialRelationshipEvent: [],
             PaymentPromise: [],
-            PaymentPromiseEvent: []
+            PaymentPromiseEvent: [],
+            FinancialEvent: []
         }
 
     def query(self, model_cls):
