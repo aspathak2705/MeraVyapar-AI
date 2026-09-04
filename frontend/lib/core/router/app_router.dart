@@ -37,6 +37,9 @@ import '../../features/events/presentation/important_events_screen.dart';
 import '../../features/events/presentation/event_detail_screen.dart';
 import '../../features/events/presentation/receivables_screen.dart';
 import '../../features/events/presentation/receivable_detail_screen.dart';
+import '../../features/intelligence/data/intelligence_repository.dart';
+import '../../features/intelligence/domain/grounded_insight_model.dart';
+import '../../features/intelligence/presentation/merchant_assistant_screen.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository());
 final profileRepositoryProvider = Provider((ref) => BusinessProfileRepository());
@@ -45,6 +48,7 @@ final canonicalTransactionRepositoryProvider = Provider((ref) => CanonicalTransa
 final captureRepositoryProvider = Provider((ref) => CaptureRepository());
 final memoryRepositoryProvider = Provider((ref) => MemoryRepository());
 final eventRepositoryProvider = Provider((ref) => EventRepository());
+final intelligenceRepositoryProvider = Provider((ref) => IntelligenceRepository());
 
 class AppRouter extends ConsumerStatefulWidget {
   const AppRouter({super.key});
@@ -375,6 +379,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
   void _openEvents(BuildContext context) async {
     final repo = ref.read(eventRepositoryProvider);
+    final intelRepo = ref.read(intelligenceRepositoryProvider);
     List<FinancialEventModel> events = [];
     try {
       await repo.evaluateEvents();
@@ -396,25 +401,47 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   });
                 },
                 onEventTap: (ev) {
+                  bool isExplaining = false;
+                  GroundedInsightModel? insight;
+
                   Navigator.of(ctx).push(
                     MaterialPageRoute(
-                      builder: (_) => EventDetailScreen(
-                        event: ev,
-                        onAcknowledge: () async {
-                          await repo.acknowledgeEvent(ev.id);
-                          final updated = await repo.getEvents();
-                          setModalState(() {
-                            events = updated;
-                          });
-                          if (ctx.mounted) Navigator.of(ctx).pop();
-                        },
-                        onDismiss: () async {
-                          await repo.dismissEvent(ev.id);
-                          final updated = await repo.getEvents();
-                          setModalState(() {
-                            events = updated;
-                          });
-                          if (ctx.mounted) Navigator.of(ctx).pop();
+                      builder: (ctxDetail) => StatefulBuilder(
+                        builder: (ctxDetailState, setDetailState) {
+                          return EventDetailScreen(
+                            event: ev,
+                            isExplaining: isExplaining,
+                            aiInsight: insight,
+                            onExplainWithAI: () async {
+                              setDetailState(() => isExplaining = true);
+                              try {
+                                const timeoutDuration = Duration(seconds: 15);
+                                final res = await intelRepo.explainEvent(ev.id).timeout(timeoutDuration);
+                                setDetailState(() {
+                                  insight = res;
+                                  isExplaining = false;
+                                });
+                              } catch (_) {
+                                setDetailState(() => isExplaining = false);
+                              }
+                            },
+                            onAcknowledge: () async {
+                              await repo.acknowledgeEvent(ev.id);
+                              final updated = await repo.getEvents();
+                              setModalState(() {
+                                events = updated;
+                              });
+                              if (ctxDetail.mounted) Navigator.of(ctxDetail).pop();
+                            },
+                            onDismiss: () async {
+                              await repo.dismissEvent(ev.id);
+                              final updated = await repo.getEvents();
+                              setModalState(() {
+                                events = updated;
+                              });
+                              if (ctxDetail.mounted) Navigator.of(ctxDetail).pop();
+                            },
+                          );
                         },
                       ),
                     ),
@@ -460,6 +487,42 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     }
   }
 
+  void _openAssistant(BuildContext context) {
+    final intelRepo = ref.read(intelligenceRepositoryProvider);
+    bool isLoading = false;
+    FinancialQueryResultModel? lastResult;
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctxState, setModalState) {
+            return MerchantAssistantScreen(
+              isLoading: isLoading,
+              lastResult: lastResult,
+              onQuerySubmit: (question) async {
+                setModalState(() {
+                  isLoading = true;
+                });
+                try {
+                  const timeoutDuration = Duration(seconds: 15);
+                  final res = await intelRepo.queryIntelligence(question: question).timeout(timeoutDuration);
+                  setModalState(() {
+                    lastResult = res;
+                    isLoading = false;
+                  });
+                } catch (_) {
+                  setModalState(() {
+                    isLoading = false;
+                  });
+                }
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!Env.isConfigured) {
@@ -497,6 +560,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onOpenPromises: () => _openPromises(context),
           onOpenEvents: () => _openEvents(context),
           onOpenReceivables: () => _openReceivables(context),
+          onOpenAssistant: () => _openAssistant(context),
         );
     }
   }

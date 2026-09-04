@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
 import '../domain/financial_event_model.dart';
+import '../../intelligence/domain/grounded_insight_model.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final FinancialEventModel event;
   final VoidCallback onAcknowledge;
   final VoidCallback onDismiss;
+  final VoidCallback? onExplainWithAI;
+  final bool isExplaining;
+  final GroundedInsightModel? aiInsight;
 
   const EventDetailScreen({
     super.key,
     required this.event,
     required this.onAcknowledge,
     required this.onDismiss,
+    this.onExplainWithAI,
+    this.isExplaining = false,
+    this.aiInsight,
   });
 
   String _formatDate(DateTime dt) {
@@ -55,7 +62,20 @@ class EventDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+              if (onExplainWithAI != null) ...[
+                ElevatedButton.icon(
+                  icon: isExplaining ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.auto_awesome),
+                  label: Text(isExplaining ? 'Generating Explanation...' : 'Understand This with AI'),
+                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF1E40AF)),
+                  onPressed: isExplaining ? null : onExplainWithAI,
+                ),
+                const SizedBox(height: 16),
+              ],
+              if (aiInsight != null) ...[
+                _buildGroundedInsightBox(aiInsight!),
+                const SizedBox(height: 16),
+              ],
               const Text(
                 'Evidence Provenance & Reason',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
@@ -98,6 +118,31 @@ class EventDetailScreen extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroundedInsightBox(GroundedInsightModel insight) {
+    return Card(
+      color: const Color(0xFFF0F9FF),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: const [
+                Icon(Icons.auto_awesome, color: Color(0xFF0284C7), size: 18),
+                SizedBox(width: 8),
+                Text('AI Grounded Explanation', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0369A1))),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(insight.summary, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+            const SizedBox(height: 4),
+            Text(insight.whyItMatters, style: const TextStyle(color: Color(0xFF334155), fontSize: 13)),
+          ],
         ),
       ),
     );

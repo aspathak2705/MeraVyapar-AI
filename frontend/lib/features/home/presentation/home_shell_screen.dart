@@ -12,6 +12,7 @@ class HomeShellScreen extends StatelessWidget {
   final VoidCallback? onOpenPromises;
   final VoidCallback? onOpenEvents;
   final VoidCallback? onOpenReceivables;
+  final VoidCallback? onOpenAssistant;
 
   const HomeShellScreen({
     super.key,
@@ -26,6 +27,7 @@ class HomeShellScreen extends StatelessWidget {
     this.onOpenPromises,
     this.onOpenEvents,
     this.onOpenReceivables,
+    this.onOpenAssistant,
   });
 
   @override
@@ -34,6 +36,11 @@ class HomeShellScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('MeraVyapar AI'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.auto_awesome),
+            tooltip: 'AI Assistant',
+            onPressed: onOpenAssistant,
+          ),
           IconButton(
             icon: const Icon(Icons.notifications_active_outlined),
             tooltip: 'Attention Events',
@@ -101,6 +108,15 @@ class HomeShellScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.auto_awesome),
+                label: const Text('Merchant AI Assistant'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1E40AF),
+                ),
+                onPressed: onOpenAssistant,
+              ),
+              const SizedBox(height: 10),
               ElevatedButton.icon(
                 icon: const Icon(Icons.notifications_active),
                 label: const Text('Things Needing Attention'),
