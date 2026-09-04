@@ -28,6 +28,11 @@ class MarketIntelligenceRepository:
         external_identifier: Optional[str] = None,
         raw_metadata: Optional[Dict[str, Any]] = None
     ) -> MarketSource:
+        # Append-only: Check if source hash already exists to guarantee immutability
+        existing = self.get_source_by_hash(provider_name, content_hash)
+        if existing:
+            return existing
+
         source = MarketSource(
             provider_name=provider_name,
             source_name=source_name,
@@ -112,6 +117,12 @@ class MarketIntelligenceRepository:
         existing = self.get_relevance(merchant_id, market_event_id)
         now = datetime.now(timezone.utc)
         if existing:
+            # Lifecycle rule: If status drops to NOT_RELEVANT due to context change, mark SUPERSEDED
+            if relevance_status == MarketRelevanceStatus.NOT_RELEVANT:
+                existing.status = "SUPERSEDED"
+            else:
+                existing.status = "ACTIVE"
+
             existing.relevance_status = relevance_status
             existing.reason_codes = reason_codes
             existing.context_snapshot = context_snapshot
@@ -121,6 +132,7 @@ class MarketIntelligenceRepository:
             return existing
 
         event = self.get_event_by_id(market_event_id)
+        init_status = "SUPERSEDED" if relevance_status == MarketRelevanceStatus.NOT_RELEVANT else "ACTIVE"
         relevance = MerchantMarketRelevance(
             merchant_id=merchant_id,
             market_event_id=market_event_id,
@@ -128,7 +140,7 @@ class MarketIntelligenceRepository:
             reason_codes=reason_codes,
             context_snapshot=context_snapshot,
             detected_at=now,
-            status="ACTIVE"
+            status=init_status
         )
         if event:
             relevance.market_event = event
