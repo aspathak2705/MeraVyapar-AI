@@ -4,6 +4,7 @@ from typing import Optional, Dict, Any, List
 from sqlalchemy.orm import Session
 from app.models.generated_insight import GeneratedInsight
 from app.schemas.financial_context import GroundedInsightResponse
+from app.core.config import settings
 
 
 class InsightPersistenceService:
@@ -17,8 +18,9 @@ class InsightPersistenceService:
         insight: GroundedInsightResponse,
         focus_entity_type: Optional[str] = None,
         focus_entity_id: Optional[UUID] = None,
-        model_identifier: str = "gemini-1.5-flash"
+        model_identifier: Optional[str] = None
     ) -> GeneratedInsight:
+        resolved_model = model_identifier or getattr(settings, "FINANCIAL_INTELLIGENCE_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
         db_insight = GeneratedInsight(
             merchant_id=merchant_id,
             insight_type=insight_type,
@@ -27,7 +29,7 @@ class InsightPersistenceService:
             context_version="1.0",
             content=insight.model_dump(mode="json"),
             source_references=[s.model_dump(mode="json") for s in insight.source_references],
-            model_identifier=model_identifier,
+            model_identifier=resolved_model,
             status="CURRENT",
             generated_at=datetime.now(timezone.utc)
         )

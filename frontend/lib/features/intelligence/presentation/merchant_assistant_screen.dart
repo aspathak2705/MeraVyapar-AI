@@ -129,24 +129,29 @@ class _MerchantAssistantScreenState extends State<MerchantAssistantScreen> {
 
   Widget _buildGroundedInsightCard(GroundedInsightModel insight) {
     final isUnavailable = insight.status == 'LLM_INTELLIGENCE_UNAVAILABLE';
+    final isRateLimited = insight.status == 'LLM_RATE_LIMITED';
 
     return Card(
-      color: isUnavailable ? const Color(0xFFF8FAFC) : Colors.white,
+      color: (isUnavailable || isRateLimited) ? const Color(0xFFF8FAFC) : Colors.white,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (isUnavailable) ...[
+            if (isUnavailable || isRateLimited) ...[
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: isRateLimited ? const Color(0xFFFEF3C7) : const Color(0xFFF1F5F9),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'AI INTELLIGENCE UNAVAILABLE',
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF475569)),
+                child: Text(
+                  isRateLimited ? 'AI TEMPORARILY BUSY' : 'AI INTELLIGENCE UNAVAILABLE',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: isRateLimited ? const Color(0xFF92400E) : const Color(0xFF475569),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),

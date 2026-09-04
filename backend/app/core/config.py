@@ -27,8 +27,11 @@ class Settings(BaseSettings):
     CLOUDFLARE_R2_ENDPOINT: Optional[str] = None
     CLOUDFLARE_R2_ACCESS_KEY_ID: Optional[str] = None
     CLOUDFLARE_R2_SECRET_ACCESS_KEY: Optional[str] = None
-    CLOUDFLARE_R2_BUCKET_NAME: Optional[str] = None
-
+    # OpenRouter & Nemotron Intelligence Configuration
+    OPENROUTER_API_KEY: Optional[str] = None
+    OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
+    FINANCIAL_INTELLIGENCE_MODEL: str = "nvidia/nemotron-3-super-120b-a12b:free"
+    NEMOTRON_REASONING_ENABLED: bool = True
 
     model_config = SettingsConfigDict(
         env_file=[".env", "../.env"],
