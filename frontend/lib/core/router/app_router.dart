@@ -40,6 +40,10 @@ import '../../features/events/presentation/receivable_detail_screen.dart';
 import '../../features/intelligence/data/intelligence_repository.dart';
 import '../../features/intelligence/domain/grounded_insight_model.dart';
 import '../../features/intelligence/presentation/merchant_assistant_screen.dart';
+import '../../features/market_intelligence/data/market_intelligence_repository.dart';
+import '../../features/market_intelligence/domain/merchant_market_relevance_model.dart';
+import '../../features/market_intelligence/presentation/relevant_market_signals_screen.dart';
+import '../../features/market_intelligence/presentation/market_signal_detail_screen.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository());
 final profileRepositoryProvider = Provider((ref) => BusinessProfileRepository());
@@ -49,6 +53,7 @@ final captureRepositoryProvider = Provider((ref) => CaptureRepository());
 final memoryRepositoryProvider = Provider((ref) => MemoryRepository());
 final eventRepositoryProvider = Provider((ref) => EventRepository());
 final intelligenceRepositoryProvider = Provider((ref) => IntelligenceRepository());
+final marketIntelligenceRepositoryProvider = Provider((ref) => MarketIntelligenceRepository());
 
 class AppRouter extends ConsumerStatefulWidget {
   const AppRouter({super.key});
@@ -523,6 +528,41 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     );
   }
 
+  void _openMarketSignals(BuildContext context) async {
+    final repo = ref.read(marketIntelligenceRepositoryProvider);
+    List<MerchantMarketRelevanceModel> signals = [];
+    try {
+      signals = await repo.getRelevantSignals();
+    } catch (_) {}
+
+    if (context.mounted) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (ctx) => StatefulBuilder(
+            builder: (ctxState, setModalState) {
+              return RelevantMarketSignalsScreen(
+                signals: signals,
+                onRefresh: () async {
+                  final updated = await repo.getRelevantSignals();
+                  setModalState(() {
+                    signals = updated;
+                  });
+                },
+                onSignalTap: (signal) {
+                  Navigator.of(ctx).push(
+                    MaterialPageRoute(
+                      builder: (_) => MarketSignalDetailScreen(signal: signal),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!Env.isConfigured) {
@@ -561,6 +601,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onOpenEvents: () => _openEvents(context),
           onOpenReceivables: () => _openReceivables(context),
           onOpenAssistant: () => _openAssistant(context),
+          onOpenMarketSignals: () => _openMarketSignals(context),
         );
     }
   }

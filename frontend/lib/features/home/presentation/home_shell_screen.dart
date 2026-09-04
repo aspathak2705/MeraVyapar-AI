@@ -13,6 +13,7 @@ class HomeShellScreen extends StatelessWidget {
   final VoidCallback? onOpenEvents;
   final VoidCallback? onOpenReceivables;
   final VoidCallback? onOpenAssistant;
+  final VoidCallback? onOpenMarketSignals;
 
   const HomeShellScreen({
     super.key,
@@ -28,6 +29,7 @@ class HomeShellScreen extends StatelessWidget {
     this.onOpenEvents,
     this.onOpenReceivables,
     this.onOpenAssistant,
+    this.onOpenMarketSignals,
   });
 
   @override
@@ -36,6 +38,11 @@ class HomeShellScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('MeraVyapar AI'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.public),
+            tooltip: 'Market Signals',
+            onPressed: onOpenMarketSignals,
+          ),
           IconButton(
             icon: const Icon(Icons.auto_awesome),
             tooltip: 'AI Assistant',
@@ -133,6 +140,12 @@ class HomeShellScreen extends StatelessWidget {
                   backgroundColor: const Color(0xFF166534),
                 ),
                 onPressed: onOpenReceivables,
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.public),
+                label: const Text('External Market Signals'),
+                onPressed: onOpenMarketSignals,
               ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
