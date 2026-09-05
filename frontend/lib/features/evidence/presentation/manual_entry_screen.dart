@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../domain/tflite_extraction_engine.dart';
+import '../domain/tflite_categorization_engine.dart';
 
 class ManualEntryScreen extends StatefulWidget {
   final String initialDirection; // 'MONEY_IN' or 'MONEY_OUT'
@@ -19,16 +21,50 @@ class ManualEntryScreen extends StatefulWidget {
 class _ManualEntryScreenState extends State<ManualEntryScreen> {
   final _formKey = GlobalKey<FormState>();
   late String _direction;
+  final _rawTextController = TextEditingController();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _counterpartyController = TextEditingController();
   String _paymentMode = 'UPI';
+  String? _detectedCategory;
+  bool _isAutoFilled = false;
+
+  final _extractionEngine = TFLiteExtractionEngine();
+  final _categorizationEngine = TFLiteCategorizationEngine();
 
   @override
   void initState() {
     super.initState();
     _direction = widget.initialDirection;
   }
+
+  void _parseAndPrefill() {
+    final rawText = _rawTextController.text.trim();
+    if (rawText.isEmpty) return;
+
+    final extResult = _extractionEngine.extract(rawText);
+    final catResult = _categorizationEngine.categorize(
+      description: rawText,
+      counterpartyName: extResult.counterpartyName,
+      direction: _direction,
+    );
+
+    setState(() {
+      if (extResult.amount != null) {
+        _amountController.text = extResult.amount.toString();
+      }
+      if (extResult.paymentMode != null) {
+        _paymentMode = extResult.paymentMode!;
+      }
+      if (extResult.counterpartyName != null) {
+        _counterpartyController.text = extResult.counterpartyName!;
+      }
+      _descriptionController.text = rawText;
+      _detectedCategory = catResult.category;
+      _isAutoFilled = true;
+    });
+  }
+
 
   @override
   void dispose() {
@@ -90,7 +126,70 @@ class _ManualEntryScreenState extends State<ManualEntryScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+                Card(
+                  color: const Color(0xFFF8FAFC),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: const BorderSide(color: Color(0xFFE2E8F0)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Row(
+                          children: [
+                            Icon(Icons.auto_awesome, size: 18, color: Color(0xFF2563EB)),
+                            SizedBox(width: 6),
+                            Text(
+                              'Paste SMS / Notification Text (Optional Assistant)',
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          controller: _rawTextController,
+                          decoration: const InputDecoration(
+                            hintText: 'e.g. Received Rs 5000 from Rajesh via UPI',
+                            isDense: true,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton.icon(
+                            onPressed: _parseAndPrefill,
+                            icon: const Icon(Icons.flash_on, size: 16),
+                            label: const Text('Auto-fill Form'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (_isAutoFilled) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEFF6FF),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.check_circle_outline, size: 16, color: Color(0xFF2563EB)),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Details detected (${_detectedCategory ?? "UNCATEGORIZED"})',
+                          style: const TextStyle(fontSize: 12, color: Color(0xFF1E40AF), fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _amountController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
