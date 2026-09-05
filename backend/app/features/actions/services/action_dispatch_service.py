@@ -64,7 +64,9 @@ class ActionDispatchService:
         if res["status"] == "SENT":
             action.status = ActionStatus.SENT
             action.provider_reference = res.get("provider_message_id")
-            action.provider_name = action.channel.value
+            action.provider_name = res.get("provider_name") or action.channel.value
+            action.delivery_mode = res.get("delivery_mode", "SIMULATED")
+            action.external_delivery_confirmed = res.get("external_delivery_confirmed", False)
             action.executed_at = datetime.now(timezone.utc)
             action.updated_at = datetime.now(timezone.utc)
             self.db.commit()
@@ -80,6 +82,9 @@ class ActionDispatchService:
             )
         else:
             action.status = ActionStatus.FAILED
+            action.provider_name = res.get("provider_name")
+            action.delivery_mode = res.get("delivery_mode", "SIMULATED")
+            action.external_delivery_confirmed = False
             action.failure_reason = res.get("error_message") or res.get("error_code")
             action.error_code = res.get("error_code")
             action.error_message = res.get("error_message")

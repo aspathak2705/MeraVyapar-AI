@@ -1,7 +1,7 @@
 import uuid
 import enum
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, DateTime, ForeignKey, Numeric, Enum as SQLEnum, Index
+from sqlalchemy import Column, String, DateTime, ForeignKey, Numeric, Enum as SQLEnum, Index, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.db.base import Base
@@ -35,6 +35,10 @@ class CanonicalTransaction(Base):
     transaction_reference = Column(String(255), nullable=True)
 
     occurred_at = Column(DateTime(timezone=True), nullable=True)
+
+    source_type = Column(String(50), nullable=True)
+    source_provider = Column(String(50), nullable=True)
+    is_simulated = Column(Boolean, nullable=False, default=False)
 
     reconciliation_status = Column(
         SQLEnum(ReconciliationStatus, native_enum=False),

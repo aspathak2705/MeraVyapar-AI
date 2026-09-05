@@ -87,9 +87,30 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                           color: isMoneyIn ? const Color(0xFF166534) : const Color(0xFF991B1B),
                         ),
                       ),
-                      title: Text(
-                        tx.counterpartyName ?? tx.description ?? 'Canonical Transaction',
-                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              tx.counterpartyName ?? tx.description ?? 'Canonical Transaction',
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          if (tx.isSimulated || tx.sourceProvider == 'SIMULATED_RAZORPAY') ...[
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.shade100,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Colors.orange.shade300),
+                              ),
+                              child: Text(
+                                'DEMO EVENT',
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.orange.shade900),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                       subtitle: Text(
                         'Method: ${tx.paymentMode} • Linked Evidence: ${tx.candidateLinks.length}\nStatus: $statusText',

@@ -1,7 +1,7 @@
 import uuid
 import enum
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, DateTime, ForeignKey, Enum as SQLEnum, Text, Index, UniqueConstraint
+from sqlalchemy import Column, String, DateTime, ForeignKey, Enum as SQLEnum, Text, Index, UniqueConstraint, Boolean
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 from app.db.base import Base
@@ -75,6 +75,8 @@ class CommunicationAction(Base):
 
     provider_name = Column(String(50), nullable=True)
     provider_reference = Column(String(255), nullable=True)
+    delivery_mode = Column(String(50), nullable=False, default="SIMULATED")
+    external_delivery_confirmed = Column(Boolean, nullable=False, default=False)
     failure_reason = Column(String(500), nullable=True)
     idempotency_key = Column(String(255), nullable=True)
 

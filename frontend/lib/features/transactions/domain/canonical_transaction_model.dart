@@ -36,6 +36,9 @@ class CanonicalTransactionModel {
   final String? description;
   final String? occurredAt;
   final String reconciliationStatus;
+  final String? sourceType;
+  final String? sourceProvider;
+  final bool isSimulated;
   final List<CandidateLinkSummaryModel> candidateLinks;
 
   const CanonicalTransactionModel({
@@ -50,6 +53,9 @@ class CanonicalTransactionModel {
     this.description,
     this.occurredAt,
     required this.reconciliationStatus,
+    this.sourceType,
+    this.sourceProvider,
+    this.isSimulated = false,
     required this.candidateLinks,
   });
 
@@ -67,6 +73,9 @@ class CanonicalTransactionModel {
       description: json['description'],
       occurredAt: json['occurred_at'],
       reconciliationStatus: json['reconciliation_status'] ?? 'UNRESOLVED',
+      sourceType: json['source_type'],
+      sourceProvider: json['source_provider'],
+      isSimulated: json['is_simulated'] as bool? ?? false,
       candidateLinks: linksJson.map((l) => CandidateLinkSummaryModel.fromJson(l)).toList(),
     );
   }

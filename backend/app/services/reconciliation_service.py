@@ -59,6 +59,15 @@ class ReconciliationService:
             if matched_b:
                 # 1. Strong Match -> Create Canonical Transaction (RECONCILED)
                 cand_b, reasons, snapshot = matched_b
+                ev_a = cand_a.primary_evidence
+                ev_b = cand_b.primary_evidence
+                is_sim = (
+                    (ev_a and ev_a.metadata_info.get("provider_identifier") == "SIMULATED_RAZORPAY") or
+                    (ev_b and ev_b.metadata_info.get("provider_identifier") == "SIMULATED_RAZORPAY")
+                )
+                src_type = "SIMULATED" if is_sim else (ev_a.evidence_source.value if ev_a else None)
+                src_prov = "RAZORPAY" if is_sim else (ev_a.metadata_info.get("provider_identifier") if ev_a else None)
+
                 canonical_tx = self.canonical_repo.create(
                     merchant_id=merchant_id,
                     amount=cand_a.amount or cand_b.amount,
@@ -68,7 +77,10 @@ class ReconciliationService:
                     counterparty_name=cand_a.counterparty_name or cand_b.counterparty_name,
                     transaction_reference=cand_a.reference_number or cand_b.reference_number,
                     occurred_at=cand_a.transaction_timestamp or cand_b.transaction_timestamp,
-                    reconciliation_status=ReconciliationStatus.RECONCILED
+                    reconciliation_status=ReconciliationStatus.RECONCILED,
+                    source_type=src_type,
+                    source_provider=src_prov,
+                    is_simulated=is_sim
                 )
 
                 self.canonical_repo.link_candidate(
@@ -127,6 +139,14 @@ class ReconciliationService:
                 )
 
                 if is_strong_standalone:
+                    ev_a = cand_a.primary_evidence
+                    is_sim = ev_a and (
+                        ev_a.metadata_info.get("provider_identifier") == "SIMULATED_RAZORPAY" or
+                        ev_a.metadata_info.get("is_simulated") is True
+                    )
+                    src_type = "SIMULATED" if is_sim else (ev_a.evidence_source.value if ev_a else None)
+                    src_prov = "RAZORPAY" if is_sim else (ev_a.metadata_info.get("provider_identifier") if ev_a else None)
+
                     canonical_tx = self.canonical_repo.create(
                         merchant_id=merchant_id,
                         amount=cand_a.amount,
@@ -136,7 +156,10 @@ class ReconciliationService:
                         counterparty_name=cand_a.counterparty_name,
                         transaction_reference=cand_a.reference_number,
                         occurred_at=cand_a.transaction_timestamp,
-                        reconciliation_status=ReconciliationStatus.UNRESOLVED
+                        reconciliation_status=ReconciliationStatus.UNRESOLVED,
+                        source_type=src_type,
+                        source_provider=src_prov,
+                        is_simulated=bool(is_sim)
                     )
                     self.canonical_repo.link_candidate(
                         merchant_id, canonical_tx.id, cand_a.id, LinkRelationshipType.PRIMARY

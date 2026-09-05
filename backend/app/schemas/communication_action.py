@@ -32,7 +32,10 @@ class CommunicationActionResponse(BaseModel):
     target_entity_type: Optional[str] = None
     promise_id: Optional[UUID] = None
     idempotency_key: str
-    provider_message_id: Optional[str] = None
+    provider_message_id: Optional[str] = Field(default=None, validation_alias="provider_reference")
+    provider_name: Optional[str] = None
+    delivery_mode: Optional[str] = "SIMULATED"
+    external_delivery_confirmed: Optional[bool] = False
     error_code: Optional[str] = None
     error_message: Optional[str] = None
     confirmed_at: Optional[datetime] = None

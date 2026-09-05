@@ -82,6 +82,29 @@ class CanonicalTransactionDetailScreen extends StatelessWidget {
                       Text('Payment Mode: ${transaction.paymentMode}', style: const TextStyle(color: Color(0xFF64748B))),
                       if (transaction.transactionReference != null)
                         Text('Reference: ${transaction.transactionReference}', style: const TextStyle(color: Color(0xFF64748B))),
+                      if (transaction.isSimulated || transaction.sourceProvider == 'SIMULATED_RAZORPAY') ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.amber.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.amber.shade300),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.info_outline, size: 18, color: Colors.amber.shade900),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'DEMO EVENT: Simulated payment event processed through reconciliation pipeline.',
+                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.amber.shade900),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),

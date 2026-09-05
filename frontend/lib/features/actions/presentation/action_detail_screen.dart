@@ -121,6 +121,41 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
                       children: [
                         Text('Channel: ${action.channel.toServerString()}'),
                         Text('Status: ${action.status.toDisplayString()}'),
+                        if (action.deliveryMode != null) ...[
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Chip(
+                                label: Text(
+                                  action.deliveryMode == 'SIMULATED' ? 'DEMO / SIMULATED' : 'PRODUCTION',
+                                  style: TextStyle(
+                                    color: action.deliveryMode == 'SIMULATED' ? Colors.orange.shade900 : Colors.green.shade900,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                backgroundColor: action.deliveryMode == 'SIMULATED' ? Colors.orange.shade100 : Colors.green.shade100,
+                              ),
+                              if (action.providerName != null) ...[
+                                const SizedBox(width: 8),
+                                Text('Provider: ${action.providerName}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                              ],
+                            ],
+                          ),
+                          if (action.deliveryMode == 'SIMULATED')
+                            Container(
+                              margin: const EdgeInsets.only(top: 6),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.shade50,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: Colors.amber.shade300),
+                              ),
+                              child: const Text(
+                                'Note: External delivery was simulated. No real message was sent.',
+                                style: TextStyle(fontSize: 12, color: Colors.black87),
+                              ),
+                            ),
+                        ],
                         if (action.errorCode != null)
                           Text('Error Code: ${action.errorCode}', style: const TextStyle(color: Colors.red)),
                         if (action.errorMessage != null)

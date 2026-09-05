@@ -44,7 +44,10 @@ class CanonicalTransactionRepository:
         counterparty_name: Optional[str] = None,
         transaction_reference: Optional[str] = None,
         occurred_at: Optional[datetime] = None,
-        reconciliation_status: ReconciliationStatus = ReconciliationStatus.UNRESOLVED
+        reconciliation_status: ReconciliationStatus = ReconciliationStatus.UNRESOLVED,
+        source_type: Optional[str] = None,
+        source_provider: Optional[str] = None,
+        is_simulated: bool = False
     ) -> CanonicalTransaction:
         tx = CanonicalTransaction(
             merchant_id=merchant_id,
@@ -55,7 +58,10 @@ class CanonicalTransactionRepository:
             counterparty_name=counterparty_name,
             transaction_reference=transaction_reference,
             occurred_at=occurred_at,
-            reconciliation_status=reconciliation_status
+            reconciliation_status=reconciliation_status,
+            source_type=source_type,
+            source_provider=source_provider,
+            is_simulated=is_simulated
         )
         if not hasattr(tx, "candidate_links") or tx.candidate_links is None:
             tx.candidate_links = []

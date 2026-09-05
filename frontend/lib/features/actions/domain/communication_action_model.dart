@@ -124,6 +124,9 @@ class CommunicationAction {
   final String? promiseId;
   final String idempotencyKey;
   final String? providerMessageId;
+  final String? providerName;
+  final String? deliveryMode;
+  final bool externalDeliveryConfirmed;
   final String? errorCode;
   final String? errorMessage;
   final DateTime? confirmedAt;
@@ -143,6 +146,9 @@ class CommunicationAction {
     this.promiseId,
     required this.idempotencyKey,
     this.providerMessageId,
+    this.providerName,
+    this.deliveryMode,
+    this.externalDeliveryConfirmed = false,
     this.errorCode,
     this.errorMessage,
     this.confirmedAt,
@@ -164,6 +170,9 @@ class CommunicationAction {
       promiseId: json['promise_id'] as String?,
       idempotencyKey: json['idempotency_key'] as String? ?? '',
       providerMessageId: json['provider_message_id'] as String?,
+      providerName: json['provider_name'] as String?,
+      deliveryMode: json['delivery_mode'] as String?,
+      externalDeliveryConfirmed: json['external_delivery_confirmed'] as bool? ?? false,
       errorCode: json['error_code'] as String?,
       errorMessage: json['error_message'] as String?,
       confirmedAt: json['confirmed_at'] != null ? DateTime.parse(json['confirmed_at'] as String) : null,

@@ -33,6 +33,18 @@ class Settings(BaseSettings):
     FINANCIAL_INTELLIGENCE_MODEL: str = "nvidia/nemotron-3-super-120b-a12b:free"
     NEMOTRON_REASONING_ENABLED: bool = True
 
+    # External Provider Configuration & Modes
+    EXTERNAL_PROVIDER_MODE: str = "simulation"  # Options: simulation, production, disabled
+    ENABLE_DEMO_ENDPOINTS: bool = True
+    WHATSAPP_PROVIDER: str = "simulation"
+    WHATSAPP_PROVIDER_KEY: Optional[str] = None
+    SMS_PROVIDER: str = "simulation"
+    SMS_PROVIDER_KEY: Optional[str] = None
+    PAYMENT_PROVIDER: str = "simulation"
+    RAZORPAY_KEY_ID: Optional[str] = None
+    RAZORPAY_KEY_SECRET: Optional[str] = None
+    RAZORPAY_WEBHOOK_SECRET: Optional[str] = None
+
     model_config = SettingsConfigDict(
         env_file=[".env", "../.env"],
         env_file_encoding="utf-8",

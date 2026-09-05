@@ -31,6 +31,9 @@ class CanonicalTransactionResponse(BaseModel):
     transaction_reference: Optional[str] = None
     occurred_at: Optional[datetime] = None
     reconciliation_status: ReconciliationStatus
+    source_type: Optional[str] = None
+    source_provider: Optional[str] = None
+    is_simulated: bool = False
     created_at: datetime
     updated_at: datetime
     candidate_links: List[CandidateLinkSummary] = []
