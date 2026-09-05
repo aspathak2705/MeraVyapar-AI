@@ -14,7 +14,9 @@ from app.api.v1.endpoints import (
     receivables,
     financial_intelligence,
     market_intelligence,
-    communication_actions
+    communication_actions,
+    cashflow,
+    reference_intelligence
 )
 
 api_router = APIRouter()
@@ -33,4 +35,7 @@ api_router.include_router(receivables.router, tags=["receivables"])
 api_router.include_router(financial_intelligence.router, tags=["financial-intelligence"])
 api_router.include_router(market_intelligence.router, tags=["market-intelligence"])
 api_router.include_router(communication_actions.router, tags=["communication-actions"])
+api_router.include_router(cashflow.router, tags=["cashflow"])
+api_router.include_router(reference_intelligence.router, tags=["reference-intelligence"])
+
 

@@ -183,6 +183,7 @@ You must not:
 - infer missing values
 - estimate probabilities
 - create scores
+- state synthetic or reference benchmark patterns (SYNTHETIC_REFERENCE_PATTERN) as observed merchant transaction facts
 - provide investment advice
 - recommend stocks
 - recommend loans

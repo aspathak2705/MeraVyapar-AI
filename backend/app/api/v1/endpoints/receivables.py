@@ -1,3 +1,4 @@
+from uuid import UUID
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
@@ -23,3 +24,20 @@ def get_prioritized_receivables(
         message="Prioritized receivables retrieved",
         data=receivables_data
     )
+
+
+@router.get("/receivables/{counterparty_id}/behavior", response_model=APIResponse)
+def get_counterparty_behavior(
+    counterparty_id: UUID,
+    merchant: Merchant = Depends(get_current_merchant),
+    db: Session = Depends(get_db)
+):
+    from app.features.receivable_intelligence.services.receivable_behavior_service import ReceivableBehaviorService
+    service = ReceivableBehaviorService(db)
+    result = service.analyze_counterparty_behavior(merchant.id, counterparty_id)
+    return APIResponse(
+        success=True,
+        message="Counterparty receivable behavior retrieved",
+        data=result.model_dump(mode="json")
+    )
+

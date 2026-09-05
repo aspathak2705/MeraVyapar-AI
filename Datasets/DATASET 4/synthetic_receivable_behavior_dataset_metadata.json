@@ -1,0 +1,88 @@
+{
+    "dataset_name": "synthetic_receivable_behavior_dataset",
+    "target_rows": 1000,
+    "generated_rows": 1000,
+    "identifier_columns": [
+        "receivable_id",
+        "merchant_id",
+        "customer_id"
+    ],
+    "temporal_feature_columns": [
+        "relationship_start_date",
+        "customer_relationship_age_days",
+        "prediction_cutoff_date",
+        "created_date",
+        "has_explicit_due_date",
+        "due_date",
+        "days_until_due",
+        "days_since_receivable_created",
+        "days_since_last_completed_receivable",
+        "observation_horizon_days"
+    ],
+    "financial_feature_columns": [
+        "original_amount",
+        "total_paid_before_cutoff",
+        "outstanding_amount",
+        "historical_average_receivable_amount",
+        "current_amount_vs_historical_average",
+        "amount_deviation_from_historical_average",
+        "outstanding_ratio"
+    ],
+    "historical_behavior_feature_columns": [
+        "historical_receivable_count",
+        "historical_completed_receivable_count",
+        "historical_on_time_payment_count",
+        "historical_delayed_payment_count",
+        "historical_partial_payment_count",
+        "historical_unpaid_count",
+        "historical_on_time_ratio",
+        "historical_average_delay_days",
+        "historical_max_delay_days"
+    ],
+    "promise_feature_columns": [
+        "historical_promise_count",
+        "historical_promise_kept_count",
+        "historical_promise_broken_count",
+        "historical_promise_open_count",
+        "historical_promise_fulfillment_ratio",
+        "current_receivable_promise_count",
+        "current_open_promise_exists",
+        "days_since_latest_promise",
+        "latest_promise_due_offset_days"
+    ],
+    "partial_payment_feature_columns": [
+        "has_partial_payment_before_cutoff",
+        "partial_payment_count_before_cutoff",
+        "partial_payment_ratio_before_cutoff"
+    ],
+    "relationship_feature_columns": [
+        "customer_relationship_age_days",
+        "historical_receivable_count",
+        "days_since_last_completed_receivable"
+    ],
+    "future_outcome_columns": [
+        "actual_final_payment_date",
+        "actual_days_to_final_payment",
+        "actual_future_delay_days",
+        "future_partial_payment_occurred",
+        "final_outcome_status"
+    ],
+    "target_column": "final_outcome_status",
+    "leakage_columns": [
+        "actual_final_payment_date",
+        "actual_days_to_final_payment",
+        "actual_future_delay_days",
+        "future_partial_payment_occurred",
+        "final_outcome_status"
+    ],
+    "null_semantics": {
+        "due_date": "No explicitly agreed payment deadline",
+        "days_until_due": "No explicit due date exists",
+        "days_since_last_completed_receivable": "No completed historical receivable exists",
+        "days_since_latest_promise": "No current relevant promise exists",
+        "latest_promise_due_offset_days": "No current relevant promise exists",
+        "actual_final_payment_date": "Full payment not observed within observation horizon",
+        "actual_days_to_final_payment": "Full payment not observed within observation horizon",
+        "actual_future_delay_days": "Cannot calculate because full payment was not observed"
+    }
+}

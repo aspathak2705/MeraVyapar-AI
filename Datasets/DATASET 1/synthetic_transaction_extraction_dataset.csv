@@ -1,0 +1,1001 @@
+sample_id,merchant_id,source_type,raw_text,amount,currency,transaction_direction,payment_mode,counterparty_name,transaction_date,transaction_time,reference_number,account_hint,bank_name,is_transaction,transaction_status
+TXN_EXT_000001,MERCHANT_0094,MANUAL_TEXT,Nominee details missing for A/c XX7159. Update now.,,,,,,,,,,,False,
+TXN_EXT_000002,MERCHANT_0383,SMS,UPI collect payment of INR 12.00 from Google Workspace credited. Ref IMPS781153731.,12,INR,CREDIT,UPI,Google Workspace,2026-08-03,10:50:34,IMPS781153731,2237,Federal Bank,True,SUCCESS
+TXN_EXT_000003,MERCHANT_0391,MANUAL_TEXT,"UPI payment of ₹95,045.00 to MSEB failed. Insufficient funds.",95045,INR,DEBIT,UPI,MSEB,2026-09-24,12:02:00,YESR819724388,,ICICI Bank,True,FAILED
+TXN_EXT_000004,MERCHANT_0274,SMS,sent 75.0k to Stripe India via upi September 16,74965,INR,DEBIT,UPI,Stripe India,2026-09-16,,403922,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000005,MERCHANT_0142,MANUAL_TEXT,"Rs25,000/- transferred to Sharma Traders. Bank charges INR 5.00 applicable.",25000,INR,DEBIT,NEFT,Sharma Traders,,,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000006,MERCHANT_0054,NOTIFICATION,"INR 1,202.00 DEBITED A/C XX1618 VIA UPI TO AMIT SHARMA. REF: UPI341648140099.",1202,INR,DEBIT,UPI,Amit Sharma,2026-09-21,04:30:59,,1618,,True,SUCCESS
+TXN_EXT_000007,MERCHANT_0972,NOTIFICATION,Punjab National Bank: Branch timings changed to 9:30 AM - 4:00 PM.,,,,,,,,,,,False,
+TXN_EXT_000008,MERCHANT_0008,NOTIFICATION,"Refund of INR15,033.00 from Iyer Exports credited to your card ending None.",15033,INR,CREDIT,CARD,Iyer Exports,2026-09-14,,TXN6384311581,,Yes Bank,True,SUCCESS
+TXN_EXT_000009,MERCHANT_0033,SMS,"INR 5,000 EMI deducted. Outstanding: ₹150,000.",5000,INR,DEBIT,BANK_TRANSFER,Bank of Baroda,2026-08-22,,,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000010,MERCHANT_0145,MANUAL_TEXT,Rs 5000 processed for Pooja Iyer,5000,INR,DEBIT,,Pooja Iyer,,,HDFCR397721596,,,True,SUCCESS
+TXN_EXT_000011,MERCHANT_0102,MANUAL_TEXT,Rs. 352 refund processed from Adani Electricity to card XXNone.,352,INR,CREDIT,CARD,Adani Electricity,2026-08-20,06:34:46,IDFCR691090234,,,True,SUCCESS
+TXN_EXT_000012,MERCHANT_0779,NOTIFICATION,INR 756.00 spent at BESCOM using your card ending 9237. Ref: None.,756,INR,DEBIT,CARD,BESCOM,2026-09-03,02:11:46,,9237,IndusInd Bank,True,SUCCESS
+TXN_EXT_000013,MERCHANT_0057,MANUAL_TEXT,Txn INR 2500 processed ref IMPS640992677,2500,INR,CREDIT,IMPS,,2026-08-31,,,,,True,PENDING
+TXN_EXT_000014,MERCHANT_0574,NOTIFICATION,Learn about UPI Lite for faster payments under INR 200.00.,,,,,,,,,,,False,
+TXN_EXT_000015,MERCHANT_0993,SMS,Payment of ₹99 to amit@paytm processed successfully.,99,INR,DEBIT,,amit@paytm,2026-08-31,01:27:31,TXN7692375192,6864,,True,SUCCESS
+TXN_EXT_000016,MERCHANT_0259,MANUAL_TEXT,UPI payment of INR 510 to ClearTax failed. Insufficient funds.,510,INR,DEBIT,UPI,ClearTax,2026-08-06,00:12:28,UPI761154018785,,Kotak Mahindra Bank,True,FAILED
+TXN_EXT_000017,MERCHANT_0153,SMS,"RTGS transfer of Rs. 3,193/- to Gupta Distributors completed. UTR: AXISR443426534. A/c XXNone.",3193,INR,DEBIT,RTGS,Gupta Distributors,2026-08-26,,TXN1857462274,,Federal Bank,True,SUCCESS
+TXN_EXT_000018,MERCHANT_0320,NOTIFICATION,"NEFT Dr: ₹3,193.00 to Airtel. A/c None. Value dt 13/09/26.",3193,INR,DEBIT,NEFT,Airtel,2026-09-13,,TXN8867392787,,,True,SUCCESS
+TXN_EXT_000019,MERCHANT_0041,SMS,"Your account balance as on 25 Sep 2026 is ₹ 55,000.",,,,,,,,,,Bank of Baroda,False,
+TXN_EXT_000020,MERCHANT_0447,SMS,Send money via UPI and win INR 50.00 cashback.,,,,,,,,,,,False,
+TXN_EXT_000021,MERCHANT_0925,NOTIFICATION,Cashback of Rs. 50/- credited to your wallet!,,,,,,,,,,,False,
+TXN_EXT_000022,MERCHANT_0973,MANUAL_TEXT,"Your available account balance is Rs. 125,000.",,,,,,,,,,,False,
+TXN_EXT_000023,MERCHANT_0441,SMS,"Open a savings account with IndusInd Bank and get ₹1,000.00 voucher.",,,,,,,,,,,False,
+TXN_EXT_000024,MERCHANT_0178,NOTIFICATION,₹149 DEBITED frm Ac XX5128 via UPI to Cafe Coffee Day on 08/09/26.,149,INR,DEBIT,UPI,Cafe Coffee Day,2026-09-08,22:45:41,992952,5128,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000025,MERCHANT_0185,SMS,IDFC FIRST Bank: POS purchase of Rs. 349 at Singh Brothers. Card XXNone.,349,INR,DEBIT,CARD,Singh Brothers,2026-09-30,,,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000026,MERCHANT_0247,SMS,"None: NEFT Credit of Rs. 88,035/- received from Singh Brothers. UTR: SBIR206273231. Value Date: September 21.",88035,INR,CREDIT,NEFT,Singh Brothers,2026-09-21,22:09:29,ICICIR374700215,,,True,SUCCESS
+TXN_EXT_000027,MERCHANT_0401,MANUAL_TEXT,"UPI collect payment of INR 74,996 from Suresh Gupta credited. Ref TXN8215987738.",74996,INR,CREDIT,UPI,Suresh Gupta,2026-09-30,,TXN8215987738,,Axis Bank,True,SUCCESS
+TXN_EXT_000028,MERCHANT_0781,MANUAL_TEXT,Suspicious login detected on your account. Contact HDFC Bank immediately.,,,,,,,,,,Federal Bank,False,
+TXN_EXT_000029,MERCHANT_0610,MANUAL_TEXT,Update your email address for account 6575.,,,,,,,,,,,False,
+TXN_EXT_000030,MERCHANT_0122,SMS,"INR95,012.00 debited via UPI to ravi@okaxis at 10:48 on Sep 01, 2026. Ref: 237801.",95012,INR,DEBIT,UPI,ravi@okaxis,2026-09-01,10:48:48,237801,2767,,True,SUCCESS
+TXN_EXT_000031,MERCHANT_0401,SMS,"Rs. 4,492 refund processed from Ravi Kumar to card XX8242.",4492,INR,CREDIT,CARD,Ravi Kumar,,,UPI842568439415,8242,Punjab National Bank,True,SUCCESS
+TXN_EXT_000032,MERCHANT_0132,NOTIFICATION,"Invoice payment of Rs. 250,025/- received from rajesh@okbaroda.",250025,INR,CREDIT,,rajesh@okbaroda,2026-08-27,00:18:17,,6295,Yes Bank,True,SUCCESS
+TXN_EXT_000033,MERCHANT_0187,NOTIFICATION,"Your card was used for Rs. 125,090/- at ABC Wholesale on 17 Sep 2026 at 2219 hrs.",125090,INR,DEBIT,CARD,ABC Wholesale,2026-09-17,22:19:30,,1216,State Bank of India,True,SUCCESS
+TXN_EXT_000034,MERCHANT_0910,MANUAL_TEXT,"Invoice payment of INR48,531.00 received from Microsoft Azure.",48531,INR,CREDIT,,,2026-09-12,16:33:15,394169,8908,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000035,MERCHANT_0880,SMS,Punjab National Bank: Never share your OTP with anyone.,,,,,,,,,,Punjab National Bank,False,
+TXN_EXT_000036,MERCHANT_0957,MANUAL_TEXT,"Rs.1,499,904 Dr A/c XX7376 UPI Ref 785761 to Zoho",1499904,INR,DEBIT,UPI,Zoho,,06:06:22,785761,7376,Axis Bank,True,SUCCESS
+TXN_EXT_000037,MERCHANT_0488,NOTIFICATION,"INR2,499,512.00 transferred to Adani Electricity. Bank charges 25 applicable. A/c XX3785.",2499512,INR,DEBIT,BANK_TRANSFER,Adani Electricity,2026-08-22,11:52:28,320869,3785,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000038,MERCHANT_0106,MANUAL_TEXT,"Transfer of Rs88,002/- from Neha Singh received. A/c XXNone.",88002,INR,CREDIT,BANK_TRANSFER,Neha Singh,2026-09-05,00:52:05,,,,True,SUCCESS
+TXN_EXT_000039,MERCHANT_0392,SMS,"NEFT transfer of INR94,969.00 to Ola is pending. Ref None.",94969,INR,DEBIT,NEFT,Ola,2026-09-09,,,,,True,PENDING
+TXN_EXT_000040,MERCHANT_0460,SMS,RTGS transfer of ₹9.00 to Zomato completed. UTR: FEDR948012137. A/c XX7961.,9,INR,DEBIT,RTGS,Zomato,2026-08-16,10:08:54,IMPS481027822,7961,ICICI Bank,True,SUCCESS
+TXN_EXT_000041,MERCHANT_0341,MANUAL_TEXT,"₹2,506.00 refund processed from Sunita Reddy to card XX5949.",2506,INR,CREDIT,CARD,Sunita Reddy,2026-09-22,05:48:25,IMPS718170969,5949,,True,SUCCESS
+TXN_EXT_000042,MERCHANT_0817,MANUAL_TEXT,"IMPS transfer of Rs. 4,509/- to Tally Solutions successful. Ref: IMPS163690958. From A/c XX1753.",4509,INR,DEBIT,IMPS,Tally Solutions,2026-08-29,03:04:15,,1753,,True,SUCCESS
+TXN_EXT_000043,MERCHANT_0533,NOTIFICATION,"Rs. 95,028 debited from your account ending 3461 via UPI to Sharma Traders on 28/08/2026. Ref no 847841.",95028,INR,DEBIT,UPI,,2026-08-28,,UPI261858104734,3461,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000044,MERCHANT_0085,MANUAL_TEXT,ICICI Bank: Your monthly account statement is now available.,,,,,,,,,,ICICI Bank,False,
+TXN_EXT_000045,MERCHANT_0971,NOTIFICATION,"INR 4,908 credited to your account from pooja@okcanara. Ref None.",4908,INR,CREDIT,BANK_TRANSFER,pooja@okcanara,2026-09-20,07:13:20,,,Federal Bank,True,SUCCESS
+TXN_EXT_000046,MERCHANT_0534,NOTIFICATION,Paid ₹504 cash to Zomato for supplies.,504,INR,DEBIT,CASH,Zomato,2026-09-28,22:45:58,617215,3241,,True,SUCCESS
+TXN_EXT_000047,MERCHANT_0432,NOTIFICATION,"Apply for home loan at 7.5% interest rate. Loan amount up to ₹5,000,000.00.",,,,,,,,,,,False,
+TXN_EXT_000048,MERCHANT_0007,SMS,"You paid ₹1,200 to Sharma Traders and earned Rs. 50/- cashback.",1200,INR,DEBIT,UPI,Sharma Traders,,,,,,True,SUCCESS
+TXN_EXT_000049,MERCHANT_0958,NOTIFICATION,KYC deadline approaching. Complete eKYC now.,,,,,,,,,,,False,
+TXN_EXT_000050,MERCHANT_0313,SMS,"Rs. 15,048 debited from your account ending 5683 via UPI to Paytm Mall on 24 Sep 2026. Ref no 621986.",15048,INR,DEBIT,UPI,Paytm Mall,2026-09-24,20:05:04,UPI732069347976,5683,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000051,MERCHANT_0348,SMS,Our mobile banking services will be unavailable tonight from 11PM to 4AM.,,,,,,,,,,,False,
+TXN_EXT_000052,MERCHANT_0974,MANUAL_TEXT,Refund of ₹152 from Rao Suppliers credited to your card ending None.,152,INR,CREDIT,CARD,,2026-08-08,18:33:26,,,State Bank of India,True,SUCCESS
+TXN_EXT_000053,MERCHANT_0457,MANUAL_TEXT,"INR2,499,882.00 refund processed from priya@okhdfcbank to card XX1651.",2499882,INR,CREDIT,CARD,priya@okhdfcbank,2026-08-17,02:50:42,,,State Bank of India,True,SUCCESS
+TXN_EXT_000054,MERCHANT_0111,NOTIFICATION,"Transfer of INR 4,496 to Ravi Kumar completed. Ref no UPI863361988939.",4496,INR,DEBIT,BANK_TRANSFER,Ravi Kumar,2026-08-15,07:12:16,UPI863361988939,,,True,SUCCESS
+TXN_EXT_000055,MERCHANT_0557,MANUAL_TEXT,Cash payment of ₹249 made to sharma.traders@okicici on 05/09/2026.,249,INR,DEBIT,CASH,,2026-09-05,10:33:34,IMPS689384867,3921,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000056,MERCHANT_0570,MANUAL_TEXT,"Rs.125,089 Dr A/c XXNone UPI Ref AXISR505968811 to Amit Sharma",125089,INR,DEBIT,UPI,Amit Sharma,2026-08-17,20:11:35,AXISR505968811,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000057,MERCHANT_0373,MANUAL_TEXT,"Federal Bank: ₹750,093 debited from A/c None towards AWS. Ref None.",750093,INR,DEBIT,BANK_TRANSFER,AWS,2026-08-22,00:36:28,,,Federal Bank,True,SUCCESS
+TXN_EXT_000058,MERCHANT_0955,NOTIFICATION,"Rs. 1,859 debited from your account ending 6215 via UPI to Mehta & Sons on 23 Aug 2026. Ref no 506648.",1859,INR,DEBIT,UPI,,2026-08-23,18:39:39,,6215,,True,SUCCESS
+TXN_EXT_000059,MERCHANT_0135,SMS,"UPI collect payment of Rs. 61,958/- from BSNL credited. Ref None.",61958,INR,CREDIT,UPI,BSNL,2026-09-02,00:04:23,,,,True,SUCCESS
+TXN_EXT_000060,MERCHANT_0349,SMS,"CARD txn: Rs95,046/- at Google Workspace on 07 Aug. Avl bal ₹120,046.",95046,INR,DEBIT,CARD,Google Workspace,2026-08-07,12:13:10,,,,True,SUCCESS
+TXN_EXT_000061,MERCHANT_0183,NOTIFICATION,"₹4,508.00 received from Lakshmi Nair on 09 Aug 2026 via UPI.",4508,INR,CREDIT,UPI,Lakshmi Nair,2026-08-09,18:41:49,TXN7892457034,,,True,SUCCESS
+TXN_EXT_000062,MERCHANT_0473,SMS,Statement for A/c XX2821 is ready for download.,,,,,,,,,,,False,
+TXN_EXT_000063,MERCHANT_0459,SMS,"INR 1,850 transferred to Ola via IMPS. IMPS Ref: IMPS196265979.",1850,INR,DEBIT,IMPS,Ola,2026-08-16,21:58:35,,1755,Punjab National Bank,True,SUCCESS
+TXN_EXT_000064,MERCHANT_0004,NOTIFICATION,"Pre-approved business loan of Rs2,500,000/- waiting for you!",,,,,,,,,,,False,
+TXN_EXT_000065,MERCHANT_0601,SMS,"UPI collect payment of ₹1,856 from Tally Solutions credited. Ref 662917.",1856,INR,CREDIT,UPI,Tally Solutions,2026-09-21,23:04:33,662917,,HDFC Bank,True,SUCCESS
+TXN_EXT_000066,MERCHANT_0579,NOTIFICATION,Rs.495 Dr A/c XX5368 UPI Ref None to Ola,495,INR,DEBIT,UPI,Ola,2026-09-14,01:56:10,,,,True,SUCCESS
+TXN_EXT_000067,MERCHANT_0124,SMS,"EMI of Rs. 20,000/- debited. Outstanding loan balance INR600,000.00.",20000,INR,DEBIT,BANK_TRANSFER,Axis Bank,2026-08-25,,,,Canara Bank,True,SUCCESS
+TXN_EXT_000068,MERCHANT_0388,SMS,"UPI collect payment of ₹3,499,656.00 from Arun Verma credited. Ref None.",3499656,INR,CREDIT,UPI,Arun Verma,2026-08-10,10:50:40,,,,True,SUCCESS
+TXN_EXT_000069,MERCHANT_0349,NOTIFICATION,HDFC Bank: Your KYC is pending. Visit nearest branch.,,,,,,,,,,,False,
+TXN_EXT_000070,MERCHANT_0575,SMS,"Upgrade to platinum card and enjoy benefits worth INR 5,000.00.",,,,,,,,,,,False,
+TXN_EXT_000071,MERCHANT_0900,NOTIFICATION,"None: POS purchase of Rs1,000,050/- at sharma.traders@okicici. Card XX6572.",1000050,INR,DEBIT,CARD,sharma.traders@okicici,2026-09-22,03:40:12,279956,6572,,True,SUCCESS
+TXN_EXT_000072,MERCHANT_0771,MANUAL_TEXT,"Payment of INR 48,454 to Adani Electricity unsuccessful. Please retry.",48454,INR,DEBIT,,Adani Electricity,2026-09-27,07:45:15,720903,,IDFC FIRST Bank,True,FAILED
+TXN_EXT_000073,MERCHANT_0095,NOTIFICATION,"Rs. 25,000 settlement processed via Razorpay for Iyer Exports",25000,INR,CREDIT,,,2026-08-15,,,,,True,PENDING
+TXN_EXT_000074,MERCHANT_0189,MANUAL_TEXT,"UPI collect request for Rs. 25,037 from Pooja Iyer pending approval.",25037,INR,DEBIT,UPI,Pooja Iyer,,,YESR882691805,9386,Federal Bank,True,PENDING
+TXN_EXT_000075,MERCHANT_0847,SMS,"₹4,907.00 received from Joshi Mart via UPI. Ref: None. Credited to A/c XXNone.",4907,INR,CREDIT,UPI,,2026-08-17,23:04:57,,,,True,SUCCESS
+TXN_EXT_000076,MERCHANT_0549,MANUAL_TEXT,"NEFT transfer Rs48,482/- to Razorpay completed. Ref: 161643.",48482,INR,DEBIT,NEFT,,2026-09-05,16:43:26,161643,,,True,SUCCESS
+TXN_EXT_000077,MERCHANT_0167,NOTIFICATION,"Paid INR499,977.00 cash to Sharma Traders for supplies.",499977,INR,DEBIT,CASH,Sharma Traders,2026-09-28,12:59:31,,,Canara Bank,True,SUCCESS
+TXN_EXT_000078,MERCHANT_0075,SMS,"None: NEFT of INR 2,492 to Cafe Coffee Day failed. UTR FEDR452558912.",2492,INR,DEBIT,NEFT,Cafe Coffee Day,2026-08-07,23:37:31,ICICIR406163675,,,True,FAILED
+TXN_EXT_000079,MERCHANT_0819,NOTIFICATION,Your monthly account statement is now available.,,,,,,,,,,,False,
+TXN_EXT_000080,MERCHANT_0251,NOTIFICATION,You are eligible for Rs. 500 cashback on your next UPI payment.,,,,,,,,,,,False,
+TXN_EXT_000081,MERCHANT_0905,NOTIFICATION,Congratulations! You earned 10 reward points on your last purchase.,,,,,,,,,,,False,
+TXN_EXT_000082,MERCHANT_0247,NOTIFICATION,"Rs. 35,027 received from karan@okpnb on 05 Sep via UPI.",35027,INR,CREDIT,UPI,karan@okpnb,2026-09-05,,,,,True,SUCCESS
+TXN_EXT_000083,MERCHANT_0568,SMS,"Transfer reference UPI853226691151 created for INR 1,850 to pooja@okcanara.",1850,INR,DEBIT,,pooja@okcanara,,,UPI853226691151,4043,,True,PENDING
+TXN_EXT_000084,MERCHANT_0149,NOTIFICATION,"IndusInd Bank: IMPS of INR2,500.00 to Jio debited. Ref IMPS416535751.",2500,INR,DEBIT,IMPS,Jio,2026-09-23,14:19:27,105948,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000085,MERCHANT_0065,SMS,Account access from new device detected. Verify if this was you.,,,,,,,,,,,False,
+TXN_EXT_000086,MERCHANT_0453,SMS,"INR 4,893.00 received from suresh@oksbi via UPI. Ref: TXN5848950368. Credited to A/c XX6138.",4893,INR,CREDIT,UPI,,2026-09-01,,TXN5848950368,6138,Punjab National Bank,True,SUCCESS
+TXN_EXT_000087,MERCHANT_0581,MANUAL_TEXT,"Dear Customer, INR 1,845.00 has been debited from your A/c XX2984 via UPI to QuickBooks on 25-09-26. UPI Ref: None.",1845,INR,DEBIT,UPI,QuickBooks,2026-09-25,,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000088,MERCHANT_0179,NOTIFICATION,"₹351 received via IMPS from Apollo Pharmacy on Aug 16, 2026.",351,INR,CREDIT,IMPS,Apollo Pharmacy,,18:38:01,,9743,Punjab National Bank,True,SUCCESS
+TXN_EXT_000089,MERCHANT_0811,NOTIFICATION,"Refund of ₹2,509.00 from Sharma Traders credited to your card ending 5670.",2509,INR,CREDIT,CARD,,2026-08-26,19:37:15,IMPS396125051,5670,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000090,MERCHANT_0108,SMS,"A/c XX7912: ₹1,500 debited. Current balance ₹56,500.00.",1500,INR,DEBIT,,Gupta Distributors,,,,7912,IndusInd Bank,True,SUCCESS
+TXN_EXT_000091,MERCHANT_0933,NOTIFICATION,"INR 24,970 debited via UPI to Zomato at 4:31PM on Sep 15, 2026. Ref: IMPS459282088.",24970,INR,DEBIT,UPI,Zomato,2026-09-15,16:31:46,IMPS459282088,,Axis Bank,True,SUCCESS
+TXN_EXT_000092,MERCHANT_0608,MANUAL_TEXT,"INR 4,898.00 transferred to Kumar Trading Co. Bank charges 15 applicable. A/c XXNone.",4898,INR,DEBIT,BANK_TRANSFER,Kumar Trading Co,2026-08-29,07:39:59,TXN9020706213,,Axis Bank,True,SUCCESS
+TXN_EXT_000093,MERCHANT_0308,MANUAL_TEXT,IndusInd Bank: Account access from new device detected. Verify if this was you.,,,,,,,,,,IndusInd Bank,False,
+TXN_EXT_000094,MERCHANT_0636,SMS,INR 494.00 received from Lakshmi Nair via UPI. Ref: TXN5284631450. Credited to A/c XXNone.,494,INR,CREDIT,UPI,Lakshmi Nair,2026-08-19,01:49:22,TXN5284631450,,Federal Bank,True,SUCCESS
+TXN_EXT_000095,MERCHANT_0372,NOTIFICATION,"Get 15% discount on credit card purchases above INR2,000.00.",,,,,,,,,,,False,
+TXN_EXT_000096,MERCHANT_0408,NOTIFICATION,"INR 87,983.00 credited to your account from Rajesh Mehta. Ref TXN3597215154.",87983,INR,CREDIT,BANK_TRANSFER,Rajesh Mehta,2026-08-11,19:46:39,TXN3597215154,,,True,SUCCESS
+TXN_EXT_000097,MERCHANT_0808,MANUAL_TEXT,sent 25.0k to Verma Goods via upi 02/08/26,25006,INR,DEBIT,UPI,Verma Goods,2026-08-02,11:46:08,,8168,Federal Bank,True,SUCCESS
+TXN_EXT_000098,MERCHANT_0644,MANUAL_TEXT,"UPI collect payment of Rs15,045/- from Tally Solutions credited. Ref None.",15045,INR,CREDIT,UPI,,2026-09-04,,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000099,MERCHANT_0718,SMS,Statement for A/c XX3968 is ready for download.,,,,,,,,,,Bank of Baroda,False,
+TXN_EXT_000100,MERCHANT_0141,SMS,"INR 2,500.00 debited from A/c XX4116. Available balance Rs. 27,500/-.",2500,INR,DEBIT,,,,,,4116,,True,SUCCESS
+TXN_EXT_000101,MERCHANT_0967,MANUAL_TEXT,Your OTP for transaction is 996501. Do not share.,,,,,,,,,,,False,
+TXN_EXT_000102,MERCHANT_0149,SMS,"Card transaction of INR250,011.00 at Ravi Kumar was declined.",250011,INR,DEBIT,CARD,Ravi Kumar,2026-08-19,,,,IndusInd Bank,True,FAILED
+TXN_EXT_000103,MERCHANT_0336,SMS,"Your credit card limit is INR 50,000.00.",,,,,,,,,,,False,
+TXN_EXT_000104,MERCHANT_0532,MANUAL_TEXT,"Rs. 48,455/- debited via UPI to pooja@okcanara. Available balance INR 63,455.",48455,INR,DEBIT,UPI,pooja@okcanara,2026-08-07,20:06:36,YESR722901319,,,True,SUCCESS
+TXN_EXT_000105,MERCHANT_0521,SMS,KYC deadline approaching. Complete eKYC now.,,,,,,,,,,,False,
+TXN_EXT_000106,MERCHANT_0104,NOTIFICATION,"Transfer reference None created for ₹ 61,988 to Myntra.",61988,INR,DEBIT,,Myntra,2026-08-09,,,,Federal Bank,True,PENDING
+TXN_EXT_000107,MERCHANT_0756,SMS,"Your transfer of INR 95,008.00 to Suresh Gupta is pending confirmation.",95008,INR,DEBIT,,,2026-09-18,20:41:11,,6006,ICICI Bank,True,PENDING
+TXN_EXT_000108,MERCHANT_0259,SMS,"Rs. 999,993 debited from your account ending None via UPI to Tata Power on August 20. Ref no 226200.",999993,INR,DEBIT,UPI,Tata Power,2026-08-20,03:42:00,,,Canara Bank,True,SUCCESS
+TXN_EXT_000109,MERCHANT_0208,MANUAL_TEXT,₹ 490 received via IMPS from DMart on 25 Sep 2026.,490,INR,CREDIT,IMPS,DMart,2026-09-25,,,8132,Canara Bank,True,SUCCESS
+TXN_EXT_000110,MERCHANT_0763,SMS,"Dear Customer, INR152.00 has been debited from your A/c XX8349 via UPI to Joshi Mart on 03 Sep 2026. UPI Ref: KOTAKR433406385.",152,INR,DEBIT,UPI,,2026-09-03,06:13:29,KOTAKR433406385,8349,Bank of Baroda,True,SUCCESS
+TXN_EXT_000111,MERCHANT_0912,NOTIFICATION,UPI collect payment of INR11.00 from Rajesh Mehta credited. Ref None.,11,INR,CREDIT,UPI,Rajesh Mehta,2026-08-24,23:56:26,,5355,Canara Bank,True,SUCCESS
+TXN_EXT_000112,MERCHANT_0376,MANUAL_TEXT,"₹48,542 paid to Indraprastha Gas. Mode not specified.",48542,INR,DEBIT,,Indraprastha Gas,2026-09-23,,,6656,,True,SUCCESS
+TXN_EXT_000113,MERCHANT_0111,SMS,"Paid INR 1,200 to Paytm Mall. You won Rs. 100 cashback!",1200,INR,DEBIT,UPI,Paytm Mall,,,,,,True,SUCCESS
+TXN_EXT_000114,MERCHANT_0891,NOTIFICATION,Rs. 99 received via IMPS from Sunita Reddy on 21/08/26.,99,INR,CREDIT,IMPS,Sunita Reddy,2026-08-21,06:47:09,UPI784458615763,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000115,MERCHANT_0222,MANUAL_TEXT,"Apply for home loan at 8.2% interest rate. Loan amount up to INR 2,500,000.",,,,,,,,,,,False,
+TXN_EXT_000116,MERCHANT_0755,SMS,"Your transfer of ₹ 374,967 to Lakshmi Nair is pending confirmation.",374967,INR,DEBIT,,Lakshmi Nair,2026-09-05,13:55:15,926595,1208,Axis Bank,True,PENDING
+TXN_EXT_000117,MERCHANT_0695,NOTIFICATION,"Refund of ₹62,016.00 from Vodafone Idea credited to your card ending 7246.",62016,INR,CREDIT,CARD,Vodafone Idea,2026-08-24,22:33:27,,,Canara Bank,True,SUCCESS
+TXN_EXT_000118,MERCHANT_0838,NOTIFICATION,"INR 94,967 credited to your account from vikram@ybl. Ref UPI972456963158.",94967,INR,CREDIT,BANK_TRANSFER,vikram@ybl,2026-09-30,16:15:08,UPI972456963158,1889,State Bank of India,True,SUCCESS
+TXN_EXT_000119,MERCHANT_0630,NOTIFICATION,Our mobile banking services will be unavailable tonight from 12AM to 4AM.,,,,,,,,,,,False,
+TXN_EXT_000120,MERCHANT_0307,NOTIFICATION,"Available bal Rs. 12,000 in A/c 7374.",,,,,,,,,,,False,
+TXN_EXT_000121,MERCHANT_0178,NOTIFICATION,"₹500,076.00 debited via UPI to neha@okkotak. Available balance ₹ 515,076.",500076,INR,DEBIT,UPI,,2026-09-22,19:41:19,,,,True,SUCCESS
+TXN_EXT_000122,MERCHANT_0861,NOTIFICATION,"IDFC FIRST Bank: NEFT of Rs4,499/- to Stripe India failed. UTR IDFCR224359899.",4499,INR,DEBIT,NEFT,Stripe India,2026-09-01,19:22:34,,,IDFC FIRST Bank,True,FAILED
+TXN_EXT_000123,MERCHANT_0403,NOTIFICATION,Account access from new device detected. Verify if this was you.,,,,,,,,,,,False,
+TXN_EXT_000124,MERCHANT_0732,SMS,IDFC FIRST Bank: IMPS of Rs. 350 to priya@okhdfcbank debited. Ref IMPS893889313.,350,INR,DEBIT,IMPS,priya@okhdfcbank,2026-09-11,09:34:29,,4992,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000125,MERCHANT_0594,NOTIFICATION,"UPI collect payment of INR25,025.00 from rahul@upi credited. Ref None.",25025,INR,CREDIT,UPI,rahul@upi,2026-09-02,22:38:03,,3176,,True,SUCCESS
+TXN_EXT_000126,MERCHANT_0809,SMS,"IMPS credit of INR 4,902.00 from Stripe India. Ref: IMPS846152610. Credited to A/c XX5259.",4902,INR,CREDIT,IMPS,Stripe India,2026-08-07,18:18:39,TXN2221681350,5259,Canara Bank,True,SUCCESS
+TXN_EXT_000127,MERCHANT_0555,MANUAL_TEXT,"Available bal ₹ 28,000 in A/c 7883.",,,,,,,,,,,False,
+TXN_EXT_000128,MERCHANT_0186,SMS,"None: Rs. 24,969 debited from A/c None towards Ola. Ref None.",24969,INR,DEBIT,BANK_TRANSFER,,2026-09-09,11:56:06,,,,True,SUCCESS
+TXN_EXT_000129,MERCHANT_0166,NOTIFICATION,Rs 10000 processed for Kumar Trading Co,10000,INR,CREDIT,IMPS,Kumar Trading Co,2026-09-24,,,,,True,SUCCESS
+TXN_EXT_000130,MERCHANT_0142,MANUAL_TEXT,"Your account balance as on 29/08/2026 is ₹ 95,000.",,,,,,,,,,,False,
+TXN_EXT_000131,MERCHANT_0198,NOTIFICATION,"You paid Rs. 4,491/- to Big Bazaar using UPI. Ref No: IMPS984233149.",4491,INR,DEBIT,UPI,Big Bazaar,2026-08-03,01:58:23,IMPS984233149,7503,ICICI Bank,True,SUCCESS
+TXN_EXT_000132,MERCHANT_0182,SMS,"Bank of Baroda: Rs94,958/- debited from A/c None towards Mehta & Sons. Ref None.",94958,INR,DEBIT,BANK_TRANSFER,Mehta & Sons,2026-09-06,02:55:04,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000133,MERCHANT_0989,SMS,"Transfer of ₹749,998 to Amit Sharma completed. Ref no None.",749998,INR,DEBIT,BANK_TRANSFER,Amit Sharma,2026-08-03,06:46:23,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000134,MERCHANT_0138,SMS,Complete your KYC to continue uninterrupted banking.,,,,,,,,,,,False,
+TXN_EXT_000135,MERCHANT_0002,SMS,"INR 2,502.00 transferred to Patel Enterprises via IMPS. IMPS Ref: IMPS944285110.",2502,INR,DEBIT,IMPS,Patel Enterprises,2026-08-03,11:32:56,IMPS245967878,6873,Axis Bank,True,SUCCESS
+TXN_EXT_000136,MERCHANT_0244,MANUAL_TEXT,Update your PAN details for uninterrupted account services.,,,,,,,,,,,False,
+TXN_EXT_000137,MERCHANT_0382,SMS,"NEFT of ₹25,034 credited from anita@okidfc. Ref UPI560243328878. A/c XX6516.",25034,INR,CREDIT,NEFT,anita@okidfc,2026-09-27,10:44:06,UPI560243328878,6516,ICICI Bank,True,SUCCESS
+TXN_EXT_000138,MERCHANT_0227,NOTIFICATION,"INR1,854.00 sent to karan@okpnb through NEFT on 11-08-26. UTR FEDR568849679.",1854,INR,DEBIT,NEFT,karan@okpnb,2026-08-11,07:17:06,IMPS567285228,7335,Axis Bank,True,SUCCESS
+TXN_EXT_000139,MERCHANT_0790,NOTIFICATION,"₹1,841 refund processed from rahul@upi to card XX3840.",1841,INR,CREDIT,CARD,rahul@upi,2026-09-23,06:05:19,,,,True,SUCCESS
+TXN_EXT_000140,MERCHANT_0627,SMS,You paid ₹248.00 to neha@okkotak using UPI. Ref No: None.,248,INR,DEBIT,UPI,neha@okkotak,2026-09-16,02:30:46,,,,True,SUCCESS
+TXN_EXT_000141,MERCHANT_0130,MANUAL_TEXT,"INR 124,919.00 credited to your account from Apollo Pharmacy. Ref UPI291571954796.",124919,INR,CREDIT,BANK_TRANSFER,,,19:17:17,UPI291571954796,,,True,SUCCESS
+TXN_EXT_000142,MERCHANT_0020,SMS,"Rs. 124,947 debited via UPI to neha@okkotak at 9:52 PM on 01-09-26. Ref: TXN9189797508.",124947,INR,DEBIT,UPI,neha@okkotak,2026-09-01,21:52:47,,,,True,SUCCESS
+TXN_EXT_000143,MERCHANT_0739,SMS,"₹375,090.00 credited from QuickBooks. Settlement received.",375090,INR,CREDIT,,QuickBooks,,19:57:10,,9209,Yes Bank,True,SUCCESS
+TXN_EXT_000144,MERCHANT_0667,SMS,You are eligible for ₹500 cashback on your next UPI payment.,,,,,,,,,,,False,
+TXN_EXT_000145,MERCHANT_0255,MANUAL_TEXT,"Bank of Baroda: NEFT of ₹ 35,039 to ravi@okaxis failed. UTR HDFCR218805217.",35039,INR,DEBIT,NEFT,ravi@okaxis,,16:24:36,,,Bank of Baroda,True,FAILED
+TXN_EXT_000146,MERCHANT_0836,MANUAL_TEXT,INR 150 paid to Reddy Logistics via UPI,150,INR,DEBIT,UPI,Reddy Logistics,,23:56:02,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000147,MERCHANT_0420,NOTIFICATION,"Dear Customer, ₹ 49 has been debited from your A/c XX4089 via UPI to Amit Sharma on 04 Aug. UPI Ref: IMPS307652855.",49,INR,DEBIT,UPI,Amit Sharma,2026-08-04,,IMPS307652855,,,True,SUCCESS
+TXN_EXT_000148,MERCHANT_0963,MANUAL_TEXT,"Get instant personal loan up to Rs. 250,000.",,,,,,,,,,,False,
+TXN_EXT_000149,MERCHANT_0134,SMS,"RTGS transfer of Rs. 4,503 to Adani Electricity completed. UTR: ICICIR499978780. A/c XXNone.",4503,INR,DEBIT,RTGS,Adani Electricity,2026-09-14,01:06:25,TXN2490454518,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000150,MERCHANT_0835,NOTIFICATION,INR740.00 received from Priya Patel via UPI. Ref: IMPS585974860. Credited to A/c XXNone.,740,INR,CREDIT,UPI,Priya Patel,2026-08-02,03:13:11,IMPS585974860,,Yes Bank,True,SUCCESS
+TXN_EXT_000151,MERCHANT_0536,SMS,Rs.99 Dr A/c XX1297 UPI Ref TXN8751796907 to Sunita Reddy,99,INR,DEBIT,UPI,,2026-09-12,,TXN8751796907,1297,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000152,MERCHANT_0118,SMS,"Rs95,025/- debited via UPI to Verma Goods at 22:08 hrs on 17 Sep. Ref: None.",95025,INR,DEBIT,UPI,Verma Goods,2026-09-17,,,5076,HDFC Bank,True,SUCCESS
+TXN_EXT_000153,MERCHANT_0206,MANUAL_TEXT,"Rs. 1,199 debited from your account ending 9422 via UPI to Apollo Pharmacy on Sep 04, 2026. Ref no 701969.",1199,INR,DEBIT,UPI,Apollo Pharmacy,2026-09-04,14:42:07,IMPS222900917,,Federal Bank,True,SUCCESS
+TXN_EXT_000154,MERCHANT_0646,MANUAL_TEXT,"IMPS credit of ₹95,012 from Deepak Joshi. Ref: IMPS462622584. Credited to A/c XX9856.",95012,INR,CREDIT,IMPS,Deepak Joshi,2026-09-26,,TXN6319253135,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000155,MERCHANT_0196,NOTIFICATION,"Rs1,200/- paid to Apollo Pharmacy. Cashback Rs. 50 credited.",1200,INR,DEBIT,UPI,Apollo Pharmacy,,,,,,True,SUCCESS
+TXN_EXT_000156,MERCHANT_0590,SMS,"Federal Bank: POS purchase of INR 124,923.00 at Reliance Fresh. Card XX5301.",124923,INR,DEBIT,CARD,Reliance Fresh,2026-08-28,,TXN4201103712,5301,Federal Bank,True,SUCCESS
+TXN_EXT_000157,MERCHANT_0770,MANUAL_TEXT,Rs. 23 debited from your account ending 2941 via UPI to Ravi Kumar on 26 Aug. Ref no 324933.,23,INR,DEBIT,UPI,,2026-08-26,21:39:13,,2941,Yes Bank,True,SUCCESS
+TXN_EXT_000158,MERCHANT_0464,MANUAL_TEXT,"Rs. 48,499 debited from your account ending 4554 via UPI to Notion on 24 Aug 2026. Ref no 213927.",48499,INR,DEBIT,UPI,Notion,2026-08-24,10:42:25,,4554,,True,SUCCESS
+TXN_EXT_000159,MERCHANT_0858,SMS,"₹24,970.00 DEBITED frm Ac XXNone via UPI to Big Bazaar on 30 Aug.",24970,INR,DEBIT,UPI,Big Bazaar,2026-08-30,,,,,True,SUCCESS
+TXN_EXT_000160,MERCHANT_0053,NOTIFICATION,"Get 15% discount on credit card purchases above ₹10,000.00.",,,,,,,,,,,False,
+TXN_EXT_000161,MERCHANT_0066,MANUAL_TEXT,Rs. 348 spent at Chargebee using your card ending 9943. Ref: 439984.,348,INR,DEBIT,CARD,Chargebee,2026-09-08,07:04:51,,,Axis Bank,True,SUCCESS
+TXN_EXT_000162,MERCHANT_0701,NOTIFICATION,None: IMPS of ₹ 451 to Pooja Iyer debited. Ref IMPS830955923.,451,INR,DEBIT,IMPS,Pooja Iyer,2026-08-22,20:20:55,,,,True,SUCCESS
+TXN_EXT_000163,MERCHANT_0197,SMS,"INR 1,000.00 paid to Mehta & Sons. Cashback INR 10 credited.",1000,INR,DEBIT,UPI,Mehta & Sons,,,,,,True,SUCCESS
+TXN_EXT_000164,MERCHANT_0641,MANUAL_TEXT,"IMPS credit of ₹87,998 from Manish Agarwal. Ref: IMPS594897685. Credited to A/c XX6113.",87998,INR,CREDIT,IMPS,,2026-08-28,11:26:22,,6113,Canara Bank,True,SUCCESS
+TXN_EXT_000165,MERCHANT_0245,MANUAL_TEXT,INR9.00 sent to Sunita Reddy through NEFT on 18/08/26. UTR YESR473098534.,9,INR,DEBIT,NEFT,Sunita Reddy,2026-08-18,11:42:25,,2124,,True,SUCCESS
+TXN_EXT_000166,MERCHANT_0573,MANUAL_TEXT,"INR 1,999,995 debited via UPI to Cafe Coffee Day at 11:49 hrs on 20-08-2026. Ref: None.",1999995,INR,DEBIT,UPI,Cafe Coffee Day,2026-08-20,11:49:45,,,Canara Bank,True,SUCCESS
+TXN_EXT_000167,MERCHANT_0635,NOTIFICATION,Congratulations! You earned 25 reward points on your last purchase.,,,,,,,,,,Bank of Baroda,False,
+TXN_EXT_000168,MERCHANT_0205,SMS,"₹74,972 sent to Arun Verma through NEFT on 15 September 2026. UTR AXISR820535276.",74972,INR,DEBIT,NEFT,Arun Verma,2026-09-15,00:01:36,TXN8199937700,8036,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000169,MERCHANT_0131,NOTIFICATION,"Rs. 1,190 transferred to neha@okkotak via IMPS. IMPS Ref: IMPS982252644.",1190,INR,DEBIT,IMPS,neha@okkotak,2026-08-26,01:11:38,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000170,MERCHANT_0883,MANUAL_TEXT,₹ 100 refund processed from Amazon to card XXNone.,100,INR,CREDIT,CARD,Amazon,2026-08-09,,IMPS270293780,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000171,MERCHANT_0742,MANUAL_TEXT,₹ 50 credited to your account from Amazon. Ref IMPS226925707.,50,INR,CREDIT,BANK_TRANSFER,Amazon,2026-09-24,09:46:59,IMPS226925707,9463,,True,SUCCESS
+TXN_EXT_000172,MERCHANT_0044,NOTIFICATION,"Transfer of Rs. 4,899 to Mahanagar Gas completed. Ref no SBIR790040719.",4899,INR,DEBIT,BANK_TRANSFER,Mahanagar Gas,,,SBIR790040719,,,True,SUCCESS
+TXN_EXT_000173,MERCHANT_0890,MANUAL_TEXT,"Payment of Rs. 34,978 to Mahanagar Gas unsuccessful. Please retry.",34978,INR,DEBIT,,Mahanagar Gas,2026-09-18,17:47:38,,,State Bank of India,True,FAILED
+TXN_EXT_000174,MERCHANT_0863,NOTIFICATION,"Dear Customer, Rs. 150/- has been debited from your A/c XX1818 via UPI to Stripe India on 21-09-26. UPI Ref: IMPS615329445.",150,INR,DEBIT,UPI,Stripe India,,08:18:36,IMPS615329445,1818,IndusInd Bank,True,SUCCESS
+TXN_EXT_000175,MERCHANT_0906,NOTIFICATION,"Rs250,051/- received from vikram@ybl via UPI. Ref: None. Credited to A/c XX8357.",250051,INR,CREDIT,UPI,vikram@ybl,2026-08-22,05:53:38,,8357,Bank of Baroda,True,SUCCESS
+TXN_EXT_000176,MERCHANT_0768,MANUAL_TEXT,Auto-debit mandate registered successfully for Spotify.,,,,,,,,,,IndusInd Bank,False,
+TXN_EXT_000177,MERCHANT_0368,NOTIFICATION,INR 10.00 credited to your account from Suresh Gupta. Ref 525756.,10,INR,CREDIT,BANK_TRANSFER,Suresh Gupta,2026-08-16,22:37:25,525756,9931,State Bank of India,True,SUCCESS
+TXN_EXT_000178,MERCHANT_0320,SMS,"Rs. 1,209 transferred to rajesh@okbaroda via IMPS. IMPS Ref: IMPS659011768.",1209,INR,DEBIT,IMPS,rajesh@okbaroda,2026-08-05,13:08:09,,,,True,SUCCESS
+TXN_EXT_000179,MERCHANT_0723,MANUAL_TEXT,KYC deadline approaching. Complete eKYC now.,,,,,,,,,,,False,
+TXN_EXT_000180,MERCHANT_0230,MANUAL_TEXT,"Rs. 87,984 received from neha@okkotak on 23 September 2026 via UPI.",87984,INR,CREDIT,UPI,neha@okkotak,2026-09-23,14:39:28,,3807,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000181,MERCHANT_0138,SMS,INR99.00 spent at AWS using your card ending 8086. Ref: IMPS557523905.,99,INR,DEBIT,CARD,AWS,2026-09-03,,IMPS557523905,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000182,MERCHANT_0932,SMS,"₹2,501 refund processed from Apollo Pharmacy to card XX1517.",2501,INR,CREDIT,CARD,Apollo Pharmacy,2026-09-18,15:09:16,,1517,,True,SUCCESS
+TXN_EXT_000183,MERCHANT_0757,NOTIFICATION,"Pre-approved business loan of INR1,000,000.00 waiting for you!",,,,,,,,,,ICICI Bank,False,
+TXN_EXT_000184,MERCHANT_0117,NOTIFICATION,"₹10.00 debited via UPI to Tata Power. Available balance Rs. 35,010.",10,INR,DEBIT,UPI,Tata Power,2026-08-21,,,5530,Federal Bank,True,SUCCESS
+TXN_EXT_000185,MERCHANT_0616,NOTIFICATION,paid Swiggy Rs23/- via card on 23 Aug fuel,23,INR,DEBIT,CARD,Swiggy,2026-08-23,19:26:28,,2040,Federal Bank,True,SUCCESS
+TXN_EXT_000186,MERCHANT_0217,MANUAL_TEXT,"₹62,007 refund processed from ravi@okaxis to card XX3764.",62007,INR,CREDIT,CARD,ravi@okaxis,2026-09-01,05:03:30,,3764,State Bank of India,True,SUCCESS
+TXN_EXT_000187,MERCHANT_0908,SMS,₹11.00 DEBITED frm Ac XX6830 via UPI to Cafe Coffee Day on 26-08-26.,11,INR,DEBIT,UPI,Cafe Coffee Day,2026-08-26,,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000188,MERCHANT_0905,SMS,Your transfer of INR251.00 to Ola is pending confirmation.,251,INR,DEBIT,,Ola,,01:55:10,,2955,,True,PENDING
+TXN_EXT_000189,MERCHANT_0755,NOTIFICATION,"sent 52.0k to neha@okkotak via upi Sep 22, 2026",52,INR,DEBIT,UPI,neha@okkotak,2026-09-22,10:46:45,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000190,MERCHANT_0264,SMS,Yes Bank: Scratch card reward worth ₹25.00 unlocked.,,,,,,,,,,Yes Bank,False,
+TXN_EXT_000191,MERCHANT_0980,SMS,"Rs. 15,023 received from pooja@okcanara on 15-09-26 via UPI.",15023,INR,CREDIT,UPI,pooja@okcanara,2026-09-15,22:00:43,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000192,MERCHANT_0001,SMS,Send money via UPI and win ₹50 cashback.,,,,,,,,,,,False,
+TXN_EXT_000193,MERCHANT_0695,SMS,"Rs. 749,938 debited from your account ending 1750 via UPI to vikram@ybl on 15 Aug. Ref no 280616.",749938,INR,DEBIT,UPI,vikram@ybl,,01:47:09,,1750,Punjab National Bank,True,SUCCESS
+TXN_EXT_000194,MERCHANT_0554,NOTIFICATION,Complete your KYC to continue uninterrupted banking.,,,,,,,,,,,False,
+TXN_EXT_000195,MERCHANT_0936,MANUAL_TEXT,"Refund of Rs2,491/- from Sharma Traders credited to your card ending None.",2491,INR,CREDIT,CARD,Sharma Traders,2026-09-09,14:08:46,,,,True,SUCCESS
+TXN_EXT_000196,MERCHANT_0945,MANUAL_TEXT,"Your transfer of INR1,203.00 to BESCOM is pending confirmation.",1203,INR,DEBIT,,,,,FEDR120380266,5358,IndusInd Bank,True,PENDING
+TXN_EXT_000197,MERCHANT_0642,NOTIFICATION,UPI collect payment of ₹9 from Adani Electricity credited. Ref YESR836613394.,9,INR,CREDIT,UPI,Adani Electricity,2026-09-26,19:57:11,,3400,IndusInd Bank,True,SUCCESS
+TXN_EXT_000198,MERCHANT_0991,SMS,Canara Bank: You won INR 200 cashback! Claim before midnight.,,,,,,,,,,Canara Bank,False,
+TXN_EXT_000199,MERCHANT_0476,SMS,"INR 48,532.00 received from BESCOM via UPI. Ref: None. Credited to A/c XX7794.",48532,INR,CREDIT,UPI,BESCOM,2026-08-01,07:32:18,,7794,HDFC Bank,True,SUCCESS
+TXN_EXT_000200,MERCHANT_0485,MANUAL_TEXT,Pay using UPI and earn exciting rewards!,,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000201,MERCHANT_0040,NOTIFICATION,"Rs.48,507 Dr A/c XX9964 UPI Ref None to Verma Goods",48507,INR,DEBIT,UPI,Verma Goods,2026-09-07,,,9964,State Bank of India,True,SUCCESS
+TXN_EXT_000202,MERCHANT_0688,NOTIFICATION,"None: POS purchase of Rs. 2,502/- at Anita Desai. Card XX3416.",2502,INR,DEBIT,CARD,Anita Desai,2026-08-11,05:21:16,,,,True,SUCCESS
+TXN_EXT_000203,MERCHANT_0636,NOTIFICATION,"State Bank of India: NEFT Credit of ₹52 received from Singh Brothers. UTR: YESR284462987. Value Date: Aug 19, 2026.",52,INR,CREDIT,NEFT,,,15:27:57,ICICIR172350979,,State Bank of India,True,SUCCESS
+TXN_EXT_000204,MERCHANT_0106,NOTIFICATION,"INR 7,500 debited from A/c XX8744. Available balance Rs. 62,500/-.",7500,INR,DEBIT,,,2026-09-20,,IMPS959629660,8744,,True,SUCCESS
+TXN_EXT_000205,MERCHANT_0451,SMS,"INR4,892.00 credited to your account from Stripe India. Ref HDFCR996278276.",4892,INR,CREDIT,BANK_TRANSFER,,2026-08-23,11:22:49,,,Axis Bank,True,SUCCESS
+TXN_EXT_000206,MERCHANT_0822,NOTIFICATION,"UPI collect payment of ₹62,042 from Ola credited. Ref None.",62042,INR,CREDIT,UPI,Ola,2026-08-18,11:25:05,,,Canara Bank,True,SUCCESS
+TXN_EXT_000207,MERCHANT_0408,SMS,Pay using UPI and earn exciting rewards!,,,,,,,,,,,False,
+TXN_EXT_000208,MERCHANT_0830,SMS,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000209,MERCHANT_0350,SMS,"You paid INR88,004.00 to Rajesh Mehta using UPI. Ref No: TXN7285695527.",88004,INR,DEBIT,UPI,Rajesh Mehta,2026-09-21,17:24:46,,9501,IndusInd Bank,True,SUCCESS
+TXN_EXT_000210,MERCHANT_0104,MANUAL_TEXT,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000211,MERCHANT_0537,SMS,You won INR 100.00 cashback! Claim before midnight.,,,,,,,,,,,False,
+TXN_EXT_000212,MERCHANT_0654,NOTIFICATION,"You paid INR3,201.00 to Patel Enterprises using UPI. Ref No: 224867.",3201,INR,DEBIT,UPI,Patel Enterprises,2026-08-20,,224867,5919,,True,SUCCESS
+TXN_EXT_000213,MERCHANT_0622,NOTIFICATION,"INR87,970.00 debited via UPI to Anita Desai. Available balance Rs. 112,970.",87970,INR,DEBIT,UPI,Anita Desai,2026-08-07,06:12:26,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000214,MERCHANT_0875,NOTIFICATION,"Rs. 125,053 debited from your account ending 3601 via UPI to rahul@upi on 21.09.2026. Ref no 392042.",125053,INR,DEBIT,UPI,,2026-09-21,01:24:23,,,Canara Bank,True,SUCCESS
+TXN_EXT_000215,MERCHANT_0938,MANUAL_TEXT,Transfer of ₹51 from Cafe Coffee Day received. A/c XX4154.,51,INR,CREDIT,BANK_TRANSFER,Cafe Coffee Day,2026-09-04,00:58:33,TXN7208619610,4154,ICICI Bank,True,SUCCESS
+TXN_EXT_000216,MERCHANT_0921,NOTIFICATION,"INR 4,907.00 DEBITED A/C XXNone VIA UPI TO POOJA IYER. REF: IMPS869084355.",4907,INR,DEBIT,UPI,Pooja Iyer,2026-08-25,19:13:33,IMPS869084355,,,True,SUCCESS
+TXN_EXT_000217,MERCHANT_0404,NOTIFICATION,INR250.00 sent to Kumar Trading Co through NEFT on 08 August 2026. UTR ICICIR926966364.,250,INR,DEBIT,NEFT,Kumar Trading Co,2026-08-08,05:25:08,403959,2002,Federal Bank,True,SUCCESS
+TXN_EXT_000218,MERCHANT_0423,NOTIFICATION,"Your card was used for INR 48,498 at Ola on 24 Aug 2026 at 10:31AM.",48498,INR,DEBIT,CARD,Ola,,10:31:12,FEDR733969290,,,True,SUCCESS
+TXN_EXT_000219,MERCHANT_0763,MANUAL_TEXT,"Refund of Rs. 4,999,776 from Rajesh Mehta credited to your card ending None.",4999776,INR,CREDIT,CARD,Rajesh Mehta,2026-08-02,06:40:33,450267,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000220,MERCHANT_0222,SMS,"Rs. 61,961 debited from your account ending 9344 via UPI to Verma Goods on 18-09-2026. Ref no 225777.",61961,INR,DEBIT,UPI,Verma Goods,2026-09-18,20:28:10,,9344,ICICI Bank,True,SUCCESS
+TXN_EXT_000221,MERCHANT_0070,SMS,"Transfer of Rs. 48,482 from Lakshmi Nair received. A/c XXNone.",48482,INR,CREDIT,BANK_TRANSFER,Lakshmi Nair,2026-09-16,01:24:28,IDFCR629442753,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000222,MERCHANT_0948,NOTIFICATION,"CARD txn: Rs. 149/- at Manish Agarwal on 20 Sep. Avl bal ₹25,149.00.",149,INR,DEBIT,CARD,Manish Agarwal,,12:49:10,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000223,MERCHANT_0222,SMS,"₹ 34,962 debited via UPI to Ravi Kumar. Available balance Rs. 79,962.",34962,INR,DEBIT,UPI,Ravi Kumar,2026-09-13,,,9225,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000224,MERCHANT_0562,SMS,Never share your OTP with anyone.,,,,,,,,,,Yes Bank,False,
+TXN_EXT_000225,MERCHANT_0701,NOTIFICATION,"Paid INR14,984.00 cash to Cafe Coffee Day for supplies.",14984,INR,DEBIT,CASH,Cafe Coffee Day,2026-09-10,02:09:04,IMPS864726126,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000226,MERCHANT_0196,SMS,"₹1,842 paid to Tally Solutions via UPI",1842,INR,DEBIT,UPI,Tally Solutions,2026-08-24,08:32:07,942438,2639,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000227,MERCHANT_0198,SMS,"Rs4,496/- DEBITED frm Ac XXNone via UPI to Singh Brothers on 01 August 2026.",4496,INR,DEBIT,UPI,Singh Brothers,,07:22:04,IMPS800053921,,HDFC Bank,True,SUCCESS
+TXN_EXT_000228,MERCHANT_0533,NOTIFICATION,"Canara Bank: INR 35,031 debited from A/c 6253 towards Tally Solutions. Ref None.",35031,INR,DEBIT,BANK_TRANSFER,Tally Solutions,2026-09-20,,,6253,Canara Bank,True,SUCCESS
+TXN_EXT_000229,MERCHANT_0004,NOTIFICATION,UPI payment of ₹740 to Slack failed. Insufficient funds.,740,INR,DEBIT,UPI,Slack,2026-09-01,17:51:00,,8794,IDFC FIRST Bank,True,FAILED
+TXN_EXT_000230,MERCHANT_0786,NOTIFICATION,"Transfer of ₹499,926 from sharma.traders@okicici received. A/c XXNone.",499926,INR,CREDIT,BANK_TRANSFER,sharma.traders@okicici,2026-09-20,05:16:06,810830,,,True,SUCCESS
+TXN_EXT_000231,MERCHANT_0909,SMS,Refund of INR 101.00 from ABC Wholesale credited to your card ending 2938.,101,INR,CREDIT,CARD,ABC Wholesale,2026-08-29,,,2938,IndusInd Bank,True,SUCCESS
+TXN_EXT_000232,MERCHANT_0530,MANUAL_TEXT,Account access from new device detected. Verify if this was you.,,,,,,,,,,,False,
+TXN_EXT_000233,MERCHANT_0090,SMS,IDFC FIRST Bank: Branch timings changed to 9:30 AM - 4:00 PM.,,,,,,,,,,,False,
+TXN_EXT_000234,MERCHANT_0995,SMS,INR 52 credited to your account from neha@okkotak. Ref None.,52,INR,CREDIT,BANK_TRANSFER,neha@okkotak,,02:15:49,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000235,MERCHANT_0332,SMS,UPI rewards worth Rs250/- waiting for you!,,,,,,,,,,State Bank of India,False,
+TXN_EXT_000236,MERCHANT_0596,SMS,"Transfer of Rs62,015/- to Kumar Trading Co completed. Ref no None.",62015,INR,DEBIT,BANK_TRANSFER,Kumar Trading Co,2026-08-26,,,7132,State Bank of India,True,SUCCESS
+TXN_EXT_000237,MERCHANT_0138,NOTIFICATION,"Paid Rs. 1,000/- to Uber. You won Rs. 50/- cashback!",1000,INR,DEBIT,UPI,Uber,,,,,,True,SUCCESS
+TXN_EXT_000238,MERCHANT_0175,SMS,"Apply for home loan at 7.5% interest rate. Loan amount up to INR 2,500,000.00.",,,,,,,,,,,False,
+TXN_EXT_000239,MERCHANT_0422,MANUAL_TEXT,paid pooja@okcanara Rs. 350 via card on 13.08.2026 fuel,350,INR,DEBIT,CARD,pooja@okcanara,2026-08-13,18:41:41,IMPS481295430,9363,Canara Bank,True,SUCCESS
+TXN_EXT_000240,MERCHANT_0133,NOTIFICATION,"UPI collect payment of INR 4,899.00 from Reddy Logistics credited. Ref None.",4899,INR,CREDIT,UPI,Reddy Logistics,,04:45:59,,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000241,MERCHANT_0133,NOTIFICATION,"Open a savings account with IndusInd Bank and get Rs. 2,000/- voucher.",,,,,,,,,,,False,
+TXN_EXT_000242,MERCHANT_0138,SMS,Rs. 250 received from Torrent Power on 22.09.2026 via UPI.,250,INR,CREDIT,UPI,,2026-09-22,04:37:19,UPI368170289869,9955,,True,SUCCESS
+TXN_EXT_000243,MERCHANT_0950,NOTIFICATION,Payment of ₹ 11 to Ravi Kumar unsuccessful. Please retry.,11,INR,DEBIT,,,2026-08-14,21:06:05,,7912,Federal Bank,True,FAILED
+TXN_EXT_000244,MERCHANT_0662,MANUAL_TEXT,Transfer of INR 348 to Kumar Trading Co completed. Ref no TXN9647679295.,348,INR,DEBIT,BANK_TRANSFER,Kumar Trading Co,2026-09-20,,,,State Bank of India,True,SUCCESS
+TXN_EXT_000245,MERCHANT_0009,MANUAL_TEXT,"Card transaction of Rs61,975/- at Zomato was declined.",61975,INR,DEBIT,CARD,Zomato,2026-09-06,,,,,True,FAILED
+TXN_EXT_000246,MERCHANT_0785,SMS,Your card was used for INR 501.00 at Slack on 26 August 2026 at 2:00 PM.,501,INR,DEBIT,CARD,Slack,2026-08-26,14:00:42,KOTAKR430204342,4869,,True,SUCCESS
+TXN_EXT_000247,MERCHANT_0195,MANUAL_TEXT,Update your PAN details for uninterrupted account services.,,,,,,,,,,,False,
+TXN_EXT_000248,MERCHANT_0976,MANUAL_TEXT,"Dear Customer, NEFT of ₹51 to sharma.traders@okicici has been debited from A/c XX3453. UTR: IDFCR601773279.",51,INR,DEBIT,NEFT,sharma.traders@okicici,2026-09-11,,,3453,,True,SUCCESS
+TXN_EXT_000249,MERCHANT_0676,SMS,You paid INR 50.00 to Deepak Joshi using UPI. Ref No: None.,50,INR,DEBIT,UPI,Deepak Joshi,2026-09-29,20:01:40,,3010,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000250,MERCHANT_0171,SMS,"EMI of INR 8,500.00 debited. Outstanding loan balance Rs297,500/-.",8500,INR,DEBIT,BANK_TRANSFER,IDFC FIRST Bank,2026-09-27,,TXN1678500147,,Yes Bank,True,SUCCESS
+TXN_EXT_000251,MERCHANT_0685,SMS,"Transfer reference 815380 created for Rs. 48,520 to Jio.",48520,INR,DEBIT,,Jio,2026-09-24,08:25:42,,,Bank of Baroda,True,PENDING
+TXN_EXT_000252,MERCHANT_0297,NOTIFICATION,"Cash payment of INR1,500,002.00 made to Vikram Rao on 22-09-2026.",1500002,INR,DEBIT,CASH,Vikram Rao,2026-09-22,18:19:31,,,,True,SUCCESS
+TXN_EXT_000253,MERCHANT_0003,NOTIFICATION,"Dear Customer, NEFT of INR 8.00 to priya@okhdfcbank has been debited from A/c XX8361. UTR: IDFCR654351339.",8,INR,DEBIT,NEFT,priya@okhdfcbank,2026-08-04,,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000254,MERCHANT_0650,NOTIFICATION,"Rs. 1,249,711 debited from your account ending None via UPI to AWS on 15 Aug 2026. Ref no 198242.",1249711,INR,DEBIT,UPI,AWS,2026-08-15,08:13:37,,,Axis Bank,True,SUCCESS
+TXN_EXT_000255,MERCHANT_0133,SMS,"Payment of ₹ 1,199 to Karan Malhotra unsuccessful. Please retry.",1199,INR,DEBIT,,Karan Malhotra,2026-08-14,,,7150,,True,FAILED
+TXN_EXT_000256,MERCHANT_0906,MANUAL_TEXT,Cash payment of ₹349 made to rajesh@okbaroda on 08 Aug 2026.,349,INR,DEBIT,CASH,rajesh@okbaroda,2026-08-08,,IDFCR334084722,3869,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000257,MERCHANT_0350,MANUAL_TEXT,"Refund of ₹ 88,022 from Sunita Reddy credited to your card ending 1329.",88022,INR,CREDIT,CARD,Sunita Reddy,2026-09-06,02:07:58,UPI448689749832,1329,,True,SUCCESS
+TXN_EXT_000258,MERCHANT_0668,MANUAL_TEXT,"Dear Customer, NEFT of INR1,843.00 to Ravi Kumar has been debited from A/c XX7735. UTR: IDFCR152541869.",1843,INR,DEBIT,NEFT,Ravi Kumar,2026-08-27,,UPI507458398326,7735,Federal Bank,True,SUCCESS
+TXN_EXT_000259,MERCHANT_0842,SMS,"UPI payment of Rs48,472/- to Uber failed. Insufficient funds.",48472,INR,DEBIT,UPI,,2026-08-26,19:06:43,,9098,HDFC Bank,True,FAILED
+TXN_EXT_000260,MERCHANT_0465,SMS,Federal Bank: Never share your OTP with anyone.,,,,,,,,,,Federal Bank,False,
+TXN_EXT_000261,MERCHANT_0370,SMS,Suspicious login detected on your account. Contact Punjab National Bank immediately.,,,,,,,,,,,False,
+TXN_EXT_000262,MERCHANT_0857,NOTIFICATION,"Rs2,500/- DEBITED frm Ac XX8953 via UPI to Uber on August 07.",2500,INR,DEBIT,UPI,Uber,2026-08-07,20:25:20,IDFCR317055967,8953,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000263,MERCHANT_0111,NOTIFICATION,"A/c XX7211: ₹2,500 debited. Current balance INR47,500.00.",2500,INR,DEBIT,BANK_TRANSFER,Swiggy,2026-09-17,,,7211,,True,SUCCESS
+TXN_EXT_000264,MERCHANT_0496,MANUAL_TEXT,"Open a savings account with IndusInd Bank and get INR 1,000 voucher.",,,,,,,,,,,False,
+TXN_EXT_000265,MERCHANT_0610,MANUAL_TEXT,"NEFT of INR 4,999,681 credited from Slack. Ref None. A/c XX7208.",4999681,INR,CREDIT,NEFT,Slack,2026-09-17,11:59:02,,7208,,True,SUCCESS
+TXN_EXT_000266,MERCHANT_0554,MANUAL_TEXT,Update your email address for account 4882.,,,,,,,,,,,False,
+TXN_EXT_000267,MERCHANT_0133,NOTIFICATION,₹496.00 received from Rao Suppliers on 08 Sep via UPI.,496,INR,CREDIT,UPI,Rao Suppliers,2026-09-08,,HDFCR119467577,5273,State Bank of India,True,SUCCESS
+TXN_EXT_000268,MERCHANT_0570,SMS,"INR 4,894.00 debited via UPI to Rao Suppliers at 0021 hrs on 07/09/2026. Ref: None.",4894,INR,DEBIT,UPI,Rao Suppliers,2026-09-07,00:21:29,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000269,MERCHANT_0991,NOTIFICATION,"Your available account balance is ₹ 75,000.",,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000270,MERCHANT_0412,NOTIFICATION,"INR 4,890.00 credited from pooja@okcanara. Settlement received.",4890,INR,CREDIT,,,2026-08-08,08:44:48,TXN9030957760,4079,Punjab National Bank,True,SUCCESS
+TXN_EXT_000271,MERCHANT_0247,SMS,"UPI collect payment of ₹374,985.00 from Chargebee credited. Ref AXISR541023669.",374985,INR,CREDIT,UPI,,2026-08-15,17:01:44,AXISR541023669,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000272,MERCHANT_0087,SMS,Learn about UPI Lite for faster payments under Rs. 200/-.,,,,,,,,,,Axis Bank,False,
+TXN_EXT_000273,MERCHANT_0609,SMS,"IndusInd Bank: NEFT of INR 34,990.00 to Microsoft Azure failed. UTR IDFCR505144293.",34990,INR,DEBIT,NEFT,Microsoft Azure,2026-08-31,,,,IndusInd Bank,True,FAILED
+TXN_EXT_000274,MERCHANT_0005,SMS,"INR 7,500.00 paid to DMart. Balance now ₹42,500.00.",7500,INR,DEBIT,BANK_TRANSFER,DMart,2026-08-13,,,9317,Canara Bank,True,SUCCESS
+TXN_EXT_000275,MERCHANT_0136,SMS,You won ₹200 cashback! Claim before midnight.,,,,,,,,,,,False,
+TXN_EXT_000276,MERCHANT_0131,NOTIFICATION,Statement for A/c XX2686 is ready for download.,,,,,,,,,,,False,
+TXN_EXT_000277,MERCHANT_0862,MANUAL_TEXT,Axis Bank: Update your email address for account 7308.,,,,,,,,,,Axis Bank,False,
+TXN_EXT_000278,MERCHANT_0502,NOTIFICATION,"NEFT of INR 95,046 credited from Verma Goods. Ref None. A/c XX1359.",95046,INR,CREDIT,NEFT,Verma Goods,,00:14:14,,1359,State Bank of India,True,SUCCESS
+TXN_EXT_000279,MERCHANT_0806,NOTIFICATION,"INR 1,209.00 received from Sunita Reddy on 19-08-2026 via UPI.",1209,INR,CREDIT,UPI,Sunita Reddy,2026-08-19,,AXISR246438473,,,True,SUCCESS
+TXN_EXT_000280,MERCHANT_0499,NOTIFICATION,"Transfer of ₹1,859.00 to karan@okpnb completed. Ref no UPI120684426027.",1859,INR,DEBIT,BANK_TRANSFER,,2026-08-24,09:05:08,UPI120684426027,,HDFC Bank,True,SUCCESS
+TXN_EXT_000281,MERCHANT_0664,SMS,Rs. 348/- transfer to Razorpay failed due to bank issue.,348,INR,DEBIT,,,2026-09-12,05:45:29,,8452,State Bank of India,True,FAILED
+TXN_EXT_000282,MERCHANT_0698,SMS,"Payment of INR 15,034.00 to karan@okpnb processed successfully.",15034,INR,DEBIT,,karan@okpnb,2026-08-08,04:40:01,SBIR649235047,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000283,MERCHANT_0869,NOTIFICATION,"Rs.4,893 Dr A/c XX8813 UPI Ref None to Patel Enterprises",4893,INR,DEBIT,UPI,,2026-09-28,03:48:02,,8813,HDFC Bank,True,SUCCESS
+TXN_EXT_000284,MERCHANT_0399,SMS,Send money via UPI and win INR 100 cashback.,,,,,,,,,,,False,
+TXN_EXT_000285,MERCHANT_0276,SMS,Rs.49 Dr A/c XX5330 UPI Ref IMPS535927034 to Pooja Iyer,49,INR,DEBIT,UPI,,2026-08-07,00:06:57,IMPS535927034,,Federal Bank,True,SUCCESS
+TXN_EXT_000286,MERCHANT_0991,SMS,Axis Bank: Rs. 50/- debited from A/c None towards Ola. Ref None.,50,INR,DEBIT,BANK_TRANSFER,Ola,2026-09-08,05:36:27,,,Axis Bank,True,SUCCESS
+TXN_EXT_000287,MERCHANT_0012,SMS,"A/c XX2389: Rs7,500/- debited. Current balance Rs32,500/-.",7500,INR,DEBIT,,,2026-09-02,,,2389,,True,SUCCESS
+TXN_EXT_000288,MERCHANT_0216,SMS,"INR 499,923.00 transferred to pooja@okcanara. Bank charges 5 applicable. A/c XX3578.",499923,INR,DEBIT,BANK_TRANSFER,pooja@okcanara,2026-08-08,12:03:40,,3578,Punjab National Bank,True,SUCCESS
+TXN_EXT_000289,MERCHANT_0020,SMS,Transfer of Rs. 742 from Indian Oil received. A/c XX3979.,742,INR,CREDIT,BANK_TRANSFER,,2026-08-29,15:55:30,,3979,Federal Bank,True,SUCCESS
+TXN_EXT_000290,MERCHANT_0013,SMS,"INR 2,500.00 debited from A/c XX9099. Available balance ₹47,500.",2500,INR,DEBIT,BANK_TRANSFER,Indian Oil,2026-08-16,,,9099,,True,SUCCESS
+TXN_EXT_000291,MERCHANT_0046,NOTIFICATION,You are eligible for INR250.00 cashback on your next UPI payment.,,,,,,,,,,,False,
+TXN_EXT_000292,MERCHANT_0352,MANUAL_TEXT,INR10.00 received from Microsoft Azure via UPI. Ref: TXN5373945362. Credited to A/c XX9631.,10,INR,CREDIT,UPI,Microsoft Azure,2026-08-31,10:13:47,TXN5373945362,9631,State Bank of India,True,SUCCESS
+TXN_EXT_000293,MERCHANT_0068,MANUAL_TEXT,You won Rs. 100/- cashback! Claim before midnight.,,,,,,,,,,,False,
+TXN_EXT_000294,MERCHANT_0094,SMS,IMPS transfer of ₹508.00 to ravi@okaxis successful. Ref: IMPS264066364. From A/c XX4236.,508,INR,DEBIT,IMPS,ravi@okaxis,2026-09-23,07:32:05,,,State Bank of India,True,SUCCESS
+TXN_EXT_000295,MERCHANT_0103,NOTIFICATION,INR 452.00 payment to Anita Desai awaiting confirmation.,452,INR,DEBIT,,Anita Desai,,09:24:33,,1196,IndusInd Bank,True,PENDING
+TXN_EXT_000296,MERCHANT_0211,SMS,"Rs. 1,000,079 received from Google Workspace via UPI. Ref: IMPS140680121. Credited to A/c XX1889.",1000079,INR,CREDIT,UPI,Google Workspace,,23:43:09,IMPS140680121,1889,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000297,MERCHANT_0324,MANUAL_TEXT,"paid Amit Sharma INR 48,471 via card on 21 August 2026 fuel",48471,INR,DEBIT,CARD,,2026-08-21,,IMPS244209787,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000298,MERCHANT_0929,SMS,"INR499,967.00 received via IMPS from Apollo Pharmacy on 14.08.2026.",499967,INR,CREDIT,IMPS,Apollo Pharmacy,2026-08-14,01:25:46,984202,,,True,SUCCESS
+TXN_EXT_000299,MERCHANT_0744,NOTIFICATION,"UPI collect payment of Rs. 4,508/- from Myntra credited. Ref None.",4508,INR,CREDIT,UPI,Myntra,2026-08-04,,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000300,MERCHANT_0606,NOTIFICATION,Pay using UPI and earn exciting rewards!,,,,,,,,,,,False,
+TXN_EXT_000301,MERCHANT_0200,MANUAL_TEXT,Rs.452 Dr A/c XX3985 UPI Ref None to Indian Oil,452,INR,DEBIT,UPI,Indian Oil,2026-08-27,02:44:12,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000302,MERCHANT_0156,MANUAL_TEXT,Card transaction of INR 12 at BESCOM was declined.,12,INR,DEBIT,CARD,BESCOM,2026-08-13,,UPI401945452174,2633,Punjab National Bank,True,FAILED
+TXN_EXT_000303,MERCHANT_0950,SMS,"IMPS of Rs. 500,061/- to AWS under processing. Ref IMPS804951238.",500061,INR,DEBIT,IMPS,,,03:09:54,,2831,,True,PENDING
+TXN_EXT_000304,MERCHANT_0477,NOTIFICATION,Punjab National Bank: POS purchase of ₹50 at Manish Agarwal. Card XX8449.,50,INR,DEBIT,CARD,Manish Agarwal,2026-09-11,00:10:20,,8449,Punjab National Bank,True,SUCCESS
+TXN_EXT_000305,MERCHANT_0160,NOTIFICATION,"Cash payment of INR 1,847 made to pooja@okcanara on 23-09-2026.",1847,INR,DEBIT,CASH,pooja@okcanara,2026-09-23,18:50:17,ICICIR866039298,1692,IndusInd Bank,True,SUCCESS
+TXN_EXT_000306,MERCHANT_0661,SMS,"INR 374,995.00 DEBITED A/C XXNone VIA UPI TO CHARGEBEE. REF: 850413.",374995,INR,DEBIT,UPI,Chargebee,2026-09-03,05:20:45,850413,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000307,MERCHANT_0711,SMS,You are eligible for Rs. 100/- cashback on your next UPI payment.,,,,,,,,,,,False,
+TXN_EXT_000308,MERCHANT_0197,NOTIFICATION,"Rs.3,500 Dr from A/c 9270. Avl bal Rs.48,500.",3500,INR,DEBIT,BANK_TRANSFER,Reliance Fresh,,,IMPS443285529,9270,,True,SUCCESS
+TXN_EXT_000309,MERCHANT_0975,SMS,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000310,MERCHANT_0560,MANUAL_TEXT,Your OTP for transaction is 415991. Do not share.,,,,,,,,,,,False,
+TXN_EXT_000311,MERCHANT_0763,SMS,"RTGS transfer of Rs. 1,202/- to Vikram Rao completed. UTR: ICICIR169981491. A/c XX8285.",1202,INR,DEBIT,RTGS,Vikram Rao,2026-08-20,07:21:55,,8285,,True,SUCCESS
+TXN_EXT_000312,MERCHANT_0419,SMS,"A/c XX9621 balance: ₹ 125,000.",,,,,,,,,,,False,
+TXN_EXT_000313,MERCHANT_0204,SMS,"Upgrade to platinum card and enjoy benefits worth Rs. 5,000.",,,,,,,,,,,False,
+TXN_EXT_000314,MERCHANT_0114,SMS,"UPI collect request for Rs124,939/- from Gupta Distributors pending approval.",124939,INR,DEBIT,UPI,Gupta Distributors,2026-09-27,,,8882,ICICI Bank,True,PENDING
+TXN_EXT_000315,MERCHANT_0209,MANUAL_TEXT,"Paid INR 25,021 cash to Reddy Logistics for supplies.",25021,INR,DEBIT,CASH,,2026-09-13,09:19:18,504567,9038,Canara Bank,True,SUCCESS
+TXN_EXT_000316,MERCHANT_0024,NOTIFICATION,"Refund of ₹1,199.00 from Cafe Coffee Day credited to your card ending 4955.",1199,INR,CREDIT,CARD,Cafe Coffee Day,2026-08-25,02:55:55,,4955,,True,SUCCESS
+TXN_EXT_000317,MERCHANT_0337,SMS,"₹1,207.00 sent to Joshi Mart through NEFT on 01/08/2026. UTR ICICIR267040531.",1207,INR,DEBIT,NEFT,Joshi Mart,2026-08-01,,,3127,,True,SUCCESS
+TXN_EXT_000318,MERCHANT_0797,MANUAL_TEXT,"CARD txn: Rs. 61,980/- at Chargebee on 29.09.2026. Avl bal Rs. 86,980.",61980,INR,DEBIT,CARD,,2026-09-29,13:27:50,UPI920839171538,1294,,True,SUCCESS
+TXN_EXT_000319,MERCHANT_0238,NOTIFICATION,"Available bal ₹12,000 in A/c 9329.",,,,,,,,,,,False,
+TXN_EXT_000320,MERCHANT_0308,NOTIFICATION,"NEFT of ₹ 4,498 credited from Indraprastha Gas. Ref None. A/c XX9163.",4498,INR,CREDIT,NEFT,Indraprastha Gas,2026-08-10,,,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000321,MERCHANT_0483,SMS,INR 51 paid to vikram@ybl via UPI,51,INR,DEBIT,UPI,vikram@ybl,2026-08-16,09:36:53,UPI791930671107,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000322,MERCHANT_0616,MANUAL_TEXT,KYC deadline approaching. Complete eKYC now.,,,,,,,,,,Yes Bank,False,
+TXN_EXT_000323,MERCHANT_0234,NOTIFICATION,"Punjab National Bank: POS purchase of Rs. 500,086/- at Apollo Pharmacy. Card XX7997.",500086,INR,DEBIT,CARD,Apollo Pharmacy,2026-08-13,22:43:34,TXN9087861217,7997,Punjab National Bank,True,SUCCESS
+TXN_EXT_000324,MERCHANT_0877,SMS,"Rs1,209/- received from Zomato on 31 August 2026 via UPI.",1209,INR,CREDIT,UPI,Zomato,2026-08-31,02:42:10,YESR116154160,2783,,True,SUCCESS
+TXN_EXT_000325,MERCHANT_0607,MANUAL_TEXT,Rs. 448 spent at Adani Electricity using your card ending 8568. Ref: 206604.,448,INR,DEBIT,CARD,Adani Electricity,2026-09-15,14:05:12,206604,8568,,True,SUCCESS
+TXN_EXT_000326,MERCHANT_0819,NOTIFICATION,IMPS credit of INR8.00 from Slack. Ref: IMPS544443186. Credited to A/c XX7776.,8,INR,CREDIT,IMPS,Slack,2026-09-15,05:42:51,,7776,,True,SUCCESS
+TXN_EXT_000327,MERCHANT_0839,NOTIFICATION,Kotak Mahindra Bank: You won INR50.00 cashback! Claim before midnight.,,,,,,,,,,Kotak Mahindra Bank,False,
+TXN_EXT_000328,MERCHANT_0621,SMS,NEFT transfer of Rs27/- to Tata Starbucks is pending. Ref IMPS919707906.,27,INR,DEBIT,NEFT,Tata Starbucks,2026-09-16,,IMPS919707906,,,True,PENDING
+TXN_EXT_000329,MERCHANT_0510,MANUAL_TEXT,Your monthly account statement is now available.,,,,,,,,,,,False,
+TXN_EXT_000330,MERCHANT_0029,MANUAL_TEXT,"IMPS transfer INR95,042.00 to DMart declined. Ref IMPS874968535.",95042,INR,DEBIT,IMPS,DMart,2026-08-24,23:24:58,,6420,,True,FAILED
+TXN_EXT_000331,MERCHANT_0942,SMS,Refer a friend and earn ₹500 per referral!,,,,,,,,,,,False,
+TXN_EXT_000332,MERCHANT_0813,SMS,Congratulations! You earned 10 reward points on your last purchase.,,,,,,,,,,,False,
+TXN_EXT_000333,MERCHANT_0008,NOTIFICATION,Yes Bank: IMPS of Rs. 248/- to Indian Oil debited. Ref IMPS506342236.,248,INR,DEBIT,IMPS,,2026-09-03,12:38:33,,6521,Yes Bank,True,SUCCESS
+TXN_EXT_000334,MERCHANT_0179,MANUAL_TEXT,"UPI collect payment of INR 4,499.00 from priya@okhdfcbank credited. Ref None.",4499,INR,CREDIT,UPI,priya@okhdfcbank,,16:38:14,,,Axis Bank,True,SUCCESS
+TXN_EXT_000335,MERCHANT_0845,MANUAL_TEXT,"Rs. 15,044/- received from Flipkart via UPI. Ref: ICICIR166163516. Credited to A/c XX6639.",15044,INR,CREDIT,UPI,Flipkart,,20:56:43,,6639,,True,SUCCESS
+TXN_EXT_000336,MERCHANT_0076,SMS,"Loan EMI ₹5,000 Dr. Remaining principal ₹175,000.",5000,INR,DEBIT,BANK_TRANSFER,Yes Bank,2026-08-28,,TXN1773338452,7267,Bank of Baroda,True,SUCCESS
+TXN_EXT_000337,MERCHANT_0410,SMS,Our mobile banking services will be unavailable tonight from 11PM to 5AM.,,,,,,,,,,,False,
+TXN_EXT_000338,MERCHANT_0549,SMS,"Rs. 1,203 debited from your account ending 2274 via UPI to Jio on 28 Sep 2026. Ref no 254650.",1203,INR,DEBIT,UPI,Jio,2026-09-28,12:52:00,,2274,,True,SUCCESS
+TXN_EXT_000339,MERCHANT_0811,MANUAL_TEXT,Update your PAN details for uninterrupted account services.,,,,,,,,,,,False,
+TXN_EXT_000340,MERCHANT_0530,SMS,"Get 5% discount on credit card purchases above INR 2,000.",,,,,,,,,,Bank of Baroda,False,
+TXN_EXT_000341,MERCHANT_0840,MANUAL_TEXT,"IMPS credit of Rs. 24,965 from Paytm Mall. Ref: IMPS243866809. Credited to A/c XXNone.",24965,INR,CREDIT,IMPS,Paytm Mall,2026-08-31,17:21:20,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000342,MERCHANT_0167,NOTIFICATION,"Get instant personal loan up to ₹ 1,000,000.",,,,,,,,,,,False,
+TXN_EXT_000343,MERCHANT_0285,SMS,"Get instant personal loan up to INR 500,000.",,,,,,,,,,,False,
+TXN_EXT_000344,MERCHANT_0018,SMS,"Rs1,500/- paid to ABC Wholesale. Balance now Rs26,500/-.",1500,INR,DEBIT,UPI,ABC Wholesale,2026-08-22,,,4681,,True,SUCCESS
+TXN_EXT_000345,MERCHANT_0911,MANUAL_TEXT,IMPS credit of Rs. 151/- from Tata Power. Ref: IMPS710308420. Credited to A/c XX7373.,151,INR,CREDIT,IMPS,,2026-09-22,,,7373,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000346,MERCHANT_0079,SMS,"INR 25,033 credited from Razorpay. Settlement received.",25033,INR,CREDIT,,Razorpay,2026-09-08,,,,Federal Bank,True,SUCCESS
+TXN_EXT_000347,MERCHANT_0204,NOTIFICATION,IndusInd Bank: Your KYC is pending. Visit nearest branch.,,,,,,,,,,,False,
+TXN_EXT_000348,MERCHANT_0340,SMS,"INR 3,500,285 received from rajesh@okbaroda on 31-08-2026 via UPI.",3500285,INR,CREDIT,UPI,rajesh@okbaroda,2026-08-31,22:28:07,,6592,Punjab National Bank,True,SUCCESS
+TXN_EXT_000349,MERCHANT_0914,NOTIFICATION,"Rs.2,508 Dr A/c XXNone UPI Ref TXN6988559484 to Amit Sharma",2508,INR,DEBIT,UPI,,2026-08-27,01:30:46,TXN6988559484,,ICICI Bank,True,SUCCESS
+TXN_EXT_000350,MERCHANT_0365,NOTIFICATION,You paid ₹ 10 to Zomato using UPI. Ref No: UPI927205386114.,10,INR,DEBIT,UPI,Zomato,,16:12:49,,6285,,True,SUCCESS
+TXN_EXT_000351,MERCHANT_0744,SMS,"₹4,906.00 transfer to neha@okkotak failed due to bank issue.",4906,INR,DEBIT,,neha@okkotak,,13:19:10,893226,,Canara Bank,True,FAILED
+TXN_EXT_000352,MERCHANT_0287,MANUAL_TEXT,Learn about UPI Lite for faster payments under Rs. 200.,,,,,,,,,,,False,
+TXN_EXT_000353,MERCHANT_0317,NOTIFICATION,"Rs. 2,494/- transferred to Amit Sharma. Bank charges 25 applicable. A/c XX9592.",2494,INR,DEBIT,BANK_TRANSFER,,2026-08-03,05:36:59,,9592,Yes Bank,True,SUCCESS
+TXN_EXT_000354,MERCHANT_0600,SMS,Pay using UPI and earn exciting rewards!,,,,,,,,,,,False,
+TXN_EXT_000355,MERCHANT_0816,SMS,"None: INR 48,511.00 debited from A/c 4533 towards anita@okidfc. Ref UPI890071338584.",48511,INR,DEBIT,BANK_TRANSFER,anita@okidfc,2026-09-25,09:10:09,UPI890071338584,4533,,True,SUCCESS
+TXN_EXT_000356,MERCHANT_0993,NOTIFICATION,"NEFT of INR 25,046.00 credited from rajesh@okbaroda. Ref 753721. A/c XXNone.",25046,INR,CREDIT,NEFT,rajesh@okbaroda,2026-08-03,18:34:49,753721,,,True,SUCCESS
+TXN_EXT_000357,MERCHANT_0470,SMS,"NEFT transfer of Rs. 87,971 to Adani Electricity is pending. Ref None.",87971,INR,DEBIT,NEFT,Adani Electricity,,19:10:50,,,Federal Bank,True,PENDING
+TXN_EXT_000358,MERCHANT_0396,SMS,UPI collect payment of Rs. 10 from Apollo Pharmacy credited. Ref None.,10,INR,CREDIT,UPI,,2026-09-20,01:23:20,,,,True,SUCCESS
+TXN_EXT_000359,MERCHANT_0677,NOTIFICATION,"Get instant business loan up to Rs. 1,000,000/-. Zero documentation!",,,,,,,,,,,False,
+TXN_EXT_000360,MERCHANT_0325,SMS,"Dear Customer, NEFT of ₹4,496.00 to Rajesh Mehta has been debited from A/c XXNone. UTR: YESR279327988.",4496,INR,DEBIT,NEFT,,2026-08-29,13:14:42,,,,True,SUCCESS
+TXN_EXT_000361,MERCHANT_0288,NOTIFICATION,"paid Iyer Exports ₹34,970 via card on 24/08/2026 fuel",34970,INR,DEBIT,CARD,Iyer Exports,2026-08-24,23:57:11,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000362,MERCHANT_0549,SMS,Suspicious login detected on your account. Contact Canara Bank immediately.,,,,,,,,,,Yes Bank,False,
+TXN_EXT_000363,MERCHANT_0148,SMS,"Dear Customer, NEFT of Rs. 500,068 to Google Workspace has been debited from A/c XXNone. UTR: SBIR884030674.",500068,INR,DEBIT,NEFT,Google Workspace,2026-08-09,04:41:51,,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000364,MERCHANT_0630,SMS,IMPS credit of ₹452.00 from Swiggy. Ref: IMPS396005983. Credited to A/c XX7386.,452,INR,CREDIT,IMPS,Swiggy,2026-09-25,02:05:12,,7386,ICICI Bank,True,SUCCESS
+TXN_EXT_000365,MERCHANT_0718,SMS,"Your available account balance is INR125,000.00.",,,,,,,,,,,False,
+TXN_EXT_000366,MERCHANT_0981,SMS,sent 35.0k to Adani Electricity via upi 10.09.2026,35037,INR,DEBIT,UPI,,2026-09-10,22:28:17,,4450,Bank of Baroda,True,SUCCESS
+TXN_EXT_000367,MERCHANT_0200,NOTIFICATION,"You paid Rs. 1,500 to Iyer Exports and earned INR 25 cashback.",1500,INR,DEBIT,UPI,Iyer Exports,,,,,,True,SUCCESS
+TXN_EXT_000368,MERCHANT_0474,MANUAL_TEXT,Nominee details missing for A/c XX1640. Update now.,,,,,,,,,,,False,
+TXN_EXT_000369,MERCHANT_0173,NOTIFICATION,INR 26 debited via UPI to Zoho at 4:05 AM on 08 September 2026. Ref: None.,26,INR,DEBIT,UPI,Zoho,2026-09-08,,,9615,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000370,MERCHANT_0461,SMS,"NEFT Dr: INR 24,960.00 to rahul@upi. A/c 7235. Value dt 15-09-2026.",24960,INR,DEBIT,NEFT,rahul@upi,2026-09-15,23:50:32,,,State Bank of India,True,SUCCESS
+TXN_EXT_000371,MERCHANT_0279,SMS,"Your available account balance is Rs. 125,000/-.",,,,,,,,,,,False,
+TXN_EXT_000372,MERCHANT_0416,NOTIFICATION,"UPI collect payment of INR 95,019.00 from Patel Enterprises credited. Ref None.",95019,INR,CREDIT,UPI,Patel Enterprises,2026-08-28,02:50:35,,2192,,True,SUCCESS
+TXN_EXT_000373,MERCHANT_0318,NOTIFICATION,"Rs. 88,010 received from Amazon via UPI. Ref: IMPS520989391. Credited to A/c XX6412.",88010,INR,CREDIT,UPI,Amazon,2026-09-30,04:55:57,IMPS520989391,6412,,True,SUCCESS
+TXN_EXT_000374,MERCHANT_0063,NOTIFICATION,"Txn: INR 1,500 at Reddy Logistics. Reward: Rs. 20/- points.",1500,INR,DEBIT,CARD,Reddy Logistics,,,,,,True,SUCCESS
+TXN_EXT_000375,MERCHANT_0861,SMS,Rs. 9/- spent at Sharma Traders using your card ending 5334. Ref: None.,9,INR,DEBIT,CARD,Sharma Traders,2026-08-30,20:48:51,,,Axis Bank,True,SUCCESS
+TXN_EXT_000376,MERCHANT_0503,MANUAL_TEXT,"₹1,500,201 paid to amit@paytm via UPI",1500201,INR,DEBIT,UPI,amit@paytm,2026-09-06,15:35:54,376185,,Yes Bank,True,SUCCESS
+TXN_EXT_000377,MERCHANT_0164,SMS,NEFT Dr: INR 23.00 to Delhi Jal Board. A/c None. Value dt 12-08-2026.,23,INR,DEBIT,NEFT,Delhi Jal Board,2026-08-12,,458505,,,True,SUCCESS
+TXN_EXT_000378,MERCHANT_0691,NOTIFICATION,"Payment of INR 1,000,072.00 to Lakshmi Nair unsuccessful. Please retry.",1000072,INR,DEBIT,,Lakshmi Nair,2026-08-26,,,,,True,FAILED
+TXN_EXT_000379,MERCHANT_0482,NOTIFICATION,"INR4,894.00 received via IMPS from Kumar Trading Co on Sep 17, 2026.",4894,INR,CREDIT,IMPS,Kumar Trading Co,2026-09-17,,IMPS719216978,,,True,SUCCESS
+TXN_EXT_000380,MERCHANT_0374,NOTIFICATION,"UPI collect payment of Rs48,473/- from sharma.traders@okicici credited. Ref IMPS902182950.",48473,INR,CREDIT,UPI,,2026-09-21,03:28:42,IMPS902182950,,,True,SUCCESS
+TXN_EXT_000381,MERCHANT_0363,SMS,₹9 received from Myntra on 29 Aug 2026 via UPI.,9,INR,CREDIT,UPI,Myntra,2026-08-29,09:39:32,,,Axis Bank,True,SUCCESS
+TXN_EXT_000382,MERCHANT_0956,SMS,You won INR 25 cashback! Claim before midnight.,,,,,,,,,,,False,
+TXN_EXT_000383,MERCHANT_0147,SMS,Bank of Baroda: Rs. 508/- debited from A/c 1732 towards Vodafone Idea. Ref UPI484603744142.,508,INR,DEBIT,BANK_TRANSFER,Vodafone Idea,,09:13:11,UPI484603744142,1732,Bank of Baroda,True,SUCCESS
+TXN_EXT_000384,MERCHANT_0113,SMS,INR 500 paid to ABC Wholesale. Cashback Rs. 10 credited.,500,INR,DEBIT,UPI,ABC Wholesale,,,,,,True,SUCCESS
+TXN_EXT_000385,MERCHANT_0326,NOTIFICATION,Rs.98 Dr A/c XXNone UPI Ref 837770 to Slack,98,INR,DEBIT,UPI,Slack,2026-09-12,12:28:00,837770,,,True,SUCCESS
+TXN_EXT_000386,MERCHANT_0484,SMS,Rs100/- transferred to Sunita Reddy. Bank charges 15 applicable. A/c XX2158.,100,INR,DEBIT,BANK_TRANSFER,Sunita Reddy,2026-09-09,04:30:12,,,Yes Bank,True,SUCCESS
+TXN_EXT_000387,MERCHANT_0051,MANUAL_TEXT,Your monthly account statement is now available.,,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000388,MERCHANT_0439,MANUAL_TEXT,"Invoice payment of INR 94,972 received from ravi@okaxis.",94972,INR,CREDIT,,ravi@okaxis,2026-09-08,17:27:24,,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000389,MERCHANT_0934,SMS,Your card was used for Rs. 744 at Anita Desai on 30 Sep 2026 at 0538 hrs.,744,INR,DEBIT,CARD,Anita Desai,2026-09-30,05:38:33,691056,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000390,MERCHANT_0726,NOTIFICATION,"₹ 15,044 refund processed from rajesh@okbaroda to card XXNone.",15044,INR,CREDIT,CARD,rajesh@okbaroda,2026-08-17,,,,,True,SUCCESS
+TXN_EXT_000391,MERCHANT_0999,NOTIFICATION,"None: NEFT Credit of INR 61,961 received from BSNL. UTR: SBIR483399227. Value Date: 10 September 2026.",61961,INR,CREDIT,NEFT,BSNL,2026-09-10,14:42:15,,,,True,SUCCESS
+TXN_EXT_000392,MERCHANT_0287,SMS,"Rs1,203/- received from Ravi Kumar via UPI. Ref: FEDR315740509. Credited to A/c XXNone.",1203,INR,CREDIT,UPI,Ravi Kumar,2026-08-31,02:37:29,FEDR315740509,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000393,MERCHANT_0590,NOTIFICATION,sent 497.0k to Pooja Iyer via upi 04 September 2026,497,INR,DEBIT,UPI,Pooja Iyer,2026-09-04,,,,Canara Bank,True,SUCCESS
+TXN_EXT_000394,MERCHANT_0136,SMS,"Paid INR 1,500 to Amazon. You won ₹10.00 cashback!",1500,INR,DEBIT,CARD,Amazon,,,,,,True,SUCCESS
+TXN_EXT_000395,MERCHANT_0090,SMS,"Your UPI transfer of ₹24,972 to Reddy Logistics could not be completed. Ref None.",24972,INR,DEBIT,UPI,Reddy Logistics,2026-09-27,15:29:20,,5352,IndusInd Bank,True,FAILED
+TXN_EXT_000396,MERCHANT_0346,NOTIFICATION,"Refund of ₹249,942 from Sharma Traders credited to your card ending 1056.",249942,INR,CREDIT,CARD,,2026-08-02,05:35:33,,1056,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000397,MERCHANT_0825,NOTIFICATION,"UPI payment of Rs1,194/- to Swiggy failed. Insufficient funds.",1194,INR,DEBIT,UPI,Swiggy,2026-09-30,,,4314,,True,FAILED
+TXN_EXT_000398,MERCHANT_0535,SMS,Our mobile banking services will be unavailable tonight from 12AM to 6AM.,,,,,,,,,,,False,
+TXN_EXT_000399,MERCHANT_0581,SMS,HDFC Bank: Link your bank account to UPI for seamless payments.,,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000400,MERCHANT_0603,NOTIFICATION,Update your PAN details for uninterrupted account services.,,,,,,,,,,,False,
+TXN_EXT_000401,MERCHANT_0520,MANUAL_TEXT,Transfer of ₹50 from ravi@okaxis received. A/c XX5195.,50,INR,CREDIT,BANK_TRANSFER,,2026-09-04,,,5195,,True,SUCCESS
+TXN_EXT_000402,MERCHANT_0332,SMS,"Rs2,502/- received via IMPS from Sharma Traders on 04 Aug.",2502,INR,CREDIT,IMPS,Sharma Traders,2026-08-04,07:48:38,TXN5789238017,8615,ICICI Bank,True,SUCCESS
+TXN_EXT_000403,MERCHANT_0693,NOTIFICATION,INR 451 transferred to Freshdesk. Bank charges 25 applicable. A/c XX9438.,451,INR,DEBIT,BANK_TRANSFER,Freshdesk,2026-09-18,18:26:13,,9438,Federal Bank,True,SUCCESS
+TXN_EXT_000404,MERCHANT_0837,SMS,"Rs. 4,503 received from Tata Power via UPI. Ref: 830206. Credited to A/c XX6847.",4503,INR,CREDIT,UPI,Tata Power,2026-08-07,16:37:14,830206,6847,,True,SUCCESS
+TXN_EXT_000405,MERCHANT_0947,SMS,"UPI collect payment of INR 3,206 from Freshdesk credited. Ref IMPS507608561.",3206,INR,CREDIT,UPI,Freshdesk,2026-08-24,05:28:43,,,,True,SUCCESS
+TXN_EXT_000406,MERCHANT_0251,SMS,Nominee details missing for A/c XX9850. Update now.,,,,,,,,,,Federal Bank,False,
+TXN_EXT_000407,MERCHANT_0382,MANUAL_TEXT,"₹1,209 received from Google Workspace via UPI. Ref: IMPS106556957. Credited to A/c XX2340.",1209,INR,CREDIT,UPI,Google Workspace,2026-08-21,03:54:52,IMPS106556957,2340,,True,SUCCESS
+TXN_EXT_000408,MERCHANT_0062,MANUAL_TEXT,ICICI Bank: NEFT Credit of INR 101 received from Ravi Kumar. UTR: YESR344787311. Value Date: 07.08.2026.,101,INR,CREDIT,NEFT,,2026-08-07,18:33:25,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000409,MERCHANT_0912,NOTIFICATION,"Your transfer of ₹ 74,954 to AWS is pending confirmation.",74954,INR,DEBIT,,AWS,,,,,Federal Bank,True,PENDING
+TXN_EXT_000410,MERCHANT_0756,SMS,INR 754 sent to Gupta Distributors through NEFT on 09-08-2026. UTR SBIR734399876.,754,INR,DEBIT,NEFT,Gupta Distributors,2026-08-09,05:01:02,IMPS611267257,9856,,True,SUCCESS
+TXN_EXT_000411,MERCHANT_0993,SMS,You won Rs. 50/- cashback! Claim before midnight.,,,,,,,,,,Punjab National Bank,False,
+TXN_EXT_000412,MERCHANT_0154,NOTIFICATION,"IMPS credit of ₹1,842.00 from amit@paytm. Ref: IMPS695586259. Credited to A/c XXNone.",1842,INR,CREDIT,IMPS,,2026-08-02,18:24:25,,,Federal Bank,True,SUCCESS
+TXN_EXT_000413,MERCHANT_0520,NOTIFICATION,"INR 34,959 received from karan@okpnb on 19 Sep 2026 via UPI.",34959,INR,CREDIT,UPI,karan@okpnb,2026-09-19,,TXN6075188222,4427,Bank of Baroda,True,SUCCESS
+TXN_EXT_000414,MERCHANT_0833,NOTIFICATION,"Dear Customer, ₹1,500,327.00 has been debited from your A/c XX3674 via UPI to priya@okhdfcbank on 19 Aug. UPI Ref: KOTAKR364451634.",1500327,INR,DEBIT,UPI,,2026-08-19,19:12:48,KOTAKR364451634,3674,State Bank of India,True,SUCCESS
+TXN_EXT_000415,MERCHANT_0402,NOTIFICATION,"Dear Customer, INR1,844.00 has been debited from your A/c XX7038 via UPI to suresh@oksbi on August 06. UPI Ref: IMPS535791871.",1844,INR,DEBIT,UPI,,2026-08-06,,IMPS535791871,7038,,True,SUCCESS
+TXN_EXT_000416,MERCHANT_0606,NOTIFICATION,"Transfer of ₹62,031.00 from ABC Wholesale received. A/c XXNone.",62031,INR,CREDIT,BANK_TRANSFER,ABC Wholesale,2026-08-17,19:08:23,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000417,MERCHANT_0781,MANUAL_TEXT,"Apply for home loan at 7.5% interest rate. Loan amount up to ₹ 2,500,000.",,,,,,,,,,,False,
+TXN_EXT_000418,MERCHANT_0349,NOTIFICATION,IMPS credit of Rs. 99 from QuickBooks. Ref: IMPS940360006. Credited to A/c XX2401.,99,INR,CREDIT,IMPS,QuickBooks,2026-09-20,02:49:38,,2401,,True,SUCCESS
+TXN_EXT_000419,MERCHANT_0579,NOTIFICATION,"INR35,028.00 debited via UPI to Reddy Logistics at 2:07AM on Aug 30, 2026. Ref: None.",35028,INR,DEBIT,UPI,Reddy Logistics,2026-08-30,02:07:56,,7228,Axis Bank,True,SUCCESS
+TXN_EXT_000420,MERCHANT_0928,NOTIFICATION,State Bank of India: Congratulations! You earned 10 reward points on your last purchase.,,,,,,,,,,State Bank of India,False,
+TXN_EXT_000421,MERCHANT_0046,SMS,"UPI collect payment of ₹48,464.00 from Karan Malhotra credited. Ref TXN8763170148.",48464,INR,CREDIT,UPI,,2026-08-31,13:43:46,TXN8763170148,6150,,True,SUCCESS
+TXN_EXT_000422,MERCHANT_0713,SMS,Rs.49 Dr A/c XX8237 UPI Ref None to ABC Wholesale,49,INR,DEBIT,UPI,ABC Wholesale,2026-08-20,,,8237,,True,SUCCESS
+TXN_EXT_000423,MERCHANT_0064,MANUAL_TEXT,UPI rewards worth Rs. 100 waiting for you!,,,,,,,,,,,False,
+TXN_EXT_000424,MERCHANT_0951,SMS,"Available bal ₹12,000 in A/c 3654.",,,,,,,,,,State Bank of India,False,
+TXN_EXT_000425,MERCHANT_0839,NOTIFICATION,"Your card was used for INR 3,500,379.00 at Anita Desai on 28 Aug at 6:12AM.",3500379,INR,DEBIT,CARD,Anita Desai,2026-08-28,06:12:40,,8794,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000426,MERCHANT_0463,NOTIFICATION,Payment of Rs351/- to pooja@okcanara unsuccessful. Please retry.,351,INR,DEBIT,,pooja@okcanara,,,UPI327093107226,5892,,True,FAILED
+TXN_EXT_000427,MERCHANT_0644,SMS,Your card was used for INR 52 at amit@paytm on 05-08-26 at 20:52 hrs.,52,INR,DEBIT,CARD,amit@paytm,2026-08-05,20:52:58,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000428,MERCHANT_0336,NOTIFICATION,"INR 124,929.00 DEBITED A/C XX7672 VIA UPI TO DELHI JAL BOARD. REF: None.",124929,INR,DEBIT,UPI,Delhi Jal Board,2026-08-19,19:47:19,,7672,IndusInd Bank,True,SUCCESS
+TXN_EXT_000429,MERCHANT_0857,SMS,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000430,MERCHANT_0809,MANUAL_TEXT,"Increase your credit limit up to ₹500,000.00.",,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000431,MERCHANT_0595,SMS,Your transfer of ₹ 99 to Slack is pending confirmation.,99,INR,DEBIT,,,2026-09-11,18:08:28,AXISR334222252,,Punjab National Bank,True,PENDING
+TXN_EXT_000432,MERCHANT_0830,SMS,"INR 2,501.00 paid to Arun Verma via UPI",2501,INR,DEBIT,UPI,Arun Verma,2026-09-20,00:31:13,IMPS384736299,,HDFC Bank,True,SUCCESS
+TXN_EXT_000433,MERCHANT_0047,MANUAL_TEXT,Transfer of Rs. 452 to rajesh@okbaroda completed. Ref no TXN2269041320.,452,INR,DEBIT,BANK_TRANSFER,rajesh@okbaroda,,21:30:45,,,Canara Bank,True,SUCCESS
+TXN_EXT_000434,MERCHANT_0967,MANUAL_TEXT,Refer a friend and earn Rs. 250/- per referral!,,,,,,,,,,,False,
+TXN_EXT_000435,MERCHANT_0217,SMS,HDFC Bank: Your debit card ending 5963 will expire soon. Request renewal.,,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000436,MERCHANT_0932,NOTIFICATION,Your monthly account statement is now available.,,,,,,,,,,,False,
+TXN_EXT_000437,MERCHANT_0913,MANUAL_TEXT,"Rs2,494/- paid to Notion via UPI",2494,INR,DEBIT,UPI,Notion,2026-09-02,02:25:23,SBIR913043828,8310,Bank of Baroda,True,SUCCESS
+TXN_EXT_000438,MERCHANT_0779,NOTIFICATION,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000439,MERCHANT_0762,SMS,"Axis Bank: Available bal INR12,000.00 in A/c 7295.",,,,,,,,,,Axis Bank,False,
+TXN_EXT_000440,MERCHANT_0117,NOTIFICATION,"A/c XX7658: Rs. 2,500/- debited. Current balance ₹27,500.",2500,INR,DEBIT,,,,,,7658,,True,SUCCESS
+TXN_EXT_000441,MERCHANT_0306,NOTIFICATION,"₹ 250,048 paid to Cafe Coffee Day via UPI",250048,INR,DEBIT,UPI,Cafe Coffee Day,2026-08-12,,,8125,IndusInd Bank,True,SUCCESS
+TXN_EXT_000442,MERCHANT_0591,NOTIFICATION,"₹14,950 credited to your account from BSNL. Ref None.",14950,INR,CREDIT,BANK_TRANSFER,BSNL,2026-08-15,04:47:24,,3125,Federal Bank,True,SUCCESS
+TXN_EXT_000443,MERCHANT_0622,SMS,Pay using UPI and earn exciting rewards!,,,,,,,,,,,False,
+TXN_EXT_000444,MERCHANT_0308,MANUAL_TEXT,Nominee details missing for A/c XX1157. Update now.,,,,,,,,,,,False,
+TXN_EXT_000445,MERCHANT_0735,MANUAL_TEXT,"IMPS credit of INR 249,960 from Patel Enterprises. Ref: IMPS495398331. Credited to A/c XXNone.",249960,INR,CREDIT,IMPS,Patel Enterprises,2026-09-10,,TXN4141796081,,Canara Bank,True,SUCCESS
+TXN_EXT_000446,MERCHANT_0441,SMS,"Rs. 1,210/- received via IMPS from suresh@oksbi on Sep 28, 2026.",1210,INR,CREDIT,IMPS,suresh@oksbi,2026-09-28,10:04:35,,6203,,True,SUCCESS
+TXN_EXT_000447,MERCHANT_0611,SMS,"Paid Rs. 88,032 cash to Iyer Exports for supplies.",88032,INR,DEBIT,CASH,Iyer Exports,2026-08-02,12:18:06,,1848,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000448,MERCHANT_0120,MANUAL_TEXT,"ICICI Bank: Get 15% discount on credit card purchases above ₹5,000.",,,,,,,,,,ICICI Bank,False,
+TXN_EXT_000449,MERCHANT_0394,SMS,Kotak Mahindra Bank: Suspicious login detected on your account. Contact ICICI Bank immediately.,,,,,,,,,,Kotak Mahindra Bank,False,
+TXN_EXT_000450,MERCHANT_0064,NOTIFICATION,Update your PAN details for uninterrupted account services.,,,,,,,,,,,False,
+TXN_EXT_000451,MERCHANT_0866,MANUAL_TEXT,Rs. 448 received from ABC Wholesale via UPI. Ref: TXN9491796858. Credited to A/c XXNone.,448,INR,CREDIT,UPI,ABC Wholesale,,,TXN9491796858,,ICICI Bank,True,SUCCESS
+TXN_EXT_000452,MERCHANT_0851,SMS,"UPI payment of Rs. 375,001/- to pooja@okcanara failed. Insufficient funds.",375001,INR,DEBIT,UPI,pooja@okcanara,2026-09-03,,TXN7075558807,,,True,FAILED
+TXN_EXT_000453,MERCHANT_0097,SMS,"Rs.61,963 Dr A/c XXNone UPI Ref 490321 to ABC Wholesale",61963,INR,DEBIT,UPI,,,01:53:49,490321,,,True,SUCCESS
+TXN_EXT_000454,MERCHANT_0800,SMS,"Payment of INR 34,953.00 to Verma Goods unsuccessful. Please retry.",34953,INR,DEBIT,,Verma Goods,,12:28:38,,9348,,True,FAILED
+TXN_EXT_000455,MERCHANT_0813,SMS,"NEFT of ₹ 3,191 credited from Amit Sharma. Ref None. A/c XXNone.",3191,INR,CREDIT,NEFT,,,,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000456,MERCHANT_0983,MANUAL_TEXT,Your card was used for ₹ 24 at Sunita Reddy on 11-09-2026 at 14:56:18.,24,INR,DEBIT,CARD,Sunita Reddy,2026-09-11,14:56:18,HDFCR424375336,6218,Axis Bank,True,SUCCESS
+TXN_EXT_000457,MERCHANT_0512,NOTIFICATION,"Federal Bank: POS purchase of INR 75,005 at Rao Suppliers. Card XXNone.",75005,INR,DEBIT,CARD,Rao Suppliers,2026-09-01,,,,Federal Bank,True,SUCCESS
+TXN_EXT_000458,MERCHANT_0115,NOTIFICATION,"IMPS of INR87,954.00 to Zomato under processing. Ref IMPS418113064.",87954,INR,DEBIT,IMPS,Zomato,2026-08-30,04:01:20,,1114,Kotak Mahindra Bank,True,PENDING
+TXN_EXT_000459,MERCHANT_0098,SMS,"₹61,984.00 received via IMPS from Pooja Iyer on 06 September 2026.",61984,INR,CREDIT,IMPS,Pooja Iyer,2026-09-06,15:27:13,,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000460,MERCHANT_0738,MANUAL_TEXT,"None: POS purchase of Rs. 15,020/- at Suresh Gupta. Card XX1645.",15020,INR,DEBIT,CARD,Suresh Gupta,2026-09-10,,UPI412001976361,1645,,True,SUCCESS
+TXN_EXT_000461,MERCHANT_0434,MANUAL_TEXT,Your transfer of ₹351 to Zoho is pending confirmation.,351,INR,DEBIT,,Zoho,2026-09-12,,,,,True,PENDING
+TXN_EXT_000462,MERCHANT_0786,SMS,"IMPS credit of ₹ 35,001 from Rao Suppliers. Ref: IMPS945687419. Credited to A/c XX7807.",35001,INR,CREDIT,IMPS,Rao Suppliers,2026-09-26,,IMPS929922494,7807,,True,SUCCESS
+TXN_EXT_000463,MERCHANT_0873,NOTIFICATION,INR 48 received from Vodafone Idea via UPI. Ref: 394635. Credited to A/c XX7848.,48,INR,CREDIT,UPI,Vodafone Idea,2026-08-02,04:29:31,394635,7848,,True,SUCCESS
+TXN_EXT_000464,MERCHANT_0571,MANUAL_TEXT,UPI payment of Rs. 494 to ClearTax failed. Insufficient funds.,494,INR,DEBIT,UPI,ClearTax,2026-09-08,,,,,True,FAILED
+TXN_EXT_000465,MERCHANT_0609,MANUAL_TEXT,"A/c XX5760 balance: ₹ 125,000.",,,,,,,,,,,False,
+TXN_EXT_000466,MERCHANT_0160,MANUAL_TEXT,"₹ 5,000 sent to Priya Patel. Charges Rs.50/- deducted.",5000,INR,DEBIT,IMPS,Priya Patel,,,TXN6532043071,,,True,SUCCESS
+TXN_EXT_000467,MERCHANT_0912,SMS,Refund of INR 249.00 from Freshdesk credited to your card ending 1176.,249,INR,CREDIT,CARD,,2026-09-10,21:40:34,UPI477543023947,1176,Federal Bank,True,SUCCESS
+TXN_EXT_000468,MERCHANT_0180,MANUAL_TEXT,"Transfer Rs. 15,000 to Sunita Reddy. Fee: Rs.50. Total debit: INR 15,050.",15000,INR,DEBIT,BANK_TRANSFER,Sunita Reddy,,,TXN2075321966,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000469,MERCHANT_0528,MANUAL_TEXT,"Dear Customer, Rs. 51 has been debited from your A/c XXNone via UPI to Stripe India on 04.08.2026. UPI Ref: UPI482274227376.",51,INR,DEBIT,UPI,,2026-08-04,00:39:29,UPI482274227376,,Yes Bank,True,SUCCESS
+TXN_EXT_000470,MERCHANT_0793,MANUAL_TEXT,NEFT transfer of INR 758.00 to MSEB is pending. Ref None.,758,INR,DEBIT,NEFT,MSEB,2026-09-07,05:32:10,,,,True,PENDING
+TXN_EXT_000471,MERCHANT_0377,SMS,NEFT transfer Rs750/- to Indraprastha Gas completed. Ref: 544280.,750,INR,DEBIT,NEFT,Indraprastha Gas,2026-09-06,09:03:37,,,,True,SUCCESS
+TXN_EXT_000472,MERCHANT_0608,SMS,"UPI collect request for ₹2,502.00 from Razorpay pending approval.",2502,INR,DEBIT,UPI,Razorpay,2026-09-11,09:36:08,TXN6089063141,,Federal Bank,True,PENDING
+TXN_EXT_000473,MERCHANT_0399,SMS,Refund of Rs. 11 from Tally Solutions credited to your card ending 4028.,11,INR,CREDIT,CARD,Tally Solutions,2026-09-24,17:46:55,,4028,HDFC Bank,True,SUCCESS
+TXN_EXT_000474,MERCHANT_0863,MANUAL_TEXT,Statement for A/c XX9401 is ready for download.,,,,,,,,,,,False,
+TXN_EXT_000475,MERCHANT_0930,NOTIFICATION,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000476,MERCHANT_0892,MANUAL_TEXT,"Dear Customer, INR 3,194 has been debited from your A/c XX3897 via UPI to Joshi Mart on Aug 22, 2026. UPI Ref: ICICIR623535947.",3194,INR,DEBIT,UPI,Joshi Mart,2026-08-22,18:57:58,ICICIR623535947,3897,HDFC Bank,True,SUCCESS
+TXN_EXT_000477,MERCHANT_0567,SMS,sent 62.0k to Notion via upi 07 Sep 2026,61976,INR,DEBIT,UPI,Notion,2026-09-07,05:07:46,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000478,MERCHANT_0609,NOTIFICATION,"Rs. 4,909/- transferred to Sharma Traders. Bank charges 15 applicable. A/c XX2240.",4909,INR,DEBIT,BANK_TRANSFER,Sharma Traders,,02:54:38,TXN6086370835,2240,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000479,MERCHANT_0474,NOTIFICATION,HDFC Bank: NEFT Credit of Rs492/- received from Microsoft Azure. UTR: ICICIR417419100. Value Date: 25 Aug.,492,INR,CREDIT,NEFT,Microsoft Azure,2026-08-25,08:45:09,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000480,MERCHANT_0614,SMS,"UPI collect payment of INR 2,494.00 from Zomato credited. Ref None.",2494,INR,CREDIT,UPI,Zomato,2026-08-03,01:50:44,,9723,,True,SUCCESS
+TXN_EXT_000481,MERCHANT_0315,SMS,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000482,MERCHANT_0177,MANUAL_TEXT,"RTGS transfer of ₹ 4,895 to Vikram Rao completed. UTR: SBIR567550375. A/c XX6564.",4895,INR,DEBIT,RTGS,,2026-08-28,02:21:42,,6564,Axis Bank,True,SUCCESS
+TXN_EXT_000483,MERCHANT_0371,SMS,paid pooja@okcanara ₹748 via card on 01 Aug 2026 fuel,748,INR,DEBIT,CARD,pooja@okcanara,2026-08-01,09:36:42,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000484,MERCHANT_0075,NOTIFICATION,"Rs. 95,019 received from Mahanagar Gas via UPI. Ref: None. Credited to A/c XXNone.",95019,INR,CREDIT,UPI,Mahanagar Gas,2026-08-01,,,,,True,SUCCESS
+TXN_EXT_000485,MERCHANT_0728,NOTIFICATION,"Rs. 1,856/- received from amit@paytm via UPI. Ref: None. Credited to A/c XX7839.",1856,INR,CREDIT,UPI,amit@paytm,2026-09-14,,,7839,Federal Bank,True,SUCCESS
+TXN_EXT_000486,MERCHANT_0833,SMS,UPI collect payment of ₹751 from Cafe Coffee Day credited. Ref None.,751,INR,CREDIT,UPI,Cafe Coffee Day,2026-09-07,16:01:07,,3985,,True,SUCCESS
+TXN_EXT_000487,MERCHANT_0608,MANUAL_TEXT,Congratulations! You earned 50 reward points on your last purchase.,,,,,,,,,,,False,
+TXN_EXT_000488,MERCHANT_0198,NOTIFICATION,"IMPS transfer of INR 1,000,068 to Big Bazaar successful. Ref: IMPS478305093. From A/c XXNone.",1000068,INR,DEBIT,IMPS,Big Bazaar,2026-09-06,17:47:35,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000489,MERCHANT_0842,SMS,"Get 5% discount on credit card purchases above ₹10,000.",,,,,,,,,,,False,
+TXN_EXT_000490,MERCHANT_0637,SMS,"Your card was used for INR 374,971.00 at Deepak Joshi on 14.08.2026 at 1614 hrs.",374971,INR,DEBIT,CARD,,2026-08-14,16:14:19,,3325,Axis Bank,True,SUCCESS
+TXN_EXT_000491,MERCHANT_0643,SMS,Scratch card reward worth Rs. 100/- unlocked.,,,,,,,,,,,False,
+TXN_EXT_000492,MERCHANT_0560,NOTIFICATION,NEFT transfer of INR 23 to Google Workspace is pending. Ref UPI293414660090.,23,INR,DEBIT,NEFT,Google Workspace,2026-09-26,,UPI293414660090,5965,,True,PENDING
+TXN_EXT_000493,MERCHANT_0302,SMS,"Rs999,951/- received via IMPS from Manish Agarwal on 02/08/26.",999951,INR,CREDIT,IMPS,Manish Agarwal,2026-08-02,05:40:18,,9013,,True,SUCCESS
+TXN_EXT_000494,MERCHANT_0342,NOTIFICATION,"UPI collect payment of Rs. 74,965 from Uber credited. Ref 990712.",74965,INR,CREDIT,UPI,Uber,2026-08-16,,,4985,State Bank of India,True,SUCCESS
+TXN_EXT_000495,MERCHANT_0756,NOTIFICATION,NEFT Dr: ₹101.00 to Zoho. A/c 4379. Value dt 22-09-26.,101,INR,DEBIT,NEFT,Zoho,2026-09-22,19:16:10,,,,True,SUCCESS
+TXN_EXT_000496,MERCHANT_0493,SMS,Payment of ₹ 150 to ABC Wholesale unsuccessful. Please retry.,150,INR,DEBIT,,ABC Wholesale,,06:09:58,TXN6902392354,7812,,True,FAILED
+TXN_EXT_000497,MERCHANT_0022,NOTIFICATION,Rs. 348/- debited via UPI to amit@paytm at 16:56 hrs on 19/08/2026. Ref: HDFCR343390582.,348,INR,DEBIT,UPI,amit@paytm,2026-08-19,,HDFCR343390582,3414,,True,SUCCESS
+TXN_EXT_000498,MERCHANT_0158,SMS,sent 250.1k to Torrent Power via upi 19 Sep 2026,250092,INR,DEBIT,UPI,Torrent Power,2026-09-19,07:42:28,,6653,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000499,MERCHANT_0158,SMS,"Yes Bank: Get 10% discount on credit card purchases above INR 10,000.00.",,,,,,,,,,Yes Bank,False,
+TXN_EXT_000500,MERCHANT_0458,MANUAL_TEXT,"Transfer of ₹749,917.00 from Arun Verma received. A/c XX6231.",749917,INR,CREDIT,BANK_TRANSFER,Arun Verma,,,SBIR924134875,6231,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000501,MERCHANT_0151,SMS,"IMPS transfer ₹ 2,504 to sharma.traders@okicici declined. Ref IMPS195871622.",2504,INR,DEBIT,IMPS,sharma.traders@okicici,2026-08-19,19:36:28,IMPS421838360,5989,,True,FAILED
+TXN_EXT_000502,MERCHANT_0398,SMS,"₹95,008 transferred to BESCOM. Bank charges 5 applicable. A/c XX1004.",95008,INR,DEBIT,BANK_TRANSFER,BESCOM,2026-09-08,15:30:35,ICICIR761822587,1004,,True,SUCCESS
+TXN_EXT_000503,MERCHANT_0397,MANUAL_TEXT,Send money via UPI and win Rs. 25 cashback.,,,,,,,,,,,False,
+TXN_EXT_000504,MERCHANT_0176,NOTIFICATION,"₹ 1,500 transferred. Remaining balance Rs26,500/- in account.",1500,INR,DEBIT,BANK_TRANSFER,Patel Enterprises,,,969634,5333,HDFC Bank,True,SUCCESS
+TXN_EXT_000505,MERCHANT_0353,NOTIFICATION,"Get instant personal loan up to INR 500,000.",,,,,,,,,,,False,
+TXN_EXT_000506,MERCHANT_0668,NOTIFICATION,NEFT transfer Rs. 500 to Notion completed. Ref: None.,500,INR,DEBIT,NEFT,Notion,,16:35:54,,2721,ICICI Bank,True,SUCCESS
+TXN_EXT_000507,MERCHANT_0416,MANUAL_TEXT,You won Rs. 10 cashback! Claim before midnight.,,,,,,,,,,,False,
+TXN_EXT_000508,MERCHANT_0452,MANUAL_TEXT,Scratch card reward worth INR 25 unlocked.,,,,,,,,,,,False,
+TXN_EXT_000509,MERCHANT_0722,MANUAL_TEXT,"Invoice payment of INR 1,843.00 received from suresh@oksbi.",1843,INR,CREDIT,,suresh@oksbi,2026-08-14,08:23:49,,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000510,MERCHANT_0821,MANUAL_TEXT,Punjab National Bank: Nominee details missing for A/c XX8030. Update now.,,,,,,,,,,Punjab National Bank,False,
+TXN_EXT_000511,MERCHANT_0848,SMS,"INR 27.00 debited via UPI to Paytm Mall. Available balance ₹15,027.00.",27,INR,DEBIT,UPI,Paytm Mall,2026-08-20,22:07:17,,,,True,SUCCESS
+TXN_EXT_000512,MERCHANT_0488,NOTIFICATION,"Rs. 35,047 received from ravi@okaxis via UPI. Ref: TXN8999384161. Credited to A/c XX2486.",35047,INR,CREDIT,UPI,ravi@okaxis,2026-08-25,12:45:50,TXN8999384161,2486,Yes Bank,True,SUCCESS
+TXN_EXT_000513,MERCHANT_0252,SMS,"RTGS transfer of INR 1,854 to Indian Oil completed. UTR: YESR212536324. A/c XX4149.",1854,INR,DEBIT,RTGS,Indian Oil,2026-08-10,09:15:01,534661,4149,Federal Bank,True,SUCCESS
+TXN_EXT_000514,MERCHANT_0049,MANUAL_TEXT,"CARD txn: Rs508/- at Zoho on August 04. Avl bal INR 25,508.",508,INR,DEBIT,CARD,Zoho,,13:45:26,IMPS984830703,3723,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000515,MERCHANT_0257,NOTIFICATION,"Card transaction of INR1,191.00 at Zomato was declined.",1191,INR,DEBIT,CARD,Zomato,2026-08-14,,TXN4714465905,,Axis Bank,True,FAILED
+TXN_EXT_000516,MERCHANT_0312,NOTIFICATION,"INR 15,007.00 received from Deepak Joshi via UPI. Ref: AXISR677174482. Credited to A/c XXNone.",15007,INR,CREDIT,UPI,,2026-09-24,06:50:09,AXISR677174482,,,True,SUCCESS
+TXN_EXT_000517,MERCHANT_0155,NOTIFICATION,"Transfer of Rs. 48,514/- from Google Workspace received. A/c XXNone.",48514,INR,CREDIT,BANK_TRANSFER,,2026-09-02,,,,Axis Bank,True,SUCCESS
+TXN_EXT_000518,MERCHANT_0815,SMS,"INR34,978.00 debited via UPI to neha@okkotak at 02:41 on Sep 19, 2026. Ref: None.",34978,INR,DEBIT,UPI,neha@okkotak,2026-09-19,02:41:21,,,,True,SUCCESS
+TXN_EXT_000519,MERCHANT_0511,SMS,"Payment of INR 4,497 to Flipkart unsuccessful. Please retry.",4497,INR,DEBIT,,Flipkart,,06:14:12,,2747,ICICI Bank,True,FAILED
+TXN_EXT_000520,MERCHANT_0496,NOTIFICATION,"Rs. 14,974 received from neha@okkotak on 26-08-26 via UPI.",14974,INR,CREDIT,UPI,,2026-08-26,,UPI408142258703,,Yes Bank,True,SUCCESS
+TXN_EXT_000521,MERCHANT_0003,SMS,Account access from new device detected. Verify if this was you.,,,,,,,,,,,False,
+TXN_EXT_000522,MERCHANT_0384,MANUAL_TEXT,IndusInd Bank: Congratulations! You earned 50 reward points on your last purchase.,,,,,,,,,,IndusInd Bank,False,
+TXN_EXT_000523,MERCHANT_0776,SMS,INR 492 DEBITED frm Ac XXNone via UPI to Singh Brothers on 29 Sep 2026.,492,INR,DEBIT,UPI,Singh Brothers,2026-09-29,19:31:44,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000524,MERCHANT_0122,NOTIFICATION,"A/c XX5002 balance: Rs. 125,000.",,,,,,,,,,,False,
+TXN_EXT_000525,MERCHANT_0082,SMS,"₹3,209 DEBITED frm Ac XX3858 via UPI to ravi@okaxis on 21-08-2026.",3209,INR,DEBIT,UPI,ravi@okaxis,,14:11:16,233402,3858,,True,SUCCESS
+TXN_EXT_000526,MERCHANT_0107,MANUAL_TEXT,"Rs. 25,000/- transaction with Sunita Reddy initiated",25000,INR,CREDIT,IMPS,,2026-08-10,,,,,True,PENDING
+TXN_EXT_000527,MERCHANT_0635,SMS,paid ABC Wholesale ₹8 via card on 24/08/2026 fuel,8,INR,DEBIT,CARD,,2026-08-24,,UPI760245172234,,Yes Bank,True,SUCCESS
+TXN_EXT_000528,MERCHANT_0872,MANUAL_TEXT,Update your email address for account 8557.,,,,,,,,,,,False,
+TXN_EXT_000529,MERCHANT_0129,SMS,"Rs. 2,502/- transferred to Rajesh Mehta via IMPS. IMPS Ref: IMPS988256872.",2502,INR,DEBIT,IMPS,Rajesh Mehta,2026-08-15,05:52:47,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000530,MERCHANT_0381,NOTIFICATION,NEFT transfer of ₹50 to DMart is pending. Ref ICICIR997160365.,50,INR,DEBIT,NEFT,DMart,2026-09-23,12:36:35,ICICIR997160365,1128,State Bank of India,True,PENDING
+TXN_EXT_000531,MERCHANT_0994,MANUAL_TEXT,NEFT of Rs. 249/- credited from pooja@okcanara. Ref None. A/c XXNone.,249,INR,CREDIT,NEFT,pooja@okcanara,2026-08-12,,,,,True,SUCCESS
+TXN_EXT_000532,MERCHANT_0128,MANUAL_TEXT,₹12 received via IMPS from Sharma Traders on 15 Sep 2026.,12,INR,CREDIT,IMPS,Sharma Traders,2026-09-15,19:24:22,,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000533,MERCHANT_0443,MANUAL_TEXT,IDFC FIRST Bank: Scratch card reward worth INR100.00 unlocked.,,,,,,,,,,IDFC FIRST Bank,False,
+TXN_EXT_000534,MERCHANT_0231,MANUAL_TEXT,"Rs. 88,013/- payment to Notion awaiting confirmation.",88013,INR,DEBIT,,,2026-08-19,05:59:55,UPI938953377368,3822,ICICI Bank,True,PENDING
+TXN_EXT_000535,MERCHANT_0547,NOTIFICATION,You are eligible for INR 250 cashback on your next UPI payment.,,,,,,,,,,,False,
+TXN_EXT_000536,MERCHANT_0532,NOTIFICATION,"Rs. 1,851/- refund processed from sharma.traders@okicici to card XX5074.",1851,INR,CREDIT,CARD,,,17:25:55,,5074,,True,SUCCESS
+TXN_EXT_000537,MERCHANT_0533,MANUAL_TEXT,"Dear Customer, NEFT of Rs1,209/- to pooja@okcanara has been debited from A/c XX2741. UTR: FEDR454982932.",1209,INR,DEBIT,NEFT,pooja@okcanara,2026-09-14,,TXN5800633419,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000538,MERCHANT_0126,MANUAL_TEXT,"INR 4,903 received from Chargebee on 18/08/2026 via UPI.",4903,INR,CREDIT,UPI,,2026-08-18,,,7626,,True,SUCCESS
+TXN_EXT_000539,MERCHANT_0151,MANUAL_TEXT,"Transfer INR 50,000 to Manish Agarwal. Fee: Rs.10. Total debit: INR 50,010.",50000,INR,DEBIT,BANK_TRANSFER,Manish Agarwal,,,,,,True,SUCCESS
+TXN_EXT_000540,MERCHANT_0346,NOTIFICATION,INR 352.00 spent at sharma.traders@okicici using your card ending 3890. Ref: UPI964818547519.,352,INR,DEBIT,CARD,sharma.traders@okicici,2026-08-30,,UPI964818547519,3890,Axis Bank,True,SUCCESS
+TXN_EXT_000541,MERCHANT_0944,SMS,Rs. 451/- refund processed from suresh@oksbi to card XXNone.,451,INR,CREDIT,CARD,suresh@oksbi,2026-08-11,13:16:49,765824,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000542,MERCHANT_0690,NOTIFICATION,"NEFT transfer of INR 4,999,875.00 to Jio is pending. Ref IMPS308471970.",4999875,INR,DEBIT,NEFT,Jio,2026-08-30,01:00:10,IMPS308471970,,IndusInd Bank,True,PENDING
+TXN_EXT_000543,MERCHANT_0189,MANUAL_TEXT,"Rs. 1,860 debited via UPI to Deepak Joshi at 0350 hrs on Sep 23, 2026. Ref: IMPS760975575.",1860,INR,DEBIT,UPI,Deepak Joshi,2026-09-23,03:50:12,IMPS760975575,4993,HDFC Bank,True,SUCCESS
+TXN_EXT_000544,MERCHANT_0707,SMS,"UPI collect payment of Rs. 1,499,929/- from suresh@oksbi credited. Ref None.",1499929,INR,CREDIT,UPI,suresh@oksbi,,,,,Canara Bank,True,SUCCESS
+TXN_EXT_000545,MERCHANT_0836,SMS,Account access from new device detected. Verify if this was you.,,,,,,,,,,,False,
+TXN_EXT_000546,MERCHANT_0449,NOTIFICATION,"₹ 15,050 DEBITED frm Ac XXNone via UPI to suresh@oksbi on 23-08-26.",15050,INR,DEBIT,UPI,suresh@oksbi,2026-08-23,00:10:55,,,Yes Bank,True,SUCCESS
+TXN_EXT_000547,MERCHANT_0772,SMS,IDFC FIRST Bank: Refer a friend and earn Rs100/- per referral!,,,,,,,,,,IDFC FIRST Bank,False,
+TXN_EXT_000548,MERCHANT_0219,MANUAL_TEXT,Kotak Mahindra Bank: Suspicious login detected on your account. Contact Yes Bank immediately.,,,,,,,,,,Kotak Mahindra Bank,False,
+TXN_EXT_000549,MERCHANT_0247,SMS,"UPI collect payment of INR4,906.00 from DMart credited. Ref None.",4906,INR,CREDIT,UPI,DMart,,00:53:10,,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000550,MERCHANT_0807,MANUAL_TEXT,"Rs. 48,512 debited from your account ending 6752 via UPI to Arun Verma on 21/08/2026. Ref no 828694.",48512,INR,DEBIT,UPI,Arun Verma,2026-08-21,17:59:25,,6752,,True,SUCCESS
+TXN_EXT_000551,MERCHANT_0697,SMS,"Rs. 48,533 refund processed from Sunita Reddy to card XX5817.",48533,INR,CREDIT,CARD,Sunita Reddy,2026-08-15,,IMPS499090969,,ICICI Bank,True,SUCCESS
+TXN_EXT_000552,MERCHANT_0922,NOTIFICATION,Payment of Rs97/- to Singh Brothers processed successfully.,97,INR,DEBIT,,Singh Brothers,2026-08-01,,IMPS330800403,1304,State Bank of India,True,SUCCESS
+TXN_EXT_000553,MERCHANT_0167,MANUAL_TEXT,"Transfer INR 50,000.00 to Sharma Traders. Fee: Rs.50. Total debit: INR 50,050.",50000,INR,DEBIT,NEFT,Sharma Traders,,,195674,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000554,MERCHANT_0846,MANUAL_TEXT,"IndusInd Bank: INR75,027.00 debited from A/c 8412 towards Flipkart. Ref None.",75027,INR,DEBIT,BANK_TRANSFER,Flipkart,2026-09-06,06:24:49,,8412,IndusInd Bank,True,SUCCESS
+TXN_EXT_000555,MERCHANT_0157,SMS,"Rs15,018/- received from Pooja Iyer via UPI. Ref: None. Credited to A/c XX3490.",15018,INR,CREDIT,UPI,Pooja Iyer,2026-08-02,10:41:33,,3490,Punjab National Bank,True,SUCCESS
+TXN_EXT_000556,MERCHANT_0544,NOTIFICATION,"Rs74,968/- received from Tata Starbucks via UPI. Ref: None. Credited to A/c XXNone.",74968,INR,CREDIT,UPI,Tata Starbucks,2026-08-08,,,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000557,MERCHANT_0786,SMS,INR 97.00 refund processed from Tata Power to card XX6536.,97,INR,CREDIT,CARD,Tata Power,2026-08-22,23:36:39,,6536,,True,SUCCESS
+TXN_EXT_000558,MERCHANT_0012,NOTIFICATION,"₹ 3,500 transferred. Remaining balance INR38,500.00 in account.",3500,INR,DEBIT,UPI,,2026-09-18,,,3547,,True,SUCCESS
+TXN_EXT_000559,MERCHANT_0445,SMS,"INR 74,955.00 DEBITED frm Ac XX1179 via UPI to Gupta Distributors on 16 Sep.",74955,INR,DEBIT,UPI,,2026-09-16,,UPI699679845035,1179,,True,SUCCESS
+TXN_EXT_000560,MERCHANT_0475,SMS,paid Deepak Joshi Rs. 10 via card on 23/09/26 fuel,10,INR,DEBIT,CARD,Deepak Joshi,2026-09-23,01:17:49,290425,5097,,True,SUCCESS
+TXN_EXT_000561,MERCHANT_0918,MANUAL_TEXT,State Bank of India: Punjab National Bank: Branch timings changed to 9:30 AM - 4:00 PM.,,,,,,,,,,State Bank of India,False,
+TXN_EXT_000562,MERCHANT_0034,SMS,"₹ 75,027 received via IMPS from Amazon on 21-08-2026.",75027,INR,CREDIT,IMPS,Amazon,2026-08-21,16:53:09,,4760,,True,SUCCESS
+TXN_EXT_000563,MERCHANT_0089,NOTIFICATION,"A/c XX9785: INR5,500.00 debited. Current balance ₹50,500.",5500,INR,DEBIT,,,2026-09-30,,,9785,HDFC Bank,True,SUCCESS
+TXN_EXT_000564,MERCHANT_0808,MANUAL_TEXT,UPI collect payment of INR 748.00 from Sunita Reddy credited. Ref None.,748,INR,CREDIT,UPI,Sunita Reddy,2026-08-11,,,3193,,True,SUCCESS
+TXN_EXT_000565,MERCHANT_0353,SMS,"₹ 751 debited via UPI to karan@okpnb. Available balance Rs45,751/-.",751,INR,DEBIT,UPI,karan@okpnb,2026-08-23,,,,Canara Bank,True,SUCCESS
+TXN_EXT_000566,MERCHANT_0767,SMS,"Rs2,494/- DEBITED frm Ac XXNone via UPI to Reliance Fresh on 02-09-26.",2494,INR,DEBIT,UPI,Reliance Fresh,2026-09-02,04:14:42,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000567,MERCHANT_0225,NOTIFICATION,Your monthly account statement is now available.,,,,,,,,,,,False,
+TXN_EXT_000568,MERCHANT_0961,SMS,₹351 credited to your account from Razorpay. Ref None.,351,INR,CREDIT,BANK_TRANSFER,Razorpay,2026-08-18,13:35:57,,5929,,True,SUCCESS
+TXN_EXT_000569,MERCHANT_0159,MANUAL_TEXT,"Increase your credit limit up to INR 100,000.",,,,,,,,,,Canara Bank,False,
+TXN_EXT_000570,MERCHANT_0618,SMS,Axis Bank: Your monthly account statement is now available.,,,,,,,,,,Axis Bank,False,
+TXN_EXT_000571,MERCHANT_0099,SMS,"Rs. 999,935 debited from your account ending None via UPI to Kumar Trading Co on 16-09-2026. Ref no 162033.",999935,INR,DEBIT,UPI,Kumar Trading Co,2026-09-16,05:00:03,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000572,MERCHANT_0462,SMS,"Available bal INR 52,000 in A/c 2596.",,,,,,,,,,Canara Bank,False,
+TXN_EXT_000573,MERCHANT_0392,MANUAL_TEXT,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000574,MERCHANT_0109,MANUAL_TEXT,You won INR25.00 cashback! Claim before midnight.,,,,,,,,,,,False,
+TXN_EXT_000575,MERCHANT_0382,NOTIFICATION,"UPI payment of INR 375,082.00 to Tata Power failed. Insufficient funds.",375082,INR,DEBIT,UPI,Tata Power,,11:07:50,,7282,,True,FAILED
+TXN_EXT_000576,MERCHANT_0140,SMS,"Rs. 25,000 sent to Karan Malhotra. Charges Rs.5/- deducted.",25000,INR,DEBIT,NEFT,Karan Malhotra,,,,,State Bank of India,True,SUCCESS
+TXN_EXT_000577,MERCHANT_0275,NOTIFICATION,Update your PAN details for uninterrupted account services.,,,,,,,,,,,False,
+TXN_EXT_000578,MERCHANT_0426,SMS,Payment of ₹ 99 to Notion unsuccessful. Please retry.,99,INR,DEBIT,,Notion,2026-08-06,03:38:33,,8756,Federal Bank,True,FAILED
+TXN_EXT_000579,MERCHANT_0102,SMS,"₹ 5,500 paid to DMart. Balance now INR30,500.00.",5500,INR,DEBIT,BANK_TRANSFER,DMart,,,751332,1651,,True,SUCCESS
+TXN_EXT_000580,MERCHANT_0295,SMS,"None: IMPS of Rs2,499,664/- to Patel Enterprises debited. Ref IMPS106336800.",2499664,INR,DEBIT,IMPS,,2026-09-05,01:07:43,TXN9664932488,,,True,SUCCESS
+TXN_EXT_000581,MERCHANT_0113,SMS,Your debit card ending 3954 will expire soon. Request renewal.,,,,,,,,,,,False,
+TXN_EXT_000582,MERCHANT_0544,SMS,"Your transfer of ₹62,000 to Suresh Gupta is pending confirmation.",62000,INR,DEBIT,,Suresh Gupta,2026-08-08,,UPI822478714673,,,True,PENDING
+TXN_EXT_000583,MERCHANT_0058,MANUAL_TEXT,"₹4,493 received from Patel Enterprises on 25-08-2026 via UPI.",4493,INR,CREDIT,UPI,Patel Enterprises,2026-08-25,,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000584,MERCHANT_0695,NOTIFICATION,"UPI payment of INR 374,974.00 to Microsoft Azure failed. Insufficient funds.",374974,INR,DEBIT,UPI,Microsoft Azure,2026-09-09,21:44:51,,3929,ICICI Bank,True,FAILED
+TXN_EXT_000585,MERCHANT_0680,NOTIFICATION,"Punjab National Bank: NEFT of INR 24,992 to BSNL failed. UTR AXISR789626099.",24992,INR,DEBIT,NEFT,BSNL,2026-08-19,19:33:30,,,Punjab National Bank,True,FAILED
+TXN_EXT_000586,MERCHANT_0299,MANUAL_TEXT,"INR 1,192.00 DEBITED A/C XX4303 VIA UPI TO GOOGLE WORKSPACE. REF: None.",1192,INR,DEBIT,UPI,Google Workspace,2026-08-20,01:25:36,,4303,Canara Bank,True,SUCCESS
+TXN_EXT_000587,MERCHANT_0955,NOTIFICATION,"None: NEFT Credit of Rs. 499,944 received from Ravi Kumar. UTR: IDFCR828017647. Value Date: 08.08.2026.",499944,INR,CREDIT,NEFT,Ravi Kumar,2026-08-08,23:15:29,,1369,,True,SUCCESS
+TXN_EXT_000588,MERCHANT_0677,SMS,"Increase your credit limit up to ₹ 500,000.",,,,,,,,,,,False,
+TXN_EXT_000589,MERCHANT_0797,NOTIFICATION,"₹1,844.00 DEBITED frm Ac XXNone via UPI to Reliance Fresh on 18 August 2026.",1844,INR,DEBIT,UPI,Reliance Fresh,2026-08-18,03:24:14,,,Federal Bank,True,SUCCESS
+TXN_EXT_000590,MERCHANT_0285,NOTIFICATION,IMPS credit of Rs. 249/- from Suresh Gupta. Ref: IMPS376142554. Credited to A/c XX9877.,249,INR,CREDIT,IMPS,Suresh Gupta,2026-09-06,17:41:07,,9877,HDFC Bank,True,SUCCESS
+TXN_EXT_000591,MERCHANT_0669,SMS,You won ₹ 10 cashback! Claim before midnight.,,,,,,,,,,Yes Bank,False,
+TXN_EXT_000592,MERCHANT_0484,NOTIFICATION,Rs. 150/- refund processed from karan@okpnb to card XX3587.,150,INR,CREDIT,CARD,karan@okpnb,2026-08-14,21:09:20,923982,3587,State Bank of India,True,SUCCESS
+TXN_EXT_000593,MERCHANT_0696,MANUAL_TEXT,"Invoice payment of INR 4,510 received from Joshi Mart.",4510,INR,CREDIT,,Joshi Mart,2026-08-06,,TXN7752955351,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000594,MERCHANT_0784,NOTIFICATION,"₹ 1,200 credited to your account from Airtel. Ref 229274.",1200,INR,CREDIT,BANK_TRANSFER,Airtel,2026-08-08,,229274,4220,IndusInd Bank,True,SUCCESS
+TXN_EXT_000595,MERCHANT_0041,NOTIFICATION,Update your PAN details for uninterrupted account services.,,,,,,,,,,,False,
+TXN_EXT_000596,MERCHANT_0071,NOTIFICATION,"Amount INR 2,500.00 marked for Suresh Gupta",2500,INR,CREDIT,IMPS,Suresh Gupta,,,,,,True,SUCCESS
+TXN_EXT_000597,MERCHANT_0521,NOTIFICATION,"NEFT of INR 4,893.00 credited from Amazon. Ref None. A/c XX7990.",4893,INR,CREDIT,NEFT,Amazon,2026-08-20,10:03:36,,7990,IndusInd Bank,True,SUCCESS
+TXN_EXT_000598,MERCHANT_0945,NOTIFICATION,INR 99 received from Mahanagar Gas via UPI. Ref: None. Credited to A/c XX5816.,99,INR,CREDIT,UPI,,2026-08-04,14:58:24,,5816,Federal Bank,True,SUCCESS
+TXN_EXT_000599,MERCHANT_0041,SMS,"₹2,500.00 transferred. Remaining balance ₹27,500.00 in account.",2500,INR,DEBIT,UPI,,2026-08-04,,IDFCR228727266,5861,,True,SUCCESS
+TXN_EXT_000600,MERCHANT_0721,NOTIFICATION,UPI collect payment of Rs. 452/- from Indraprastha Gas credited. Ref KOTAKR347922133.,452,INR,CREDIT,UPI,Indraprastha Gas,2026-08-11,06:13:20,KOTAKR347922133,8695,,True,SUCCESS
+TXN_EXT_000601,MERCHANT_0515,SMS,Rs748/- received from sharma.traders@okicici on 26 Aug via UPI.,748,INR,CREDIT,UPI,sharma.traders@okicici,2026-08-26,22:32:14,244136,,State Bank of India,True,SUCCESS
+TXN_EXT_000602,MERCHANT_0968,SMS,"Increase your credit limit up to Rs. 100,000.",,,,,,,,,,,False,
+TXN_EXT_000603,MERCHANT_0844,SMS,"₹95,023.00 received via IMPS from Cafe Coffee Day on August 29.",95023,INR,CREDIT,IMPS,Cafe Coffee Day,2026-08-29,,,4692,State Bank of India,True,SUCCESS
+TXN_EXT_000604,MERCHANT_0825,NOTIFICATION,Rs. 507 received from Lakshmi Nair via UPI. Ref: HDFCR773141595. Credited to A/c XX2517.,507,INR,CREDIT,UPI,Lakshmi Nair,2026-09-17,06:53:04,HDFCR773141595,2517,Canara Bank,True,SUCCESS
+TXN_EXT_000605,MERCHANT_0179,SMS,"You paid ₹1,000 to Flipkart and earned INR25.00 cashback.",1000,INR,DEBIT,UPI,Flipkart,,,,,,True,SUCCESS
+TXN_EXT_000606,MERCHANT_0115,SMS,INR 448.00 DEBITED A/C XX1971 VIA UPI TO RAZORPAY. REF: None.,448,INR,DEBIT,UPI,,2026-09-18,,,1971,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000607,MERCHANT_0941,MANUAL_TEXT,"INR 24,965 received from Apollo Pharmacy via UPI. Ref: ICICIR200405760. Credited to A/c XXNone.",24965,INR,CREDIT,UPI,,2026-09-11,14:57:13,ICICIR200405760,,,True,SUCCESS
+TXN_EXT_000608,MERCHANT_0946,SMS,"Dear Customer, NEFT of INR 88,009.00 to Notion has been debited from A/c XXNone. UTR: KOTAKR462189456.",88009,INR,DEBIT,NEFT,Notion,2026-08-29,,UPI254074915576,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000609,MERCHANT_0121,SMS,"Transfer INR10,000.00 to Deepak Joshi. Fee: Rs.25. Total debit: Rs. 10,025/-.",10000,INR,DEBIT,BANK_TRANSFER,Deepak Joshi,2026-08-13,,,,,True,SUCCESS
+TXN_EXT_000610,MERCHANT_0532,NOTIFICATION,"NEFT Dr: ₹ 4,507 to AWS. A/c None. Value dt Aug 09, 2026.",4507,INR,DEBIT,NEFT,AWS,2026-08-09,,,,Federal Bank,True,SUCCESS
+TXN_EXT_000611,MERCHANT_0550,MANUAL_TEXT,ICICI Bank: Your OTP for transaction is 407706. Do not share.,,,,,,,,,,ICICI Bank,False,
+TXN_EXT_000612,MERCHANT_0842,MANUAL_TEXT,"UPI collect payment of ₹125,073.00 from Gupta Distributors credited. Ref IMPS147276808.",125073,INR,CREDIT,UPI,Gupta Distributors,2026-08-14,,IMPS147276808,,ICICI Bank,True,SUCCESS
+TXN_EXT_000613,MERCHANT_0078,NOTIFICATION,Rs 25000 processed for Singh Brothers,25000,INR,DEBIT,UPI,,2026-08-30,,TXN9381721143,,,True,SUCCESS
+TXN_EXT_000614,MERCHANT_0754,SMS,"Dear Customer, NEFT of INR 48,505.00 to Myntra has been debited from A/c XX3911. UTR: KOTAKR352198812.",48505,INR,DEBIT,NEFT,Myntra,2026-08-15,,,3911,,True,SUCCESS
+TXN_EXT_000615,MERCHANT_0882,SMS,"Cash payment of INR1,000,094.00 made to Vikram Rao on 31.08.2026.",1000094,INR,DEBIT,CASH,Vikram Rao,2026-08-31,09:57:54,IMPS776776527,,Yes Bank,True,SUCCESS
+TXN_EXT_000616,MERCHANT_0661,SMS,"sent 50.0k to Verma Goods via upi Aug 05, 2026",50,INR,DEBIT,UPI,,2026-08-05,07:53:33,TXN6696442664,9686,,True,SUCCESS
+TXN_EXT_000617,MERCHANT_0625,SMS,Cash payment of ₹450 made to Neha Singh on 19/08/2026.,450,INR,DEBIT,CASH,Neha Singh,2026-08-19,09:15:13,IMPS308659087,,Yes Bank,True,SUCCESS
+TXN_EXT_000618,MERCHANT_0322,SMS,"Rs.14,951 Dr A/c XX7627 UPI Ref FEDR848903745 to Apollo Pharmacy",14951,INR,DEBIT,UPI,,2026-09-27,19:58:09,,7627,,True,SUCCESS
+TXN_EXT_000619,MERCHANT_0584,SMS,"Refund of ₹95,013.00 from Big Bazaar credited to your card ending 7244.",95013,INR,CREDIT,CARD,Big Bazaar,2026-09-03,,SBIR347842250,7244,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000620,MERCHANT_0074,MANUAL_TEXT,"INR 15,000 sent to Karan Malhotra. Charges Rs.15/- deducted.",15000,INR,DEBIT,NEFT,Karan Malhotra,2026-08-21,,UPI950275468961,,Federal Bank,True,SUCCESS
+TXN_EXT_000621,MERCHANT_0072,MANUAL_TEXT,"Rs.1,249,731 Dr A/c XX2485 UPI Ref IMPS530156867 to Amit Sharma",1249731,INR,DEBIT,UPI,Amit Sharma,2026-08-25,03:36:34,IMPS530156867,2485,Yes Bank,True,SUCCESS
+TXN_EXT_000622,MERCHANT_0516,MANUAL_TEXT,"UPI collect payment of ₹1,851 from rahul@upi credited. Ref TXN6752211372.",1851,INR,CREDIT,UPI,rahul@upi,2026-08-25,,,,,True,SUCCESS
+TXN_EXT_000623,MERCHANT_0826,MANUAL_TEXT,Transfer reference SBIR841100072 created for INR 101.00 to Reddy Logistics.,101,INR,DEBIT,,,,19:23:27,,,Axis Bank,True,PENDING
+TXN_EXT_000624,MERCHANT_0185,NOTIFICATION,"₹ 7,500 transferred. Remaining balance Rs. 52,500 in account.",7500,INR,DEBIT,BANK_TRANSFER,,2026-09-29,,,1027,,True,SUCCESS
+TXN_EXT_000625,MERCHANT_0200,MANUAL_TEXT,Kotak Mahindra Bank: POS purchase of Rs. 52 at Uber. Card XXNone.,52,INR,DEBIT,CARD,Uber,,,,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000626,MERCHANT_0703,MANUAL_TEXT,"Refund of INR 48,522 from Manish Agarwal credited to your card ending 6127.",48522,INR,CREDIT,CARD,Manish Agarwal,2026-08-28,03:32:27,IMPS690813637,6127,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000627,MERCHANT_0020,SMS,"Rs. 10,000 transferred to Reddy Logistics. Bank charges INR 10.00 applicable.",10000,INR,DEBIT,IMPS,Reddy Logistics,2026-09-08,,UPI414526795461,,,True,SUCCESS
+TXN_EXT_000628,MERCHANT_0680,MANUAL_TEXT,"INR 62,013.00 received from karan@okpnb on 04 September 2026 via UPI.",62013,INR,CREDIT,UPI,karan@okpnb,,12:34:09,,,,True,SUCCESS
+TXN_EXT_000629,MERCHANT_0090,MANUAL_TEXT,"Get 15% discount on credit card purchases above INR 10,000.",,,,,,,,,,IDFC FIRST Bank,False,
+TXN_EXT_000630,MERCHANT_0023,SMS,"INR34,998.00 received from neha@okkotak via UPI. Ref: YESR633361273. Credited to A/c XX6563.",34998,INR,CREDIT,UPI,,2026-08-25,,YESR633361273,6563,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000631,MERCHANT_0350,SMS,IMPS of ₹250 to QuickBooks under processing. Ref IMPS493215687.,250,INR,DEBIT,IMPS,QuickBooks,2026-08-18,04:25:24,256524,,Yes Bank,True,PENDING
+TXN_EXT_000632,MERCHANT_0106,SMS,"Rs.1,500 Dr from A/c 4441. Avl bal Rs.36,500.",1500,INR,DEBIT,,,,,,4441,,True,SUCCESS
+TXN_EXT_000633,MERCHANT_0732,NOTIFICATION,"Rs. 2,498/- transferred to Priya Patel via IMPS. IMPS Ref: IMPS403959566.",2498,INR,DEBIT,IMPS,Priya Patel,2026-09-13,17:45:02,,9372,Axis Bank,True,SUCCESS
+TXN_EXT_000634,MERCHANT_0344,MANUAL_TEXT,"IDFC FIRST Bank: ₹ 48,515 debited from A/c 5369 towards Zoho. Ref None.",48515,INR,DEBIT,BANK_TRANSFER,Zoho,2026-08-27,,,5369,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000635,MERCHANT_0598,SMS,"Payment of INR48,542.00 to Slack unsuccessful. Please retry.",48542,INR,DEBIT,,Slack,2026-08-08,,,,IndusInd Bank,True,FAILED
+TXN_EXT_000636,MERCHANT_0466,NOTIFICATION,"Cash payment of Rs749,992/- made to Reliance Fresh on 10.08.2026.",749992,INR,DEBIT,CASH,Reliance Fresh,2026-08-10,,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000637,MERCHANT_0783,MANUAL_TEXT,"ICICI Bank: Pre-approved business loan of Rs. 500,000 waiting for you!",,,,,,,,,,ICICI Bank,False,
+TXN_EXT_000638,MERCHANT_0458,MANUAL_TEXT,Your debit card ending 8956 will expire soon. Request renewal.,,,,,,,,,,,False,
+TXN_EXT_000639,MERCHANT_0114,MANUAL_TEXT,IMPS transfer of INR27.00 to Pooja Iyer successful. Ref: IMPS152705290. From A/c XX7366.,27,INR,DEBIT,IMPS,Pooja Iyer,2026-08-03,,ICICIR134163406,7366,Federal Bank,True,SUCCESS
+TXN_EXT_000640,MERCHANT_0327,NOTIFICATION,"NEFT Dr: INR 24,953.00 to Adani Electricity. A/c 8023. Value dt 15/08/2026.",24953,INR,DEBIT,NEFT,,2026-08-15,,,8023,ICICI Bank,True,SUCCESS
+TXN_EXT_000641,MERCHANT_0958,NOTIFICATION,"Rs. 75,020/- received from Rao Suppliers on 29 Sep 2026 via UPI.",75020,INR,CREDIT,UPI,,2026-09-29,19:10:42,,8390,,True,SUCCESS
+TXN_EXT_000642,MERCHANT_0635,NOTIFICATION,Statement for A/c XX2319 is ready for download.,,,,,,,,,,,False,
+TXN_EXT_000643,MERCHANT_0537,SMS,"Kotak Mahindra Bank: Your credit card limit is Rs. 50,000/-.",,,,,,,,,,Kotak Mahindra Bank,False,
+TXN_EXT_000644,MERCHANT_0039,NOTIFICATION,"Rs. 4,905 debited from your account ending None via UPI to Pooja Iyer on August 15. Ref no 645310.",4905,INR,DEBIT,UPI,Pooja Iyer,2026-08-15,05:59:43,951118,,Yes Bank,True,SUCCESS
+TXN_EXT_000645,MERCHANT_0503,NOTIFICATION,"INR 62,040.00 payment to ABC Wholesale awaiting confirmation.",62040,INR,DEBIT,,ABC Wholesale,2026-08-26,21:28:19,,4810,Federal Bank,True,PENDING
+TXN_EXT_000646,MERCHANT_0255,MANUAL_TEXT,"Rs. 75,042/- received from Paytm Mall via UPI. Ref: None. Credited to A/c XX4656.",75042,INR,CREDIT,UPI,Paytm Mall,2026-08-18,18:23:07,,4656,,True,SUCCESS
+TXN_EXT_000647,MERCHANT_0157,MANUAL_TEXT,Account access from new device detected. Verify if this was you.,,,,,,,,,,,False,
+TXN_EXT_000648,MERCHANT_0295,SMS,"INR 24,994 received via IMPS from Ola on 26-08-2026.",24994,INR,CREDIT,IMPS,Ola,,05:26:15,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000649,MERCHANT_0290,MANUAL_TEXT,"IMPS transfer of INR 74,957.00 to Karan Malhotra successful. Ref: IMPS485520835. From A/c XX4411.",74957,INR,DEBIT,IMPS,Karan Malhotra,2026-09-05,12:05:25,193520,4411,IndusInd Bank,True,SUCCESS
+TXN_EXT_000650,MERCHANT_0483,SMS,RTGS transfer of ₹23.00 to Delhi Jal Board completed. UTR: ICICIR911472797. A/c XX8304.,23,INR,DEBIT,RTGS,Delhi Jal Board,2026-08-04,,,8304,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000651,MERCHANT_0128,MANUAL_TEXT,Link your bank account to UPI for seamless payments.,,,,,,,,,,Canara Bank,False,
+TXN_EXT_000652,MERCHANT_0702,MANUAL_TEXT,"Kotak Mahindra Bank: Upgrade to platinum card and enjoy benefits worth ₹25,000.",,,,,,,,,,Kotak Mahindra Bank,False,
+TXN_EXT_000653,MERCHANT_0672,NOTIFICATION,Nominee details missing for A/c XX5933. Update now.,,,,,,,,,,,False,
+TXN_EXT_000654,MERCHANT_0164,NOTIFICATION,"Punjab National Bank: POS purchase of INR 88,027.00 at Slack. Card XX2938.",88027,INR,DEBIT,CARD,,2026-09-20,16:14:34,,2938,Punjab National Bank,True,SUCCESS
+TXN_EXT_000655,MERCHANT_0658,SMS,"You paid ₹4,896 to sharma.traders@okicici using UPI. Ref No: None.",4896,INR,DEBIT,UPI,,2026-08-08,20:22:40,,9999,State Bank of India,True,SUCCESS
+TXN_EXT_000656,MERCHANT_0401,SMS,"Get instant business loan up to Rs. 2,000,000/-. Zero documentation!",,,,,,,,,,,False,
+TXN_EXT_000657,MERCHANT_0896,MANUAL_TEXT,"INR4,498.00 DEBITED frm Ac XXNone via UPI to Rajesh Mehta on 13-08-26.",4498,INR,DEBIT,UPI,Rajesh Mehta,2026-08-13,22:06:04,,,Yes Bank,True,SUCCESS
+TXN_EXT_000658,MERCHANT_0169,MANUAL_TEXT,Account access from new device detected. Verify if this was you.,,,,,,,,,,,False,
+TXN_EXT_000659,MERCHANT_0944,NOTIFICATION,IDFC FIRST Bank: You won Rs. 10 cashback! Claim before midnight.,,,,,,,,,,IDFC FIRST Bank,False,
+TXN_EXT_000660,MERCHANT_0059,NOTIFICATION,"Transfer reference 387813 created for ₹10,000",10000,INR,DEBIT,,Sharma Traders,,,,,,True,SUCCESS
+TXN_EXT_000661,MERCHANT_0388,NOTIFICATION,"UPI collect request for INR 94,990 from rajesh@okbaroda pending approval.",94990,INR,DEBIT,UPI,,2026-08-28,01:48:39,,,,True,PENDING
+TXN_EXT_000662,MERCHANT_0366,MANUAL_TEXT,"Bank of Baroda: NEFT Credit of INR 4,497 received from sharma.traders@okicici. UTR: KOTAKR801963760. Value Date: 26/08/26.",4497,INR,CREDIT,NEFT,sharma.traders@okicici,,,,7354,Bank of Baroda,True,SUCCESS
+TXN_EXT_000663,MERCHANT_0929,NOTIFICATION,Scratch card reward worth INR 50 unlocked.,,,,,,,,,,,False,
+TXN_EXT_000664,MERCHANT_0157,NOTIFICATION,"UPI collect payment of ₹2,490 from Uber credited. Ref ICICIR805070917.",2490,INR,CREDIT,UPI,Uber,2026-08-16,,,6173,,True,SUCCESS
+TXN_EXT_000665,MERCHANT_0209,MANUAL_TEXT,"Your UPI transfer of Rs. 249,952/- to neha@okkotak could not be completed. Ref UPI421797470730.",249952,INR,DEBIT,UPI,,,00:02:59,UPI421797470730,4938,Yes Bank,True,FAILED
+TXN_EXT_000666,MERCHANT_0970,NOTIFICATION,"You paid Rs. 94,973/- to Airtel using UPI. Ref No: KOTAKR110197828.",94973,INR,DEBIT,UPI,Airtel,2026-09-21,17:38:56,KOTAKR110197828,,,True,SUCCESS
+TXN_EXT_000667,MERCHANT_0823,NOTIFICATION,"Federal Bank: NEFT of ₹ 750,024 to ABC Wholesale failed. UTR SBIR251953364.",750024,INR,DEBIT,NEFT,ABC Wholesale,2026-09-17,13:25:00,,,Federal Bank,True,FAILED
+TXN_EXT_000668,MERCHANT_0263,NOTIFICATION,"UPI payment of INR 48,486 to sharma.traders@okicici failed. Insufficient funds.",48486,INR,DEBIT,UPI,,2026-08-19,,ICICIR695658257,,Federal Bank,True,FAILED
+TXN_EXT_000669,MERCHANT_0023,MANUAL_TEXT,"INR 48,459.00 transferred to Stripe India. Bank charges 10 applicable. A/c XXNone.",48459,INR,DEBIT,BANK_TRANSFER,Stripe India,2026-09-10,,,,State Bank of India,True,SUCCESS
+TXN_EXT_000670,MERCHANT_0525,SMS,"INR4,497.00 refund processed from Anita Desai to card XX1091.",4497,INR,CREDIT,CARD,Anita Desai,2026-09-14,22:43:52,TXN5774483398,1091,IndusInd Bank,True,SUCCESS
+TXN_EXT_000671,MERCHANT_0722,NOTIFICATION,Update your PAN details for uninterrupted account services.,,,,,,,,,,,False,
+TXN_EXT_000672,MERCHANT_0041,NOTIFICATION,"₹5,500 debited from A/c XX9669. Available balance Rs. 50,500.",5500,INR,DEBIT,,,2026-09-05,,,9669,ICICI Bank,True,SUCCESS
+TXN_EXT_000673,MERCHANT_0731,SMS,State Bank of India: Cashback of Rs. 200/- credited to your wallet!,,,,,,,,,,State Bank of India,False,
+TXN_EXT_000674,MERCHANT_0717,MANUAL_TEXT,"Available bal INR 52,000.00 in A/c 9345.",,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000675,MERCHANT_0406,SMS,"Rs. 4,896 refund processed from Arun Verma to card XX6767.",4896,INR,CREDIT,CARD,Arun Verma,2026-09-06,05:55:10,,6767,,True,SUCCESS
+TXN_EXT_000676,MERCHANT_0974,MANUAL_TEXT,Account access from new device detected. Verify if this was you.,,,,,,,,,,,False,
+TXN_EXT_000677,MERCHANT_0246,NOTIFICATION,"Your UPI transfer of Rs. 94,997 to suresh@oksbi could not be completed. Ref None.",94997,INR,DEBIT,UPI,,2026-08-31,,,,Kotak Mahindra Bank,True,FAILED
+TXN_EXT_000678,MERCHANT_0351,SMS,"Dear Customer, ₹3,193.00 has been debited from your A/c XXNone via UPI to MSEB on August 26. UPI Ref: None.",3193,INR,DEBIT,UPI,MSEB,2026-08-26,08:53:24,,,State Bank of India,True,SUCCESS
+TXN_EXT_000679,MERCHANT_0010,NOTIFICATION,"IMPS of ₹750,016 to Tally Solutions under processing. Ref IMPS786781749.",750016,INR,DEBIT,IMPS,Tally Solutions,,08:19:54,,4668,Axis Bank,True,PENDING
+TXN_EXT_000680,MERCHANT_0127,SMS,"UPI collect payment of INR 14,953.00 from AWS credited. Ref IDFCR733740880.",14953,INR,CREDIT,UPI,AWS,2026-09-25,12:03:28,IDFCR733740880,,State Bank of India,True,SUCCESS
+TXN_EXT_000681,MERCHANT_0342,SMS,"Federal Bank: Your account balance as on 24/08/2026 is INR 35,000.00.",,,,,,,,,,Federal Bank,False,
+TXN_EXT_000682,MERCHANT_0974,MANUAL_TEXT,"INR 35,036 DEBITED frm Ac XX9444 via UPI to Kumar Trading Co on 29/09/26.",35036,INR,DEBIT,UPI,Kumar Trading Co,2026-09-29,03:22:30,,9444,,True,SUCCESS
+TXN_EXT_000683,MERCHANT_0687,NOTIFICATION,"₹750,070.00 refund processed from Anita Desai to card XX6809.",750070,INR,CREDIT,CARD,Anita Desai,2026-08-18,18:22:14,UPI739048684753,6809,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000684,MERCHANT_0864,NOTIFICATION,"INR249,928.00 received from DMart on 13 September 2026 via UPI.",249928,INR,CREDIT,UPI,DMart,2026-09-13,23:40:01,,,,True,SUCCESS
+TXN_EXT_000685,MERCHANT_0751,NOTIFICATION,Scratch card reward worth INR100.00 unlocked.,,,,,,,,,,,False,
+TXN_EXT_000686,MERCHANT_0216,NOTIFICATION,"₹24,989.00 payment to Sunita Reddy awaiting confirmation.",24989,INR,DEBIT,,,2026-08-21,14:06:20,,,IndusInd Bank,True,PENDING
+TXN_EXT_000687,MERCHANT_0530,NOTIFICATION,sent 494.0k to Myntra via upi 28 Aug,494,INR,DEBIT,UPI,Myntra,2026-08-28,21:09:37,,,Axis Bank,True,SUCCESS
+TXN_EXT_000688,MERCHANT_0920,MANUAL_TEXT,Rs. 149 received from rajesh@okbaroda via UPI. Ref: AXISR800767402. Credited to A/c XX5206.,149,INR,CREDIT,UPI,rajesh@okbaroda,2026-09-14,00:35:28,AXISR800767402,5206,,True,SUCCESS
+TXN_EXT_000689,MERCHANT_0486,SMS,"Federal Bank: NEFT Credit of ₹ 3,194 received from Paytm Mall. UTR: IDFCR710261100. Value Date: 23-08-26.",3194,INR,CREDIT,NEFT,Paytm Mall,2026-08-23,07:46:27,,,Federal Bank,True,SUCCESS
+TXN_EXT_000690,MERCHANT_0125,NOTIFICATION,"Your card was used for ₹500,089 at Anita Desai on 14/09/2026 at 4:09PM.",500089,INR,DEBIT,CARD,Anita Desai,2026-09-14,16:09:35,,3535,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000691,MERCHANT_0956,SMS,"You paid ₹ 1,858 to BESCOM using UPI. Ref No: TXN7767115101.",1858,INR,DEBIT,UPI,,,09:14:13,,,,True,SUCCESS
+TXN_EXT_000692,MERCHANT_0375,NOTIFICATION,"IMPS credit of INR4,909.00 from Arun Verma. Ref: IMPS225874394. Credited to A/c XX1206.",4909,INR,CREDIT,IMPS,Arun Verma,2026-09-28,01:41:31,IMPS112141776,1206,,True,SUCCESS
+TXN_EXT_000693,MERCHANT_0494,MANUAL_TEXT,"INR1,249,746.00 debited via UPI to Big Bazaar at 21:44 hrs on 14 Aug 2026. Ref: UPI460472169986.",1249746,INR,DEBIT,UPI,Big Bazaar,2026-08-14,21:44:05,UPI460472169986,,,True,SUCCESS
+TXN_EXT_000694,MERCHANT_0185,SMS,Rs. 490 debited from your account ending 7594 via UPI to Uber on 11 Aug. Ref no 732599.,490,INR,DEBIT,UPI,Uber,,,,7594,Federal Bank,True,SUCCESS
+TXN_EXT_000695,MERCHANT_0151,SMS,Learn about UPI Lite for faster payments under INR200.00.,,,,,,,,,,Punjab National Bank,False,
+TXN_EXT_000696,MERCHANT_0056,SMS,IndusInd Bank: Your KYC is pending. Visit nearest branch.,,,,,,,,,,,False,
+TXN_EXT_000697,MERCHANT_0468,NOTIFICATION,"Dear Customer, INR 4,898.00 has been debited from your A/c XXNone via UPI to Notion on 04-08-2026. UPI Ref: IMPS557408869.",4898,INR,DEBIT,UPI,Notion,2026-08-04,05:55:02,IMPS557408869,,HDFC Bank,True,SUCCESS
+TXN_EXT_000698,MERCHANT_0139,SMS,"₹4,500.00 paid to Uber. Balance now INR 19,500.00.",4500,INR,DEBIT,BANK_TRANSFER,,2026-08-09,,,9727,,True,SUCCESS
+TXN_EXT_000699,MERCHANT_0599,NOTIFICATION,"Rs. 4,501 received from Uber via UPI. Ref: TXN2682725757. Credited to A/c XX3828.",4501,INR,CREDIT,UPI,Uber,2026-09-29,20:55:20,TXN2682725757,3828,Yes Bank,True,SUCCESS
+TXN_EXT_000700,MERCHANT_0613,NOTIFICATION,"Rs. 1,250,265 debited via UPI to Indraprastha Gas at 5:17 AM on 15/09/2026. Ref: None.",1250265,INR,DEBIT,UPI,Indraprastha Gas,2026-09-15,05:17:08,,,State Bank of India,True,SUCCESS
+TXN_EXT_000701,MERCHANT_0279,NOTIFICATION,Statement for A/c XX9958 is ready for download.,,,,,,,,,,Yes Bank,False,
+TXN_EXT_000702,MERCHANT_0587,SMS,Rs.505 Dr A/c XXNone UPI Ref None to Ola,505,INR,DEBIT,UPI,Ola,2026-08-06,22:02:32,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000703,MERCHANT_0130,SMS,"ICICI Bank: NEFT Credit of INR 14,973 received from Swiggy. UTR: KOTAKR493991984. Value Date: 03/08/26.",14973,INR,CREDIT,NEFT,Swiggy,2026-08-03,11:38:41,,7517,ICICI Bank,True,SUCCESS
+TXN_EXT_000704,MERCHANT_0403,SMS,"Transfer of ₹1,000,017 to Indraprastha Gas completed. Ref no IMPS989533119.",1000017,INR,DEBIT,BANK_TRANSFER,Indraprastha Gas,2026-09-18,10:20:00,IMPS989533119,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000705,MERCHANT_0967,NOTIFICATION,UPI collect payment of ₹499.00 from vikram@ybl credited. Ref None.,499,INR,CREDIT,UPI,vikram@ybl,2026-09-26,,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000706,MERCHANT_0087,MANUAL_TEXT,"Amount INR 25,000 marked for Neha Singh",25000,INR,DEBIT,UPI,,2026-09-13,,,,,True,PENDING
+TXN_EXT_000707,MERCHANT_0125,SMS,"₹1,206 credited to your account from Swiggy. Ref None.",1206,INR,CREDIT,BANK_TRANSFER,Swiggy,2026-08-22,22:55:08,,1290,IndusInd Bank,True,SUCCESS
+TXN_EXT_000708,MERCHANT_0097,SMS,"Loan EMI ₹ 8,500 Dr. Remaining principal ₹ 297,500.",8500,INR,DEBIT,BANK_TRANSFER,Yes Bank,2026-09-25,,IDFCR350785761,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000709,MERCHANT_0940,NOTIFICATION,"You paid Rs. 14,955/- to Vikram Rao using UPI. Ref No: None.",14955,INR,DEBIT,UPI,Vikram Rao,2026-09-11,03:45:33,,,Federal Bank,True,SUCCESS
+TXN_EXT_000710,MERCHANT_0395,SMS,"INR 95,029 received from ClearTax via UPI. Ref: IMPS719809183. Credited to A/c XXNone.",95029,INR,CREDIT,UPI,,2026-08-13,06:04:17,IMPS719809183,,ICICI Bank,True,SUCCESS
+TXN_EXT_000711,MERCHANT_0101,SMS,₹ 753 transferred to Joshi Mart via IMPS. IMPS Ref: IMPS389582299.,753,INR,DEBIT,IMPS,,,02:30:37,251981,,Yes Bank,True,SUCCESS
+TXN_EXT_000712,MERCHANT_0020,SMS,"Rs3,210/- received from Delhi Jal Board via UPI. Ref: TXN3283035614. Credited to A/c XX9202.",3210,INR,CREDIT,UPI,,2026-08-15,16:45:06,TXN3283035614,9202,,True,SUCCESS
+TXN_EXT_000713,MERCHANT_0485,MANUAL_TEXT,"IMPS transfer ₹500,085 to suresh@oksbi declined. Ref IMPS387918390.",500085,INR,DEBIT,IMPS,suresh@oksbi,2026-09-18,01:49:31,IMPS995847952,6266,Bank of Baroda,True,FAILED
+TXN_EXT_000714,MERCHANT_0620,SMS,"₹94,988.00 sent via RTGS to Tata Starbucks on 24 Sep 2026. Ref None.",94988,INR,DEBIT,RTGS,Tata Starbucks,2026-09-24,,,,Federal Bank,True,SUCCESS
+TXN_EXT_000715,MERCHANT_0151,SMS,"Refund of Rs. 125,029 from vikram@ybl credited to your card ending 7864.",125029,INR,CREDIT,CARD,vikram@ybl,2026-08-22,05:41:41,,7864,IndusInd Bank,True,SUCCESS
+TXN_EXT_000716,MERCHANT_0679,SMS,Axis Bank: POS purchase of Rs. 98 at Cafe Coffee Day. Card XXNone.,98,INR,DEBIT,CARD,Cafe Coffee Day,2026-09-05,09:40:44,,,Axis Bank,True,SUCCESS
+TXN_EXT_000717,MERCHANT_0676,NOTIFICATION,"Available bal Rs52,000/- in A/c 8725.",,,,,,,,,,,False,
+TXN_EXT_000718,MERCHANT_0540,SMS,Your monthly account statement is now available.,,,,,,,,,,,False,
+TXN_EXT_000719,MERCHANT_0481,SMS,"Rs. 48,461/- received from Anita Desai on 05/09/2026 via UPI.",48461,INR,CREDIT,UPI,Anita Desai,2026-09-05,01:32:11,,,Federal Bank,True,SUCCESS
+TXN_EXT_000720,MERCHANT_0963,SMS,"IndusInd Bank: NEFT Credit of INR498.00 received from Apollo Pharmacy. UTR: SBIR312468211. Value Date: Aug 31, 2026.",498,INR,CREDIT,NEFT,Apollo Pharmacy,2026-08-31,02:22:45,,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000721,MERCHANT_0821,MANUAL_TEXT,"Rs. 3,196/- transferred to Freshdesk via IMPS. IMPS Ref: IMPS771758113.",3196,INR,DEBIT,IMPS,Freshdesk,,06:06:11,,,,True,SUCCESS
+TXN_EXT_000722,MERCHANT_0291,MANUAL_TEXT,"Payment of Rs. 3,192/- to ClearTax unsuccessful. Please retry.",3192,INR,DEBIT,,ClearTax,2026-09-05,,UPI975702253505,,Kotak Mahindra Bank,True,FAILED
+TXN_EXT_000723,MERCHANT_0923,NOTIFICATION,INR 50.00 paid to Ola. Mode not specified.,50,INR,DEBIT,,,2026-09-26,16:23:52,,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000724,MERCHANT_0502,SMS,Your debit card ending 5095 will expire soon. Request renewal.,,,,,,,,,,IndusInd Bank,False,
+TXN_EXT_000725,MERCHANT_0614,SMS,"Open a savings account with HDFC Bank and get Rs. 1,000 voucher.",,,,,,,,,,,False,
+TXN_EXT_000726,MERCHANT_0429,SMS,"IMPS transfer of ₹249,993 to Torrent Power successful. Ref: IMPS278138015. From A/c XXNone.",249993,INR,DEBIT,IMPS,Torrent Power,2026-09-24,05:02:34,,,State Bank of India,True,SUCCESS
+TXN_EXT_000727,MERCHANT_0002,SMS,"Transfer of INR 124,903 to Amit Sharma completed. Ref no None.",124903,INR,DEBIT,BANK_TRANSFER,Amit Sharma,2026-08-21,09:01:51,,,,True,SUCCESS
+TXN_EXT_000728,MERCHANT_0745,NOTIFICATION,"Your credit card limit is Rs100,000/-.",,,,,,,,,,,False,
+TXN_EXT_000729,MERCHANT_0386,MANUAL_TEXT,IMPS credit of INR452.00 from Notion. Ref: IMPS554033342. Credited to A/c XXNone.,452,INR,CREDIT,IMPS,,,,IMPS567219082,,,True,SUCCESS
+TXN_EXT_000730,MERCHANT_0139,SMS,Paid Rs. 500/- to Big Bazaar. You won ₹ 20 cashback!,500,INR,DEBIT,UPI,Big Bazaar,,,,,,True,SUCCESS
+TXN_EXT_000731,MERCHANT_0176,NOTIFICATION,"INR 95,025.00 debited via UPI to Delhi Jal Board. Available balance ₹140,025.",95025,INR,DEBIT,UPI,,2026-08-16,,,1076,,True,SUCCESS
+TXN_EXT_000732,MERCHANT_0436,NOTIFICATION,"NEFT Dr: INR34,960.00 to Sunita Reddy. A/c None. Value dt 04 Aug.",34960,INR,DEBIT,NEFT,Sunita Reddy,2026-08-04,04:30:13,TXN8639993987,,,True,SUCCESS
+TXN_EXT_000733,MERCHANT_0726,SMS,sent 250.1k to Reddy Logistics via upi 31.08.2026,250054,INR,DEBIT,UPI,Reddy Logistics,2026-08-31,23:43:37,TXN1027115821,4239,Federal Bank,True,SUCCESS
+TXN_EXT_000734,MERCHANT_0070,SMS,IMPS transfer of INR 750.00 to Iyer Exports successful. Ref: IMPS609238563. From A/c XXNone.,750,INR,DEBIT,IMPS,Iyer Exports,2026-09-16,,TXN1538504511,,Federal Bank,True,SUCCESS
+TXN_EXT_000735,MERCHANT_0914,MANUAL_TEXT,INR 500.00 received from sharma.traders@okicici via UPI. Ref: None. Credited to A/c XXNone.,500,INR,CREDIT,UPI,sharma.traders@okicici,2026-09-25,13:53:16,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000736,MERCHANT_0797,MANUAL_TEXT,Rs. 151 received from Neha Singh via UPI. Ref: YESR184242563. Credited to A/c XX7283.,151,INR,CREDIT,UPI,Neha Singh,2026-09-28,,YESR184242563,7283,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000737,MERCHANT_0952,NOTIFICATION,sent 4.9k to Flipkart via upi 13-08-2026,4901,INR,DEBIT,UPI,Flipkart,2026-08-13,00:26:01,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000738,MERCHANT_0485,NOTIFICATION,Axis Bank: Your KYC is pending. Visit nearest branch.,,,,,,,,,,,False,
+TXN_EXT_000739,MERCHANT_0581,NOTIFICATION,"Rs.374,924 Dr A/c XX5843 UPI Ref 428957 to Ravi Kumar",374924,INR,DEBIT,UPI,Ravi Kumar,2026-08-10,17:55:51,,5843,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000740,MERCHANT_0255,NOTIFICATION,"Get instant personal loan up to Rs. 500,000.",,,,,,,,,,Federal Bank,False,
+TXN_EXT_000741,MERCHANT_0371,NOTIFICATION,Rs. 97 received from Pooja Iyer on August 18 via UPI.,97,INR,CREDIT,UPI,,2026-08-18,17:34:17,,,Axis Bank,True,SUCCESS
+TXN_EXT_000742,MERCHANT_0750,SMS,Nominee details missing for A/c XX3118. Update now.,,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000743,MERCHANT_0187,MANUAL_TEXT,Punjab National Bank: POS purchase of Rs. 25/- at Apollo Pharmacy. Card XX1754.,25,INR,DEBIT,CARD,Apollo Pharmacy,2026-09-30,,,1754,Punjab National Bank,True,SUCCESS
+TXN_EXT_000744,MERCHANT_0178,NOTIFICATION,ICICI Bank: NEFT Credit of INR 491.00 received from Tata Starbucks. UTR: IDFCR173705699. Value Date: 28 August 2026.,491,INR,CREDIT,NEFT,Tata Starbucks,2026-08-28,00:03:05,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000745,MERCHANT_0553,NOTIFICATION,"None: ₹249,956 debited from A/c None towards Notion. Ref None.",249956,INR,DEBIT,BANK_TRANSFER,Notion,2026-09-19,08:03:12,,,,True,SUCCESS
+TXN_EXT_000746,MERCHANT_0817,NOTIFICATION,"CARD txn: INR 999,963.00 at amit@paytm on 20-09-2026. Avl bal Rs1,024,963/-.",999963,INR,DEBIT,CARD,,2026-09-20,12:50:45,460745,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000747,MERCHANT_0497,SMS,"INR 1,000,046.00 DEBITED A/C XX2866 VIA UPI TO DMART. REF: TXN7850993986.",1000046,INR,DEBIT,UPI,DMart,2026-08-16,05:48:20,TXN7850993986,2866,,True,SUCCESS
+TXN_EXT_000748,MERCHANT_0746,SMS,Rs502/- received from Paytm Mall on 03-09-26 via UPI.,502,INR,CREDIT,UPI,Paytm Mall,2026-09-03,,,7422,,True,SUCCESS
+TXN_EXT_000749,MERCHANT_0073,SMS,"INR8,500.00 EMI deducted. Outstanding: ₹170,000.",8500,INR,DEBIT,BANK_TRANSFER,Kotak Mahindra Bank,2026-09-23,,,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000750,MERCHANT_0253,NOTIFICATION,"INR 2,503 received from neha@okkotak via UPI. Ref: None. Credited to A/c XX1167.",2503,INR,CREDIT,UPI,neha@okkotak,2026-09-15,,,1167,IndusInd Bank,True,SUCCESS
+TXN_EXT_000751,MERCHANT_0740,NOTIFICATION,sent 500.0k to Microsoft Azure via upi 28 Aug,500010,INR,DEBIT,UPI,Microsoft Azure,2026-08-28,23:17:52,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000752,MERCHANT_0151,NOTIFICATION,Txn INR 2500 processed ref IMPS164404084,2500,INR,DEBIT,IMPS,ABC Wholesale,,,,,,True,SUCCESS
+TXN_EXT_000753,MERCHANT_0935,SMS,"Transfer of Rs. 14,955/- from Suresh Gupta received. A/c XX5029.",14955,INR,CREDIT,BANK_TRANSFER,Suresh Gupta,2026-08-13,,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000754,MERCHANT_0279,MANUAL_TEXT,Never share your OTP with anyone.,,,,,,,,,,,False,
+TXN_EXT_000755,MERCHANT_0087,NOTIFICATION,INR 751.00 transferred to Microsoft Azure. Bank charges 5 applicable. A/c XX6848.,751,INR,DEBIT,BANK_TRANSFER,Microsoft Azure,,16:29:51,,6848,,True,SUCCESS
+TXN_EXT_000756,MERCHANT_0755,SMS,"Bank of Baroda: NEFT of INR 87,963 to ABC Wholesale failed. UTR HDFCR696331764.",87963,INR,DEBIT,NEFT,ABC Wholesale,2026-09-19,,473543,7416,Bank of Baroda,True,FAILED
+TXN_EXT_000757,MERCHANT_0076,NOTIFICATION,Txn INR 2500 processed ref IMPS196779973,2500,INR,CREDIT,UPI,Pooja Iyer,,,,,,True,PENDING
+TXN_EXT_000758,MERCHANT_0556,MANUAL_TEXT,Your debit card ending 4522 will expire soon. Request renewal.,,,,,,,,,,,False,
+TXN_EXT_000759,MERCHANT_0797,NOTIFICATION,"IMPS of ₹ 4,490 to BESCOM under processing. Ref IMPS867638331.",4490,INR,DEBIT,IMPS,BESCOM,2026-09-29,21:34:16,,,State Bank of India,True,PENDING
+TXN_EXT_000760,MERCHANT_0668,NOTIFICATION,"NEFT Dr: INR 94,960.00 to Mahanagar Gas. A/c 5481. Value dt 30 August 2026.",94960,INR,DEBIT,NEFT,Mahanagar Gas,2026-08-30,14:40:24,895304,,Axis Bank,True,SUCCESS
+TXN_EXT_000761,MERCHANT_0584,SMS,"Dear Customer, ₹1,845.00 has been debited from your A/c XX1897 via UPI to Verma Goods on 07 Aug 2026. UPI Ref: None.",1845,INR,DEBIT,UPI,Verma Goods,2026-08-07,07:18:49,,1897,Canara Bank,True,SUCCESS
+TXN_EXT_000762,MERCHANT_0878,SMS,"You paid ₹374,926 to Tata Starbucks using UPI. Ref No: TXN9682739123.",374926,INR,DEBIT,UPI,Tata Starbucks,2026-09-10,21:17:29,TXN9682739123,,IndusInd Bank,True,SUCCESS
+TXN_EXT_000763,MERCHANT_0430,SMS,"₹ 500,064 payment to Big Bazaar awaiting confirmation.",500064,INR,DEBIT,,Big Bazaar,2026-09-04,11:42:31,,3468,,True,PENDING
+TXN_EXT_000764,MERCHANT_0253,SMS,Send money via UPI and win Rs. 50/- cashback.,,,,,,,,,,,False,
+TXN_EXT_000765,MERCHANT_0554,SMS,INR 349.00 DEBITED A/C XX8165 VIA UPI TO BESCOM. REF: None.,349,INR,DEBIT,UPI,BESCOM,2026-08-21,19:44:21,,8165,,True,SUCCESS
+TXN_EXT_000766,MERCHANT_0746,NOTIFICATION,₹ 252 received from QuickBooks via UPI. Ref: UPI833853821736. Credited to A/c XX2850.,252,INR,CREDIT,UPI,QuickBooks,2026-08-08,15:40:19,UPI833853821736,2850,IndusInd Bank,True,SUCCESS
+TXN_EXT_000767,MERCHANT_0449,MANUAL_TEXT,INR 754.00 debited via UPI to rajesh@okbaroda at 21:59 hrs on 19-09-26. Ref: None.,754,INR,DEBIT,UPI,rajesh@okbaroda,2026-09-19,,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000768,MERCHANT_0464,SMS,"Rs. 95,020/- debited via UPI to Deepak Joshi. Available balance INR 140,020.",95020,INR,DEBIT,UPI,Deepak Joshi,,05:25:52,HDFCR313327931,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000769,MERCHANT_0055,MANUAL_TEXT,"INR95,025.00 received from Sharma Traders on 19.09.2026 via UPI.",95025,INR,CREDIT,UPI,Sharma Traders,,19:04:33,,,,True,SUCCESS
+TXN_EXT_000770,MERCHANT_0092,MANUAL_TEXT,"INR 5,000.00 settlement processed via Razorpay for Vikram Rao",5000,INR,CREDIT,UPI,Vikram Rao,2026-09-17,,,,,True,SUCCESS
+TXN_EXT_000771,MERCHANT_0022,MANUAL_TEXT,"Punjab National Bank: IMPS of Rs75,023/- to Zomato debited. Ref IMPS926703710.",75023,INR,DEBIT,IMPS,Zomato,2026-08-01,12:01:00,KOTAKR339326299,6351,Punjab National Bank,True,SUCCESS
+TXN_EXT_000772,MERCHANT_0600,SMS,UPI collect payment of ₹ 507 from ravi@okaxis credited. Ref None.,507,INR,CREDIT,UPI,ravi@okaxis,2026-08-05,22:54:45,,,Canara Bank,True,SUCCESS
+TXN_EXT_000773,MERCHANT_0106,NOTIFICATION,INR252.00 refund processed from rajesh@okbaroda to card XX2723.,252,INR,CREDIT,CARD,rajesh@okbaroda,2026-09-25,07:55:54,,2723,,True,SUCCESS
+TXN_EXT_000774,MERCHANT_0489,SMS,"INR4,491.00 transfer to Flipkart failed due to bank issue.",4491,INR,DEBIT,,,2026-08-31,08:44:43,,,Bank of Baroda,True,FAILED
+TXN_EXT_000775,MERCHANT_0493,NOTIFICATION,Congratulations! You earned 25 reward points on your last purchase.,,,,,,,,,,,False,
+TXN_EXT_000776,MERCHANT_0998,MANUAL_TEXT,"Rs. 4,501/- refund processed from Tata Starbucks to card XXNone.",4501,INR,CREDIT,CARD,Tata Starbucks,2026-09-30,05:19:08,,,Yes Bank,True,SUCCESS
+TXN_EXT_000777,MERCHANT_0538,MANUAL_TEXT,"Dear Customer, Rs. 491 has been debited from your A/c XXNone via UPI to QuickBooks on Sep 30, 2026. UPI Ref: TXN1363516573.",491,INR,DEBIT,UPI,QuickBooks,2026-09-30,19:52:15,TXN1363516573,,HDFC Bank,True,SUCCESS
+TXN_EXT_000778,MERCHANT_0160,SMS,IndusInd Bank: Link your bank account to UPI for seamless payments.,,,,,,,,,,IndusInd Bank,False,
+TXN_EXT_000779,MERCHANT_0457,SMS,"Your credit card limit is INR 300,000.00.",,,,,,,,,,State Bank of India,False,
+TXN_EXT_000780,MERCHANT_0625,MANUAL_TEXT,"Rs. 24,967/- spent at Rajesh Mehta using your card ending None. Ref: None.",24967,INR,DEBIT,CARD,Rajesh Mehta,2026-08-05,,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000781,MERCHANT_0974,SMS,"Rs. 1,196 debited from your account ending None via UPI to rahul@upi on 20-08-26. Ref no 456637.",1196,INR,DEBIT,UPI,,2026-08-20,03:23:50,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000782,MERCHANT_0987,MANUAL_TEXT,"Rs.74,986 Dr A/c XX7731 UPI Ref TXN1047446910 to Iyer Exports",74986,INR,DEBIT,UPI,Iyer Exports,2026-08-15,,TXN1047446910,7731,ICICI Bank,True,SUCCESS
+TXN_EXT_000783,MERCHANT_0016,SMS,"INR 34,978 debited via UPI to Sunita Reddy. Available balance INR79,978.00.",34978,INR,DEBIT,UPI,Sunita Reddy,2026-08-27,03:30:29,,3202,,True,SUCCESS
+TXN_EXT_000784,MERCHANT_0321,NOTIFICATION,Canara Bank: Branch timings changed to 9:30 AM - 4:00 PM.,,,,,,,,,,,False,
+TXN_EXT_000785,MERCHANT_0822,SMS,"Apply for home loan at 7.5% interest rate. Loan amount up to Rs. 2,500,000.",,,,,,,,,,,False,
+TXN_EXT_000786,MERCHANT_0205,NOTIFICATION,"IMPS transfer of ₹4,900.00 to ravi@okaxis successful. Ref: IMPS889541282. From A/c XXNone.",4900,INR,DEBIT,IMPS,,,,124993,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000787,MERCHANT_0443,SMS,"Get instant personal loan up to INR 1,000,000.",,,,,,,,,,,False,
+TXN_EXT_000788,MERCHANT_0265,SMS,"NEFT Dr: ₹4,895 to AWS. A/c 9857. Value dt 05/08/26.",4895,INR,DEBIT,NEFT,AWS,2026-08-05,06:39:25,,9857,,True,SUCCESS
+TXN_EXT_000789,MERCHANT_0318,SMS,"₹25,011 sent to amit@paytm through NEFT on 15 Aug 2026. UTR FEDR421704344.",25011,INR,DEBIT,NEFT,,2026-08-15,14:19:23,,3233,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000790,MERCHANT_0051,MANUAL_TEXT,"Your transfer of Rs. 4,494 to Rajesh Mehta is pending confirmation.",4494,INR,DEBIT,,Rajesh Mehta,2026-09-11,01:09:54,,,ICICI Bank,True,PENDING
+TXN_EXT_000791,MERCHANT_0812,SMS,"Dear Customer, ₹752 has been debited from your A/c XX8616 via UPI to Vodafone Idea on 16/09/2026. UPI Ref: TXN3505651251.",752,INR,DEBIT,UPI,,2026-09-16,02:36:23,TXN3505651251,,Yes Bank,True,SUCCESS
+TXN_EXT_000792,MERCHANT_0603,NOTIFICATION,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000793,MERCHANT_0966,SMS,Refund of Rs. 496/- from Tata Starbucks credited to your card ending None.,496,INR,CREDIT,CARD,Tata Starbucks,2026-08-31,15:52:11,AXISR781582020,,,True,SUCCESS
+TXN_EXT_000794,MERCHANT_0196,NOTIFICATION,KYC deadline approaching. Complete eKYC now.,,,,,,,,,,,False,
+TXN_EXT_000795,MERCHANT_0831,NOTIFICATION,"Yes Bank: IMPS of ₹ 1,206 to Lakshmi Nair debited. Ref IMPS244562430.",1206,INR,DEBIT,IMPS,Lakshmi Nair,2026-08-10,,TXN8228609138,,Yes Bank,True,SUCCESS
+TXN_EXT_000796,MERCHANT_0992,MANUAL_TEXT,Cashback of ₹50.00 credited to your wallet!,,,,,,,,,,,False,
+TXN_EXT_000797,MERCHANT_0417,SMS,None: IMPS of INR252.00 to Jio debited. Ref IMPS379351967.,252,INR,DEBIT,IMPS,Jio,2026-09-19,14:19:29,,,,True,SUCCESS
+TXN_EXT_000798,MERCHANT_0660,SMS,"NEFT transfer INR 95,035.00 to Delhi Jal Board completed. Ref: UPI780020052482.",95035,INR,DEBIT,NEFT,Delhi Jal Board,2026-08-20,,UPI780020052482,,HDFC Bank,True,SUCCESS
+TXN_EXT_000799,MERCHANT_0036,NOTIFICATION,"Rs4,500/- debited from A/c XX3340. Available balance ₹49,500.00.",4500,INR,DEBIT,UPI,,2026-08-09,,725380,3340,IndusInd Bank,True,SUCCESS
+TXN_EXT_000800,MERCHANT_0140,SMS,"Rs. 3,500/- paid to Rao Suppliers. Balance now ₹28,500.00.",3500,INR,DEBIT,,Rao Suppliers,2026-09-17,,IMPS954829815,5291,,True,SUCCESS
+TXN_EXT_000801,MERCHANT_0917,NOTIFICATION,"NEFT transfer of INR249,910.00 to AWS is pending. Ref None.",249910,INR,DEBIT,NEFT,AWS,,15:29:31,,,ICICI Bank,True,PENDING
+TXN_EXT_000802,MERCHANT_0851,MANUAL_TEXT,You are eligible for ₹250 cashback on your next UPI payment.,,,,,,,,,,,False,
+TXN_EXT_000803,MERCHANT_0933,SMS,NEFT of Rs100/- credited from sharma.traders@okicici. Ref None. A/c XX8350.,100,INR,CREDIT,NEFT,sharma.traders@okicici,2026-09-17,07:47:42,,8350,,True,SUCCESS
+TXN_EXT_000804,MERCHANT_0033,NOTIFICATION,"₹ 499,981 credited from Airtel. Settlement received.",499981,INR,CREDIT,,Airtel,2026-08-02,,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000805,MERCHANT_0364,NOTIFICATION,"Refund of ₹ 95,011 from AWS credited to your card ending 9866.",95011,INR,CREDIT,CARD,,2026-08-12,04:51:02,TXN8534977387,9866,,True,SUCCESS
+TXN_EXT_000806,MERCHANT_0188,NOTIFICATION,HDFC Bank: Refer a friend and earn ₹250.00 per referral!,,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000807,MERCHANT_0128,SMS,Pay using UPI and earn exciting rewards!,,,,,,,,,,,False,
+TXN_EXT_000808,MERCHANT_0457,SMS,"NEFT Dr: Rs. 374,946 to Indraprastha Gas. A/c 2546. Value dt 09-09-2026.",374946,INR,DEBIT,NEFT,Indraprastha Gas,2026-09-09,06:43:11,,2546,State Bank of India,True,SUCCESS
+TXN_EXT_000809,MERCHANT_0812,SMS,₹751 paid to Anita Desai via UPI,751,INR,DEBIT,UPI,Anita Desai,2026-09-14,00:42:57,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000810,MERCHANT_0455,NOTIFICATION,"IDFC FIRST Bank: Available bal ₹ 12,000 in A/c 3007.",,,,,,,,,,IDFC FIRST Bank,False,
+TXN_EXT_000811,MERCHANT_0224,NOTIFICATION,Account access from new device detected. Verify if this was you.,,,,,,,,,,Punjab National Bank,False,
+TXN_EXT_000812,MERCHANT_0984,MANUAL_TEXT,"INR2,510.00 received from Myntra via UPI. Ref: TXN6021075141. Credited to A/c XXNone.",2510,INR,CREDIT,UPI,Myntra,,11:38:51,TXN6021075141,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000813,MERCHANT_0779,SMS,Federal Bank: Send money via UPI and win Rs. 100/- cashback.,,,,,,,,,,Federal Bank,False,
+TXN_EXT_000814,MERCHANT_0767,SMS,Nominee details missing for A/c XX9289. Update now.,,,,,,,,,,State Bank of India,False,
+TXN_EXT_000815,MERCHANT_0890,SMS,"Rs.3,197 Dr A/c XXNone UPI Ref UPI340699312602 to Flipkart",3197,INR,DEBIT,UPI,,2026-08-04,,,,,True,SUCCESS
+TXN_EXT_000816,MERCHANT_0545,NOTIFICATION,"Canara Bank: NEFT Credit of Rs. 1,857 received from BSNL. UTR: SBIR676203014. Value Date: 14 Sep 2026.",1857,INR,CREDIT,NEFT,BSNL,2026-09-14,15:38:39,TXN1460219219,,Canara Bank,True,SUCCESS
+TXN_EXT_000817,MERCHANT_0110,NOTIFICATION,"₹ 1,845 credited to your account from Suresh Gupta. Ref None.",1845,INR,CREDIT,BANK_TRANSFER,Suresh Gupta,2026-09-18,19:17:38,,4783,Yes Bank,True,SUCCESS
+TXN_EXT_000818,MERCHANT_0338,MANUAL_TEXT,Kotak Mahindra Bank: Branch timings changed to 9:30 AM - 4:00 PM.,,,,,,,,,,,False,
+TXN_EXT_000819,MERCHANT_0636,MANUAL_TEXT,"₹25,013.00 paid to neha@okkotak via UPI",25013,INR,DEBIT,UPI,,2026-09-25,15:11:48,SBIR158141154,7933,Federal Bank,True,SUCCESS
+TXN_EXT_000820,MERCHANT_0634,SMS,paid Big Bazaar INR 11 via card on August 31 fuel,11,INR,DEBIT,CARD,Big Bazaar,2026-08-31,21:43:41,TXN3632445649,3571,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000821,MERCHANT_0586,NOTIFICATION,Your OTP for transaction is 353578. Do not share.,,,,,,,,,,,False,
+TXN_EXT_000822,MERCHANT_0585,NOTIFICATION,"paid QuickBooks ₹35,046 via card on 09 August 2026 fuel",35046,INR,DEBIT,CARD,QuickBooks,2026-08-09,23:07:53,ICICIR573635441,,,True,SUCCESS
+TXN_EXT_000823,MERCHANT_0794,MANUAL_TEXT,"Upgrade to platinum card and enjoy benefits worth Rs. 5,000/-.",,,,,,,,,,,False,
+TXN_EXT_000824,MERCHANT_0497,NOTIFICATION,"INR 34,993.00 debited via UPI to Rao Suppliers at 04:32 hrs on 07-08-2026. Ref: None.",34993,INR,DEBIT,UPI,Rao Suppliers,2026-08-07,,,9612,,True,SUCCESS
+TXN_EXT_000825,MERCHANT_0439,SMS,Update your email address for account 1963.,,,,,,,,,,IndusInd Bank,False,
+TXN_EXT_000826,MERCHANT_0324,NOTIFICATION,INR 148.00 credited to your account from Iyer Exports. Ref None.,148,INR,CREDIT,BANK_TRANSFER,Iyer Exports,2026-08-25,03:20:23,,5306,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000827,MERCHANT_0268,NOTIFICATION,"Dear Customer, NEFT of Rs753/- to Tally Solutions has been debited from A/c XXNone. UTR: YESR932792876.",753,INR,DEBIT,NEFT,,,02:32:18,,,,True,SUCCESS
+TXN_EXT_000828,MERCHANT_0945,SMS,"Cash payment of INR 34,993 made to Arun Verma on 16/09/2026.",34993,INR,DEBIT,CASH,Arun Verma,2026-09-16,01:08:43,UPI780329820150,,,True,SUCCESS
+TXN_EXT_000829,MERCHANT_0081,NOTIFICATION,"Your UPI transfer of ₹3,197.00 to Manish Agarwal could not be completed. Ref IMPS368460847.",3197,INR,DEBIT,UPI,Manish Agarwal,2026-08-08,,IMPS368460847,,Bank of Baroda,True,FAILED
+TXN_EXT_000830,MERCHANT_0899,MANUAL_TEXT,Bank of Baroda: Refer a friend and earn ₹100 per referral!,,,,,,,,,,Bank of Baroda,False,
+TXN_EXT_000831,MERCHANT_0235,MANUAL_TEXT,Nominee details missing for A/c XX8758. Update now.,,,,,,,,,,,False,
+TXN_EXT_000832,MERCHANT_0352,MANUAL_TEXT,"UPI collect request for ₹94,957 from Flipkart pending approval.",94957,INR,DEBIT,UPI,,2026-08-15,18:00:14,,,,True,PENDING
+TXN_EXT_000833,MERCHANT_0071,MANUAL_TEXT,"INR 249,939.00 DEBITED A/C XX4039 VIA UPI TO MICROSOFT AZURE. REF: None.",249939,INR,DEBIT,UPI,Microsoft Azure,2026-08-19,17:23:29,,4039,,True,SUCCESS
+TXN_EXT_000834,MERCHANT_0920,SMS,INR26.00 transfer to Rao Suppliers failed due to bank issue.,26,INR,DEBIT,,,2026-08-26,16:10:38,,,,True,FAILED
+TXN_EXT_000835,MERCHANT_0275,NOTIFICATION,Federal Bank: Link your bank account to UPI for seamless payments.,,,,,,,,,,Federal Bank,False,
+TXN_EXT_000836,MERCHANT_0154,NOTIFICATION,IMPS transfer of ₹ 743 to Indraprastha Gas successful. Ref: IMPS112609563. From A/c XXNone.,743,INR,DEBIT,IMPS,Indraprastha Gas,2026-08-12,,,,,True,SUCCESS
+TXN_EXT_000837,MERCHANT_0620,NOTIFICATION,"Rs. 95,039 debited from your account ending None via UPI to Swiggy on 23/09/2026. Ref no 565511.",95039,INR,DEBIT,UPI,Swiggy,2026-09-23,,,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000838,MERCHANT_0354,NOTIFICATION,₹23 received via IMPS from Neha Singh on 23 Sep.,23,INR,CREDIT,IMPS,,2026-09-23,12:11:52,921794,,State Bank of India,True,SUCCESS
+TXN_EXT_000839,MERCHANT_0362,SMS,"Rs.15,026 Dr A/c XX1324 UPI Ref FEDR110053768 to Jio",15026,INR,DEBIT,UPI,Jio,2026-08-25,22:00:07,FEDR110053768,1324,,True,SUCCESS
+TXN_EXT_000840,MERCHANT_0063,MANUAL_TEXT,"₹750,018.00 debited via UPI to Sharma Traders at 08:48 on 24-08-2026. Ref: FEDR813586772.",750018,INR,DEBIT,UPI,Sharma Traders,2026-08-24,,FEDR813586772,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000841,MERCHANT_0767,SMS,"paid Uber Rs. 48,539 via card on 01-08-2026 fuel",48539,INR,DEBIT,CARD,,,,,,Canara Bank,True,SUCCESS
+TXN_EXT_000842,MERCHANT_0406,SMS,"Your card was used for INR374,905.00 at priya@okhdfcbank on August 01 at 1929 hrs.",374905,INR,DEBIT,CARD,priya@okhdfcbank,2026-08-01,,,6766,Bank of Baroda,True,SUCCESS
+TXN_EXT_000843,MERCHANT_0468,SMS,"₹375,097 received from neha@okkotak via UPI. Ref: TXN6741677240. Credited to A/c XX2346.",375097,INR,CREDIT,UPI,neha@okkotak,2026-09-16,23:45:39,TXN6741677240,2346,,True,SUCCESS
+TXN_EXT_000844,MERCHANT_0047,NOTIFICATION,"Rs. 1,846/- transfer to Iyer Exports failed due to bank issue.",1846,INR,DEBIT,,,2026-08-13,09:29:03,,,Kotak Mahindra Bank,True,FAILED
+TXN_EXT_000845,MERCHANT_0333,NOTIFICATION,Transfer of INR348.00 to Chargebee completed. Ref no ICICIR189479909.,348,INR,DEBIT,BANK_TRANSFER,,,,ICICIR189479909,,Federal Bank,True,SUCCESS
+TXN_EXT_000846,MERCHANT_0279,NOTIFICATION,"Rs. 15,015/- received via IMPS from Ola on 01.09.2026.",15015,INR,CREDIT,IMPS,Ola,2026-09-01,,AXISR941251439,5075,State Bank of India,True,SUCCESS
+TXN_EXT_000847,MERCHANT_0653,NOTIFICATION,"INR 1,208 refund processed from ABC Wholesale to card XX2273.",1208,INR,CREDIT,CARD,,,,,2273,IndusInd Bank,True,SUCCESS
+TXN_EXT_000848,MERCHANT_0482,NOTIFICATION,"HDFC Bank: Your credit card limit is ₹300,000.",,,,,,,,,,HDFC Bank,False,
+TXN_EXT_000849,MERCHANT_0599,MANUAL_TEXT,UPI rewards worth INR 50.00 waiting for you!,,,,,,,,,,,False,
+TXN_EXT_000850,MERCHANT_0899,SMS,None: Rs. 492 debited from A/c 1760 towards Myntra. Ref UPI336264631348.,492,INR,DEBIT,BANK_TRANSFER,Myntra,2026-08-04,,UPI336264631348,1760,,True,SUCCESS
+TXN_EXT_000851,MERCHANT_0405,NOTIFICATION,"NEFT Dr: Rs4,890/- to rahul@upi. A/c None. Value dt 15/08/26.",4890,INR,DEBIT,NEFT,rahul@upi,2026-08-15,,150083,,,True,SUCCESS
+TXN_EXT_000852,MERCHANT_0577,SMS,"Transfer of Rs. 14,961 from Zoho received. A/c XXNone.",14961,INR,CREDIT,BANK_TRANSFER,Zoho,2026-09-21,19:11:27,UPI475866939527,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000853,MERCHANT_0971,SMS,INR 508.00 received from Verma Goods on 23/09/2026 via UPI.,508,INR,CREDIT,UPI,Verma Goods,2026-09-23,17:19:11,UPI762424073287,9625,Yes Bank,True,SUCCESS
+TXN_EXT_000854,MERCHANT_0322,SMS,"Get instant personal loan up to Rs. 500,000/-.",,,,,,,,,,,False,
+TXN_EXT_000855,MERCHANT_0845,NOTIFICATION,"IMPS credit of Rs749,951/- from Indian Oil. Ref: IMPS582401429. Credited to A/c XX7401.",749951,INR,CREDIT,IMPS,Indian Oil,2026-08-10,21:42:54,,7401,,True,SUCCESS
+TXN_EXT_000856,MERCHANT_0570,SMS,"Increase your credit limit up to Rs250,000/-.",,,,,,,,,,,False,
+TXN_EXT_000857,MERCHANT_0054,NOTIFICATION,"Axis Bank: NEFT Credit of ₹ 15,005 received from Verma Goods. UTR: AXISR678471226. Value Date: August 12.",15005,INR,CREDIT,NEFT,Verma Goods,,15:53:18,ICICIR153582130,,Axis Bank,True,SUCCESS
+TXN_EXT_000858,MERCHANT_0195,NOTIFICATION,Your monthly account statement is now available.,,,,,,,,,,,False,
+TXN_EXT_000859,MERCHANT_0468,NOTIFICATION,Transfer of Rs. 349/- to amit@paytm completed. Ref no KOTAKR290148048.,349,INR,DEBIT,BANK_TRANSFER,amit@paytm,2026-09-08,20:24:26,,7188,,True,SUCCESS
+TXN_EXT_000860,MERCHANT_0403,SMS,INR 23 payment to Verma Goods awaiting confirmation.,23,INR,DEBIT,,,,,,7889,HDFC Bank,True,PENDING
+TXN_EXT_000861,MERCHANT_0249,SMS,UPI collect payment of INR 449.00 from Arun Verma credited. Ref None.,449,INR,CREDIT,UPI,,2026-08-06,12:28:14,,6480,,True,SUCCESS
+TXN_EXT_000862,MERCHANT_0882,NOTIFICATION,NEFT of ₹26.00 credited from Verma Goods. Ref None. A/c XX3892.,26,INR,CREDIT,NEFT,Verma Goods,2026-09-07,14:00:16,,3892,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000863,MERCHANT_0220,SMS,Your monthly account statement is now available.,,,,,,,,,,,False,
+TXN_EXT_000864,MERCHANT_0094,NOTIFICATION,"Refund of Rs. 749,987/- from sharma.traders@okicici credited to your card ending 4732.",749987,INR,CREDIT,CARD,sharma.traders@okicici,2026-09-03,20:04:16,IMPS410254439,,Yes Bank,True,SUCCESS
+TXN_EXT_000865,MERCHANT_0574,SMS,"Rs. 3,192/- received from Chargebee via UPI. Ref: None. Credited to A/c XXNone.",3192,INR,CREDIT,UPI,Chargebee,2026-09-12,22:48:16,,,Yes Bank,True,SUCCESS
+TXN_EXT_000866,MERCHANT_0057,SMS,₹740.00 refund processed from Tata Starbucks to card XXNone.,740,INR,CREDIT,CARD,Tata Starbucks,2026-08-07,,,,Federal Bank,True,SUCCESS
+TXN_EXT_000867,MERCHANT_0939,NOTIFICATION,ICICI Bank: Pay using UPI and earn exciting rewards!,,,,,,,,,,ICICI Bank,False,
+TXN_EXT_000868,MERCHANT_0683,MANUAL_TEXT,"INR 15,000 sent via RTGS to Patel Enterprises on 15.09.2026. Ref IMPS430804119.",15000,INR,DEBIT,RTGS,Patel Enterprises,2026-09-15,11:24:23,IMPS430804119,,,True,SUCCESS
+TXN_EXT_000869,MERCHANT_0069,NOTIFICATION,"Apply for home loan at 8.9% interest rate. Loan amount up to INR 5,000,000.00.",,,,,,,,,,,False,
+TXN_EXT_000870,MERCHANT_0873,NOTIFICATION,"₹24,977.00 debited via UPI to Slack. Available balance ₹59,977.00.",24977,INR,DEBIT,UPI,Slack,2026-09-22,22:21:06,TXN9125023089,9260,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000871,MERCHANT_0210,MANUAL_TEXT,"You paid ₹4,500 to Flipkart using UPI. Ref No: None.",4500,INR,DEBIT,UPI,,2026-09-04,20:30:47,,,,True,SUCCESS
+TXN_EXT_000872,MERCHANT_0387,SMS,"INR 25,034.00 DEBITED A/C XX1686 VIA UPI TO AWS. REF: 389155.",25034,INR,DEBIT,UPI,AWS,2026-09-16,04:09:48,389155,,HDFC Bank,True,SUCCESS
+TXN_EXT_000873,MERCHANT_0864,MANUAL_TEXT,"Get instant business loan up to Rs. 1,000,000/-. Zero documentation!",,,,,,,,,,,False,
+TXN_EXT_000874,MERCHANT_0969,MANUAL_TEXT,"Transfer of INR 3,205.00 from Amit Sharma received. A/c XX8261.",3205,INR,CREDIT,BANK_TRANSFER,Amit Sharma,2026-08-21,,805666,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000875,MERCHANT_0429,NOTIFICATION,Rs. 499/- received via IMPS from Myntra on 14/08/2026.,499,INR,CREDIT,IMPS,Myntra,2026-08-14,14:09:45,UPI259419385522,8355,Canara Bank,True,SUCCESS
+TXN_EXT_000876,MERCHANT_0497,MANUAL_TEXT,"A/c XX1155 balance: INR25,000.00.",,,,,,,,,,,False,
+TXN_EXT_000877,MERCHANT_0156,SMS,"₹250,007.00 paid to Amazon via UPI",250007,INR,DEBIT,UPI,Amazon,2026-08-09,13:58:26,,6927,,True,SUCCESS
+TXN_EXT_000878,MERCHANT_0620,NOTIFICATION,IMPS transfer of Rs. 505/- to Notion successful. Ref: IMPS373535066. From A/c XX3936.,505,INR,DEBIT,IMPS,,2026-08-14,,110298,3936,ICICI Bank,True,SUCCESS
+TXN_EXT_000879,MERCHANT_0261,NOTIFICATION,Learn about UPI Lite for faster payments under Rs. 200.,,,,,,,,,,IndusInd Bank,False,
+TXN_EXT_000880,MERCHANT_0038,NOTIFICATION,"Transfer reference IMPS711068865 created for INR 4,905.00 to pooja@okcanara.",4905,INR,DEBIT,,pooja@okcanara,,,,,Punjab National Bank,True,PENDING
+TXN_EXT_000881,MERCHANT_0711,MANUAL_TEXT,RTGS transfer of ₹ 150 to Amit Sharma completed. UTR: YESR586145040. A/c XXNone.,150,INR,DEBIT,RTGS,Amit Sharma,2026-09-18,,IDFCR628311983,,,True,SUCCESS
+TXN_EXT_000882,MERCHANT_0065,NOTIFICATION,"Dear Customer, ₹61,978 has been debited from your A/c XX8700 via UPI to Adani Electricity on 27/08/2026. UPI Ref: None.",61978,INR,DEBIT,UPI,Adani Electricity,2026-08-27,01:29:10,,8700,,True,SUCCESS
+TXN_EXT_000883,MERCHANT_0868,NOTIFICATION,IMPS credit of ₹251.00 from Mahanagar Gas. Ref: IMPS248040578. Credited to A/c XX8168.,251,INR,CREDIT,IMPS,Mahanagar Gas,2026-09-08,05:20:06,AXISR310150544,8168,Axis Bank,True,SUCCESS
+TXN_EXT_000884,MERCHANT_0238,SMS,₹ 452 received via IMPS from Priya Patel on 28 Aug 2026.,452,INR,CREDIT,IMPS,Priya Patel,2026-08-28,10:35:04,,8755,Bank of Baroda,True,SUCCESS
+TXN_EXT_000885,MERCHANT_0369,SMS,"Refund of ₹1,499,732 from sharma.traders@okicici credited to your card ending 2050.",1499732,INR,CREDIT,CARD,sharma.traders@okicici,2026-09-25,04:50:43,,2050,Yes Bank,True,SUCCESS
+TXN_EXT_000886,MERCHANT_0363,MANUAL_TEXT,"Paid INR35,009.00 cash to Vodafone Idea for supplies.",35009,INR,DEBIT,CASH,Vodafone Idea,2026-08-27,,,3303,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000887,MERCHANT_0159,MANUAL_TEXT,"None: NEFT Credit of Rs. 124,940 received from Joshi Mart. UTR: SBIR601532871. Value Date: September 27.",124940,INR,CREDIT,NEFT,,2026-09-27,22:38:09,,,,True,SUCCESS
+TXN_EXT_000888,MERCHANT_0554,MANUAL_TEXT,"Your credit card limit is Rs. 100,000.",,,,,,,,,,,False,
+TXN_EXT_000889,MERCHANT_0812,MANUAL_TEXT,"CARD txn: INR 26.00 at Arun Verma on 06/09/2026. Avl bal Rs. 25,026/-.",26,INR,DEBIT,CARD,Arun Verma,2026-09-06,,,6019,HDFC Bank,True,SUCCESS
+TXN_EXT_000890,MERCHANT_0042,SMS,"IMPS credit of Rs94,987/- from Delhi Jal Board. Ref: IMPS697097434. Credited to A/c XX4063.",94987,INR,CREDIT,IMPS,Delhi Jal Board,2026-08-11,11:48:18,YESR464997824,4063,Canara Bank,True,SUCCESS
+TXN_EXT_000891,MERCHANT_0136,MANUAL_TEXT,"Transfer of INR 4,892.00 to DMart completed. Ref no IMPS859624835.",4892,INR,DEBIT,BANK_TRANSFER,DMart,2026-08-10,,IMPS859624835,3281,Bank of Baroda,True,SUCCESS
+TXN_EXT_000892,MERCHANT_0608,SMS,"IMPS credit of ₹24,975.00 from ABC Wholesale. Ref: IMPS752767992. Credited to A/c XX9727.",24975,INR,CREDIT,IMPS,ABC Wholesale,2026-08-23,,,9727,,True,SUCCESS
+TXN_EXT_000893,MERCHANT_0634,NOTIFICATION,UPI collect payment of INR349.00 from Sunita Reddy credited. Ref IMPS672119440.,349,INR,CREDIT,UPI,Sunita Reddy,2026-08-06,21:25:54,IMPS672119440,3179,,True,SUCCESS
+TXN_EXT_000894,MERCHANT_0113,SMS,Federal Bank: Auto-debit mandate registered successfully for Amazon Prime.,,,,,,,,,,Federal Bank,False,
+TXN_EXT_000895,MERCHANT_0792,NOTIFICATION,"IMPS transfer ₹ 1,858 to Verma Goods declined. Ref IMPS335596484.",1858,INR,DEBIT,IMPS,,2026-09-03,,UPI176586523237,,Punjab National Bank,True,FAILED
+TXN_EXT_000896,MERCHANT_0531,MANUAL_TEXT,Punjab National Bank: Our mobile banking services will be unavailable tonight from 11PM to 4AM.,,,,,,,,,,Punjab National Bank,False,
+TXN_EXT_000897,MERCHANT_0100,SMS,"Payment of Rs. 1,842/- to AWS unsuccessful. Please retry.",1842,INR,DEBIT,,AWS,2026-08-18,16:54:06,,,,True,FAILED
+TXN_EXT_000898,MERCHANT_0663,MANUAL_TEXT,Open a savings account with Punjab National Bank and get Rs. 500 voucher.,,,,,,,,,,,False,
+TXN_EXT_000899,MERCHANT_0039,SMS,"₹15,000 sent to Patel Enterprises. Charges Rs.25/- deducted.",15000,INR,DEBIT,IMPS,Patel Enterprises,2026-08-16,,735770,,,True,SUCCESS
+TXN_EXT_000900,MERCHANT_0322,MANUAL_TEXT,"You paid INR 1,210.00 to Myntra using UPI. Ref No: None.",1210,INR,DEBIT,UPI,,2026-08-27,01:47:30,,6554,State Bank of India,True,SUCCESS
+TXN_EXT_000901,MERCHANT_0113,NOTIFICATION,"INR1,500.00 transferred. Remaining balance INR 16,500.00 in account.",1500,INR,DEBIT,,Kumar Trading Co,2026-09-02,,,9808,,True,SUCCESS
+TXN_EXT_000902,MERCHANT_0572,NOTIFICATION,"NEFT of ₹ 88,016 credited from Anita Desai. Ref None. A/c XX3727.",88016,INR,CREDIT,NEFT,,2026-08-13,14:25:56,,3727,Bank of Baroda,True,SUCCESS
+TXN_EXT_000903,MERCHANT_0592,SMS,"INR 12 debited via UPI to Amazon. Available balance INR 35,012.",12,INR,DEBIT,UPI,Amazon,2026-09-23,05:06:45,795804,5710,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000904,MERCHANT_0136,MANUAL_TEXT,"UPI collect payment of ₹ 1,000,035 from Delhi Jal Board credited. Ref None.",1000035,INR,CREDIT,UPI,Delhi Jal Board,2026-09-27,11:08:25,,,Yes Bank,True,SUCCESS
+TXN_EXT_000905,MERCHANT_0850,MANUAL_TEXT,paid Amazon INR 493.00 via card on 15 Sep fuel,493,INR,DEBIT,CARD,Amazon,2026-09-15,,,9399,,True,SUCCESS
+TXN_EXT_000906,MERCHANT_0117,NOTIFICATION,"Rs.5,500 Dr from A/c 4150. Avl bal Rs.40,500.",5500,INR,DEBIT,BANK_TRANSFER,Zomato,2026-08-05,,,4150,,True,SUCCESS
+TXN_EXT_000907,MERCHANT_0428,NOTIFICATION,"₹27.00 debited via UPI to Deepak Joshi. Available balance INR35,027.00.",27,INR,DEBIT,UPI,Deepak Joshi,2026-09-15,20:02:23,781749,,,True,SUCCESS
+TXN_EXT_000908,MERCHANT_0474,SMS,UPI collect payment of INR450.00 from Notion credited. Ref None.,450,INR,CREDIT,UPI,Notion,2026-08-30,14:06:05,,,,True,SUCCESS
+TXN_EXT_000909,MERCHANT_0422,NOTIFICATION,"INR4,999,947.00 debited via UPI to BESCOM. Available balance INR 5,024,947.",4999947,INR,DEBIT,UPI,BESCOM,2026-08-16,,,2297,Axis Bank,True,SUCCESS
+TXN_EXT_000910,MERCHANT_0915,NOTIFICATION,Complete your KYC to continue uninterrupted banking.,,,,,,,,,,,False,
+TXN_EXT_000911,MERCHANT_0199,MANUAL_TEXT,NEFT transfer Rs. 10/- to Paytm Mall completed. Ref: 536604.,10,INR,DEBIT,NEFT,Paytm Mall,,18:46:23,536604,,ICICI Bank,True,SUCCESS
+TXN_EXT_000912,MERCHANT_0154,SMS,Bank of Baroda: NEFT Credit of INR 248 received from pooja@okcanara. UTR: YESR903361043. Value Date: 14/08/2026.,248,INR,CREDIT,NEFT,,2026-08-14,16:45:49,TXN8356592812,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000913,MERCHANT_0905,SMS,"CARD txn: ₹4,899.00 at Verma Goods on 01-08-26. Avl bal ₹29,899.",4899,INR,DEBIT,CARD,Verma Goods,,00:29:40,,7793,Yes Bank,True,SUCCESS
+TXN_EXT_000914,MERCHANT_0966,MANUAL_TEXT,₹ 152 refund processed from Tata Starbucks to card XXNone.,152,INR,CREDIT,CARD,Tata Starbucks,2026-09-05,,,,HDFC Bank,True,SUCCESS
+TXN_EXT_000915,MERCHANT_0372,SMS,"Rs. 48,453 refund processed from Flipkart to card XXNone.",48453,INR,CREDIT,CARD,Flipkart,2026-08-19,17:06:04,,,,True,SUCCESS
+TXN_EXT_000916,MERCHANT_0162,MANUAL_TEXT,"INR4,504.00 spent at Mahanagar Gas using your card ending 4058. Ref: None.",4504,INR,DEBIT,CARD,Mahanagar Gas,2026-09-06,22:38:23,,4058,,True,SUCCESS
+TXN_EXT_000917,MERCHANT_0076,NOTIFICATION,"Dear Customer, ₹2,503.00 has been debited from your A/c XX8173 via UPI to Stripe India on September 27. UPI Ref: None.",2503,INR,DEBIT,UPI,,,,,,Punjab National Bank,True,SUCCESS
+TXN_EXT_000918,MERCHANT_0011,SMS,State Bank of India: You won ₹ 200 cashback! Claim before midnight.,,,,,,,,,,State Bank of India,False,
+TXN_EXT_000919,MERCHANT_0621,SMS,₹349.00 sent to Apollo Pharmacy through NEFT on 10-08-26. UTR HDFCR624378881.,349,INR,DEBIT,NEFT,Apollo Pharmacy,2026-08-10,,,,,True,SUCCESS
+TXN_EXT_000920,MERCHANT_0844,NOTIFICATION,"NEFT of Rs. 1,205 credited from Patel Enterprises. Ref ICICIR738526881. A/c XX1810.",1205,INR,CREDIT,NEFT,Patel Enterprises,2026-08-07,12:03:03,ICICIR738526881,1810,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000921,MERCHANT_0645,NOTIFICATION,"INR 499,950 credited from vikram@ybl. Settlement received.",499950,INR,CREDIT,,vikram@ybl,2026-09-30,20:26:40,IMPS336771632,,,True,SUCCESS
+TXN_EXT_000922,MERCHANT_0465,NOTIFICATION,"INR48,534.00 refund processed from ravi@okaxis to card XXNone.",48534,INR,CREDIT,CARD,ravi@okaxis,2026-08-16,,,,State Bank of India,True,SUCCESS
+TXN_EXT_000923,MERCHANT_0079,SMS,"Rs.7,500 Dr from A/c 5371. Avl bal Rs.32,500.",7500,INR,DEBIT,UPI,,2026-09-20,,UPI950261314384,5371,Punjab National Bank,True,SUCCESS
+TXN_EXT_000924,MERCHANT_0363,NOTIFICATION,NEFT transfer Rs448/- to Sharma Traders completed. Ref: AXISR476171636.,448,INR,DEBIT,NEFT,Sharma Traders,2026-08-29,,,3293,,True,SUCCESS
+TXN_EXT_000925,MERCHANT_0430,SMS,"Apply for home loan at 7.5% interest rate. Loan amount up to INR 10,000,000.00.",,,,,,,,,,,False,
+TXN_EXT_000926,MERCHANT_0485,SMS,"Invoice payment of Rs48,469/- received from ClearTax.",48469,INR,CREDIT,,ClearTax,2026-09-10,,,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000927,MERCHANT_0569,SMS,"NEFT of INR 74,998 credited from Joshi Mart. Ref YESR943244821. A/c XX5111.",74998,INR,CREDIT,NEFT,Joshi Mart,2026-08-10,15:51:00,YESR943244821,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000928,MERCHANT_0162,SMS,"Rs. 20,000 EMI deducted. Outstanding: Rs700,000/-.",20000,INR,DEBIT,BANK_TRANSFER,Kotak Mahindra Bank,2026-08-15,,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000929,MERCHANT_0485,SMS,"Upgrade to platinum card and enjoy benefits worth Rs. 10,000.",,,,,,,,,,,False,
+TXN_EXT_000930,MERCHANT_0414,NOTIFICATION,"IMPS transfer ₹ 95,024 to Ravi Kumar declined. Ref IMPS950312143.",95024,INR,DEBIT,IMPS,Ravi Kumar,2026-08-31,04:55:25,,8679,,True,FAILED
+TXN_EXT_000931,MERCHANT_0800,SMS,Yes Bank: Branch timings changed to 9:30 AM - 4:00 PM.,,,,,,,,,,IndusInd Bank,False,
+TXN_EXT_000932,MERCHANT_0157,NOTIFICATION,Yes Bank: Open a savings account with Axis Bank and get INR 500.00 voucher.,,,,,,,,,,Yes Bank,False,
+TXN_EXT_000933,MERCHANT_0750,SMS,"Rs. 24,952 debited via UPI to Myntra. Available balance Rs39,952/-.",24952,INR,DEBIT,UPI,Myntra,2026-09-09,05:36:40,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000934,MERCHANT_0218,MANUAL_TEXT,Transfer of INR98.00 from Indian Oil received. A/c XX8950.,98,INR,CREDIT,BANK_TRANSFER,Indian Oil,2026-08-17,,IDFCR714224890,8950,Federal Bank,True,SUCCESS
+TXN_EXT_000935,MERCHANT_0078,NOTIFICATION,"Rs. 2,500 paid to Apollo Pharmacy. Cashback Rs50/- credited.",2500,INR,DEBIT,CARD,Apollo Pharmacy,,,,,,True,SUCCESS
+TXN_EXT_000936,MERCHANT_0315,NOTIFICATION,"Increase your credit limit up to Rs250,000/-.",,,,,,,,,,,False,
+TXN_EXT_000937,MERCHANT_0077,NOTIFICATION,"Dear Customer, INR 87,956.00 has been debited from your A/c XX5811 via UPI to Tata Starbucks on 16-09-2026. UPI Ref: None.",87956,INR,DEBIT,UPI,,2026-09-16,08:58:08,,5811,HDFC Bank,True,SUCCESS
+TXN_EXT_000938,MERCHANT_0806,SMS,"INR 500,100 sent via RTGS to Vodafone Idea on Aug 08, 2026. Ref None.",500100,INR,DEBIT,RTGS,Vodafone Idea,2026-08-08,04:09:36,,,ICICI Bank,True,SUCCESS
+TXN_EXT_000939,MERCHANT_0694,SMS,₹152 DEBITED frm Ac XX8605 via UPI to Anita Desai on August 19.,152,INR,DEBIT,UPI,,2026-08-19,12:06:39,TXN3680094643,8605,,True,SUCCESS
+TXN_EXT_000940,MERCHANT_0041,NOTIFICATION,Refer a friend and earn ₹250 per referral!,,,,,,,,,,,False,
+TXN_EXT_000941,MERCHANT_0432,NOTIFICATION,"Transfer of Rs. 94,959 from Deepak Joshi received. A/c XXNone.",94959,INR,CREDIT,BANK_TRANSFER,Deepak Joshi,2026-08-11,,,,IDFC FIRST Bank,True,SUCCESS
+TXN_EXT_000942,MERCHANT_0166,SMS,"Pre-approved business loan of Rs. 500,000 waiting for you!",,,,,,,,,,ICICI Bank,False,
+TXN_EXT_000943,MERCHANT_0261,NOTIFICATION,"₹250,085.00 DEBITED frm Ac XX2385 via UPI to Patel Enterprises on 30 Sep 2026.",250085,INR,DEBIT,UPI,Patel Enterprises,2026-09-30,15:15:40,UPI305275510197,,HDFC Bank,True,SUCCESS
+TXN_EXT_000944,MERCHANT_0128,MANUAL_TEXT,"INR 1,500,260.00 payment to karan@okpnb awaiting confirmation.",1500260,INR,DEBIT,,karan@okpnb,2026-08-30,02:56:48,IMPS143992952,5185,IDFC FIRST Bank,True,PENDING
+TXN_EXT_000945,MERCHANT_0717,NOTIFICATION,"Pre-approved business loan of ₹1,000,000.00 waiting for you!",,,,,,,,,,,False,
+TXN_EXT_000946,MERCHANT_0424,NOTIFICATION,You paid ₹152 to Ola using UPI. Ref No: None.,152,INR,DEBIT,UPI,Ola,2026-09-06,17:34:01,,6793,State Bank of India,True,SUCCESS
+TXN_EXT_000947,MERCHANT_0850,MANUAL_TEXT,"Rs.34,982 Dr A/c XXNone UPI Ref 889013 to Ola",34982,INR,DEBIT,UPI,Ola,2026-09-02,21:56:24,,,,True,SUCCESS
+TXN_EXT_000948,MERCHANT_0707,NOTIFICATION,You paid Rs50/- to QuickBooks using UPI. Ref No: None.,50,INR,DEBIT,UPI,QuickBooks,2026-09-21,23:25:01,,,Kotak Mahindra Bank,True,SUCCESS
+TXN_EXT_000949,MERCHANT_0276,MANUAL_TEXT,"UPI collect request for Rs. 1,201 from suresh@oksbi pending approval.",1201,INR,DEBIT,UPI,suresh@oksbi,,,497349,5055,ICICI Bank,True,PENDING
+TXN_EXT_000950,MERCHANT_0195,NOTIFICATION,"Paid INR 2,000 to ABC Wholesale. You won ₹25.00 cashback!",2000,INR,DEBIT,CARD,ABC Wholesale,,,,,,True,SUCCESS
+TXN_EXT_000951,MERCHANT_0761,SMS,"Open a savings account with HDFC Bank and get Rs. 2,000 voucher.",,,,,,,,,,,False,
+TXN_EXT_000952,MERCHANT_0431,NOTIFICATION,"Yes Bank: POS purchase of ₹ 2,500,292 at Kumar Trading Co. Card XX1235.",2500292,INR,DEBIT,CARD,,2026-09-08,06:22:13,,1235,Yes Bank,True,SUCCESS
+TXN_EXT_000953,MERCHANT_0498,MANUAL_TEXT,UPI collect payment of ₹48.00 from Deepak Joshi credited. Ref None.,48,INR,CREDIT,UPI,Deepak Joshi,2026-08-21,09:55:04,,,,True,SUCCESS
+TXN_EXT_000954,MERCHANT_0068,SMS,"Loan EMI Rs. 5,000/- Dr. Remaining principal INR 175,000.00.",5000,INR,DEBIT,BANK_TRANSFER,Bank of Baroda,2026-09-14,,,6383,Punjab National Bank,True,SUCCESS
+TXN_EXT_000955,MERCHANT_0796,SMS,"CARD txn: INR 492.00 at Flipkart on Aug 24, 2026. Avl bal INR 25,492.",492,INR,DEBIT,CARD,Flipkart,2026-08-24,06:54:01,,,,True,SUCCESS
+TXN_EXT_000956,MERCHANT_0418,MANUAL_TEXT,"Transfer of Rs. 15,005 from Sunita Reddy received. A/c XX9834.",15005,INR,CREDIT,BANK_TRANSFER,Sunita Reddy,2026-09-08,04:21:59,,9834,,True,SUCCESS
+TXN_EXT_000957,MERCHANT_0643,SMS,₹ 151 received via IMPS from Tata Power on 03 Sep 2026.,151,INR,CREDIT,IMPS,,2026-09-03,,,,Axis Bank,True,SUCCESS
+TXN_EXT_000958,MERCHANT_0197,SMS,"Rs.1,500 Dr from A/c 3803. Avl bal Rs.56,500.",1500,INR,DEBIT,UPI,,2026-09-16,,TXN2351531223,3803,,True,SUCCESS
+TXN_EXT_000959,MERCHANT_0292,MANUAL_TEXT,"NEFT Dr: Rs. 500,029 to Big Bazaar. A/c None. Value dt Aug 25, 2026.",500029,INR,DEBIT,NEFT,Big Bazaar,,15:46:25,,,Bank of Baroda,True,SUCCESS
+TXN_EXT_000960,MERCHANT_0908,MANUAL_TEXT,"Your UPI transfer of ₹61,994 to amit@paytm could not be completed. Ref SBIR736223347.",61994,INR,DEBIT,UPI,amit@paytm,2026-08-06,19:08:01,,2168,IndusInd Bank,True,FAILED
+TXN_EXT_000961,MERCHANT_0124,MANUAL_TEXT,"Refund of ₹3,500,455 from ABC Wholesale credited to your card ending None.",3500455,INR,CREDIT,CARD,ABC Wholesale,2026-08-12,13:26:56,,,,True,SUCCESS
+TXN_EXT_000962,MERCHANT_0084,SMS,"Paid Rs2,500/- to Big Bazaar. You won INR 50 cashback!",2500,INR,DEBIT,CARD,Big Bazaar,,,,,,True,SUCCESS
+TXN_EXT_000963,MERCHANT_0658,SMS,NEFT of INR251.00 credited from Stripe India. Ref 833543. A/c XX5510.,251,INR,CREDIT,NEFT,Stripe India,2026-09-18,08:21:18,833543,,State Bank of India,True,SUCCESS
+TXN_EXT_000964,MERCHANT_0464,NOTIFICATION,Send money via UPI and win INR 25.00 cashback.,,,,,,,,,,,False,
+TXN_EXT_000965,MERCHANT_0450,SMS,"Refund of INR 88,021 from Suresh Gupta credited to your card ending 6810.",88021,INR,CREDIT,CARD,Suresh Gupta,2026-08-24,,,6810,IndusInd Bank,True,SUCCESS
+TXN_EXT_000966,MERCHANT_0592,MANUAL_TEXT,"Dear Customer, NEFT of Rs. 451 to Verma Goods has been debited from A/c XX9790. UTR: SBIR549553756.",451,INR,DEBIT,NEFT,Verma Goods,2026-09-30,18:11:49,,9790,,True,SUCCESS
+TXN_EXT_000967,MERCHANT_0653,NOTIFICATION,KYC deadline approaching. Complete eKYC now.,,,,,,,,,,,False,
+TXN_EXT_000968,MERCHANT_0271,NOTIFICATION,₹449 credited to your account from Ravi Kumar. Ref None.,449,INR,CREDIT,BANK_TRANSFER,Ravi Kumar,2026-09-08,15:37:00,,1740,,True,SUCCESS
+TXN_EXT_000969,MERCHANT_0091,SMS,"Txn: ₹ 1,000 at Patel Enterprises. Reward: INR 50.00 points.",1000,INR,DEBIT,CARD,Patel Enterprises,,,,,,True,SUCCESS
+TXN_EXT_000970,MERCHANT_0548,NOTIFICATION,sent 4.5k to Sharma Traders via upi August 29,4495,INR,DEBIT,UPI,Sharma Traders,2026-08-29,16:32:47,,9304,HDFC Bank,True,SUCCESS
+TXN_EXT_000971,MERCHANT_0457,NOTIFICATION,INR 10.00 transfer to Slack failed due to bank issue.,10,INR,DEBIT,,Slack,2026-09-14,,,,,True,FAILED
+TXN_EXT_000972,MERCHANT_0719,MANUAL_TEXT,"₹95,008.00 refund processed from QuickBooks to card XX1095.",95008,INR,CREDIT,CARD,,2026-09-06,05:24:00,,,,True,SUCCESS
+TXN_EXT_000973,MERCHANT_0015,NOTIFICATION,You paid INR 10 to Reddy Logistics using UPI. Ref No: TXN5601854998.,10,INR,DEBIT,UPI,Reddy Logistics,2026-09-13,08:31:53,TXN5601854998,1316,,True,SUCCESS
+TXN_EXT_000974,MERCHANT_0270,SMS,₹448 refund processed from Adani Electricity to card XX1579.,448,INR,CREDIT,CARD,Adani Electricity,2026-08-27,06:21:56,TXN1267698902,,ICICI Bank,True,SUCCESS
+TXN_EXT_000975,MERCHANT_0947,SMS,"Rs. 75,042/- credited to your account from BESCOM. Ref KOTAKR400491536.",75042,INR,CREDIT,BANK_TRANSFER,BESCOM,2026-09-01,,KOTAKR400491536,3435,Bank of Baroda,True,SUCCESS
+TXN_EXT_000976,MERCHANT_0836,SMS,Cashback of Rs. 100/- credited to your wallet!,,,,,,,,,,,False,
+TXN_EXT_000977,MERCHANT_0474,SMS,"Increase your credit limit up to Rs. 100,000/-.",,,,,,,,,,,False,
+TXN_EXT_000978,MERCHANT_0143,NOTIFICATION,IMPS transfer INR 149.00 to Iyer Exports declined. Ref IMPS696800574.,149,INR,DEBIT,IMPS,Iyer Exports,,16:21:04,,7708,Kotak Mahindra Bank,True,FAILED
+TXN_EXT_000979,MERCHANT_0828,SMS,"Bank of Baroda: A/c XX6258 balance: INR125,000.00.",,,,,,,,,,Bank of Baroda,False,
+TXN_EXT_000980,MERCHANT_0259,SMS,"Rs. 24,993 received from Zomato on 19.09.2026 via UPI.",24993,INR,CREDIT,UPI,Zomato,2026-09-19,17:17:11,UPI458401148762,1583,Yes Bank,True,SUCCESS
+TXN_EXT_000981,MERCHANT_0793,NOTIFICATION,"Dear Customer, ₹ 75,040 has been debited from your A/c XXNone via UPI to Freshdesk on 23 Aug 2026. UPI Ref: None.",75040,INR,DEBIT,UPI,Freshdesk,2026-08-23,16:20:33,,,,True,SUCCESS
+TXN_EXT_000982,MERCHANT_0152,SMS,"INR 749.00 debited via UPI to Reddy Logistics. Available balance INR45,749.00.",749,INR,DEBIT,UPI,Reddy Logistics,,17:38:54,,2134,Yes Bank,True,SUCCESS
+TXN_EXT_000983,MERCHANT_0649,NOTIFICATION,INR 497 received from Paytm Mall on 27 August 2026 via UPI.,497,INR,CREDIT,UPI,Paytm Mall,2026-08-27,16:34:00,,2523,Canara Bank,True,SUCCESS
+TXN_EXT_000984,MERCHANT_0922,SMS,"Rs1,843/- received via IMPS from Joshi Mart on Aug 30, 2026.",1843,INR,CREDIT,IMPS,Joshi Mart,2026-08-30,14:30:42,540636,,,True,SUCCESS
+TXN_EXT_000985,MERCHANT_0754,NOTIFICATION,"Rs. 749,963 transferred to Big Bazaar. Bank charges 5 applicable. A/c XX4120.",749963,INR,DEBIT,BANK_TRANSFER,Big Bazaar,2026-08-05,13:20:43,544114,4120,Bank of Baroda,True,SUCCESS
+TXN_EXT_000986,MERCHANT_0076,SMS,"Get instant business loan up to Rs2,000,000/-. Zero documentation!",,,,,,,,,,,False,
+TXN_EXT_000987,MERCHANT_0130,SMS,Scratch card reward worth INR 25.00 unlocked.,,,,,,,,,,,False,
+TXN_EXT_000988,MERCHANT_0730,SMS,"Available bal ₹12,000.00 in A/c 3945.",,,,,,,,,,,False,
+TXN_EXT_000989,MERCHANT_0379,SMS,Our mobile banking services will be unavailable tonight from 12AM to 5AM.,,,,,,,,,,,False,
+TXN_EXT_000990,MERCHANT_0121,NOTIFICATION,Refund of Rs. 250 from Patel Enterprises credited to your card ending 3478.,250,INR,CREDIT,CARD,Patel Enterprises,2026-08-17,,TXN8281800690,3478,Federal Bank,True,SUCCESS
+TXN_EXT_000991,MERCHANT_0504,SMS,"₹3,193 received from Flipkart on 01/08/2026 via UPI.",3193,INR,CREDIT,UPI,Flipkart,,21:20:14,,,Yes Bank,True,SUCCESS
+TXN_EXT_000992,MERCHANT_0687,NOTIFICATION,"Available bal ₹12,000 in A/c 2175.",,,,,,,,,,,False,
+TXN_EXT_000993,MERCHANT_0364,SMS,"Refund of ₹1,197.00 from Tally Solutions credited to your card ending None.",1197,INR,CREDIT,CARD,Tally Solutions,2026-08-18,,,,Federal Bank,True,SUCCESS
+TXN_EXT_000994,MERCHANT_0546,SMS,"Pre-approved business loan of Rs. 1,000,000/- waiting for you!",,,,,,,,,,,False,
+TXN_EXT_000995,MERCHANT_0980,SMS,"₹3,209 DEBITED frm Ac XXNone via UPI to Rao Suppliers on 15 September 2026.",3209,INR,DEBIT,UPI,Rao Suppliers,2026-09-15,09:11:11,,,Axis Bank,True,SUCCESS
+TXN_EXT_000996,MERCHANT_0204,MANUAL_TEXT,Link your bank account to UPI for seamless payments.,,,,,,,,,,,False,
+TXN_EXT_000997,MERCHANT_0230,MANUAL_TEXT,IMPS transfer Rs. 10 to Vodafone Idea declined. Ref IMPS368418452.,10,INR,DEBIT,IMPS,,2026-09-04,,,,Canara Bank,True,FAILED
+TXN_EXT_000998,MERCHANT_0071,SMS,"NEFT transfer Rs. 3,201/- to ravi@okaxis completed. Ref: UPI345124430722.",3201,INR,DEBIT,NEFT,ravi@okaxis,2026-08-20,,UPI345124430722,,HDFC Bank,True,SUCCESS
+TXN_EXT_000999,MERCHANT_0175,MANUAL_TEXT,"Available bal INR 52,000 in A/c 2964.",,,,,,,,,,State Bank of India,False,
+TXN_EXT_001000,MERCHANT_0273,MANUAL_TEXT,Pay using UPI and earn exciting rewards!,,,,,,,,,,,False,

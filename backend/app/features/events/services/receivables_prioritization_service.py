@@ -60,6 +60,14 @@ class ReceivablesPrioritizationService:
                 priority = "LOW"
                 reason_codes.append("FUTURE_DUE_DATE")
 
+            # Optional behavior context as additional explanation factor
+            if p.counterparty_id:
+                from app.features.receivable_intelligence.services.receivable_behavior_service import ReceivableBehaviorService
+                beh_service = ReceivableBehaviorService(self.db)
+                beh_res = beh_service.analyze_counterparty_behavior(merchant_id, p.counterparty_id)
+                if beh_res.pattern_type in ("REPEATED_DELAY", "OCCASIONAL_DELAY"):
+                    reason_codes.append(f"BEHAVIOR_{beh_res.pattern_type}")
+
             receivables.append(
                 PrioritizedReceivableResponse(
                     receivable_id=str(p.id),

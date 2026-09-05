@@ -1,0 +1,58 @@
+{
+    "dataset_name": "synthetic_cashflow_forecasting_dataset",
+    "num_samples": 1000,
+    "num_merchants": 150,
+    "max_history_days": 90,
+    "forecast_days": 7,
+    "temporal_contract": {
+        "input_rule": "Every input feature must be computable strictly using information available at or before cutoff_date.",
+        "future_leakage_rule": "No future realized transaction, payment, amount, receivable collection, disruption, or event may influence input features.",
+        "history": "Available observations ending at cutoff_date",
+        "forecast": "cutoff_date + 1 through cutoff_date + 7"
+    },
+    "history_distribution_target": {
+        "FULL_HISTORY": "~70% (90 days)",
+        "PARTIAL_LONG": "~15% (45-89 days)",
+        "PARTIAL_MEDIUM": "~10% (21-44 days)",
+        "INSUFFICIENT_HISTORY": "~5% (<21 days)"
+    },
+    "primary_targets": [
+        "target_money_in_next_7_days",
+        "target_money_out_next_7_days"
+    ],
+    "derived_target": "target_net_cashflow_next_7_days",
+    "split_strategy": "MERCHANT_GROUP_AWARE",
+    "excluded_from_training": [
+        "sample_id",
+        "merchant_id",
+        "cutoff_date",
+        "dataset_split",
+        "target_money_in_next_7_days",
+        "target_money_out_next_7_days",
+        "target_net_cashflow_next_7_days"
+    ],
+    "ml_features": [
+        "business_type",
+        "business_behavior",
+        "history_expected_days",
+        "history_available_days",
+        "history_completeness_ratio",
+        "has_full_history",
+        "has_partial_history",
+        "history_category",
+        "is_insufficient_history",
+        "avg_money_in_7d",
+        "avg_money_out_7d",
+        "avg_money_in_30d",
+        "avg_money_out_30d",
+        "money_in_trend_7d",
+        "money_out_trend_7d",
+        "money_in_volatility_30d",
+        "money_out_volatility_30d",
+        "receivables_expected_7d",
+        "receivables_overdue_7d",
+        "obligations_due_7d",
+        "recurring_expenses_30d",
+        "history_window"
+    ]
+}

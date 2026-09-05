@@ -31,7 +31,7 @@ class GroundedInsightResponse(BaseModel):
 
 
 class FinancialContextPackage(BaseModel):
-    context_version: str = "1.0"
+    context_version: str = "2.0"
     merchant_id: UUID
     focus_type: str  # EVENT, COUNTERPARTY, RECEIVABLE, GENERAL
     focus_entity_id: Optional[UUID] = None
@@ -40,6 +40,9 @@ class FinancialContextPackage(BaseModel):
     receivables: List[Dict[str, Any]] = []
     counterparties: List[Dict[str, Any]] = []
     computed_metrics: Dict[str, Any] = {}
+    cashflow_context: Optional[Dict[str, Any]] = None
+    receivable_behavior_context: Optional[Dict[str, Any]] = None
+    reference_context: Optional[Dict[str, Any]] = None
     provenance_sources: List[InsightSourceReference] = []
 
 

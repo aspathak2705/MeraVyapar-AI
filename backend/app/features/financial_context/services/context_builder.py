@@ -97,13 +97,28 @@ class FinancialContextBuilder:
             receivables_data.append(r.model_dump(mode="json"))
             provenance.append(InsightSourceReference(entity_type="payment_promise", entity_id=r.source_payment_promise_id, label=f"Receivable: ₹{r.amount} ({r.state})"))
 
+        # Reference Archetype Context
+        from app.features.reference_intelligence.services.merchant_archetype_service import MerchantArchetypeService
+        arch_service = MerchantArchetypeService(self.db)
+        arch_match = arch_service.match_merchant_archetype(merchant_id)
+
+        ref_ctx = None
+        if arch_match.status == "AVAILABLE" and arch_match.matched_archetype:
+            ref_ctx = {
+                "source_type": "SYNTHETIC_REFERENCE_PATTERN",
+                "not_merchant_evidence": True,
+                "merchant_archetype": arch_match.matched_archetype.model_dump(mode="json"),
+                "reference_patterns": arch_match.reference_patterns
+            }
+
         return FinancialContextPackage(
-            context_version="1.0",
+            context_version="2.0",
             merchant_id=merchant_id,
             focus_type="GENERAL",
             focus_entity_id=focus_entity_id,
             events=events_data,
             receivables=receivables_data,
             computed_metrics=facts,
+            reference_context=ref_ctx,
             provenance_sources=provenance
         )
