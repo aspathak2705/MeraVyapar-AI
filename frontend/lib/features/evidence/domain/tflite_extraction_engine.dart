@@ -32,17 +32,12 @@ class TFLiteExtractionEngine {
       );
     }
 
-    double? finalAmount;
-    String? finalPaymentMode;
-    String? finalCounterparty;
-    String? finalBankName;
     LocalMLResultStatus status = LocalMLResultStatus.unavailable;
     String engineUsed = 'RuleBasedTransactionParser';
 
     // Priority Step 1: Model Prediction (if loaded)
     if (tokenizer != null) {
       final tokens = tokenizer!.encode(cleanText);
-      // Simulate/Validate model inference output
       if (tokens.isNotEmpty) {
         status = LocalMLResultStatus.success;
         engineUsed = 'TFLiteExtractionEngine';
@@ -51,27 +46,19 @@ class TFLiteExtractionEngine {
 
     // Priority Step 2 & 3: Domain Validation -> Regex Fallback
     final ruleAmount = _parseAmountWithRule(cleanText);
-    if (finalAmount == null || finalAmount <= 0) {
-      finalAmount = ruleAmount;
-      if (status == LocalMLResultStatus.success && ruleAmount != null) {
-        status = LocalMLResultStatus.fallbackUsed;
-      }
+    double? finalAmount = ruleAmount;
+    if (status == LocalMLResultStatus.success && ruleAmount != null) {
+      status = LocalMLResultStatus.fallbackUsed;
     }
 
     final rulePaymentMode = _parsePaymentModeWithRule(cleanText);
-    if (finalPaymentMode == null || !_isValidPaymentMode(finalPaymentMode)) {
-      finalPaymentMode = rulePaymentMode;
-    }
+    String? finalPaymentMode = rulePaymentMode;
 
     final ruleCounterparty = _parseCounterpartyWithRule(cleanText);
-    if (finalCounterparty == null || finalCounterparty.trim().isEmpty) {
-      finalCounterparty = ruleCounterparty;
-    }
+    String? finalCounterparty = ruleCounterparty;
 
     final ruleBank = _parseBankNameWithRule(cleanText);
-    if (finalBankName == null || finalBankName.trim().isEmpty) {
-      finalBankName = ruleBank;
-    }
+    String? finalBankName = ruleBank;
 
     if (tokenizer == null && (finalAmount != null || finalCounterparty != null)) {
       status = LocalMLResultStatus.fallbackUsed;
@@ -88,10 +75,6 @@ class TFLiteExtractionEngine {
       status: status,
       engineUsed: engineUsed,
     );
-  }
-
-  bool _isValidPaymentMode(String mode) {
-    return ['UPI', 'CASH', 'BANK_TRANSFER', 'CARD', 'NEFT', 'IMPS', 'RTGS', 'CHEQUE', 'OTHER'].contains(mode);
   }
 
   double? _parseAmountWithRule(String text) {
