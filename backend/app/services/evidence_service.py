@@ -95,10 +95,14 @@ class EvidenceService:
         evidence_type: EvidenceType = EvidenceType.PAYMENT_SCREENSHOT,
         idempotency_key: Optional[str] = None
     ) -> FinancialEvidence:
-        # Validate allowed content types
-        allowed_types = ["image/jpeg", "image/png", "image/webp", "application/pdf"]
-        if content_type not in allowed_types:
-            raise ValidationError(f"Unsupported file MIME type: {content_type}. Allowed: {allowed_types}")
+        # Validate allowed content types and header magic bytes
+        from app.infrastructure.storage.validation import validate_file_signature_and_hash
+        from app.infrastructure.storage.base import StorageValidationError
+
+        try:
+            sha256_hash, file_size = validate_file_signature_and_hash(file_obj, content_type)
+        except StorageValidationError as val_err:
+            raise ValidationError(str(val_err))
 
         if idempotency_key:
             existing = self.repo.get_by_idempotency_key(merchant_id, idempotency_key)
@@ -106,15 +110,20 @@ class EvidenceService:
                 return existing
 
         evidence_id = uuid.uuid4()
-        ext = os.path.splitext(filename)[1] if filename and "." in filename else ""
+        # Whitelist extension extraction cleanly
+        raw_ext = os.path.splitext(filename)[1].lower() if filename and "." in filename else ""
+        ext = raw_ext if raw_ext in [".jpg", ".jpeg", ".png", ".pdf", ".webp"] else ""
         object_key = f"merchants/{merchant_id}/evidence/{evidence_id}{ext}"
-        stored_key = self.storage.upload(file_obj, object_key, content_type)
 
+        stored_meta = self.storage.upload(file_obj, object_key, content_type, sha256_hash=sha256_hash)
+        stored_key = stored_meta.object_key
 
         meta = {
             "submission_method": "file_upload",
             "original_filename": filename,
-            "content_type": content_type
+            "content_type": content_type,
+            "size_bytes": file_size,
+            "sha256": sha256_hash
         }
 
         try:
@@ -140,4 +149,5 @@ class EvidenceService:
                 from app.core.logging import logger
                 logger.warning(f"Failed compensating storage cleanup for {stored_key}: {cleanup_err}")
             raise e
+
 

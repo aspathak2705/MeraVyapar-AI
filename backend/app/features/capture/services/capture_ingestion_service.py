@@ -1,3 +1,5 @@
+import os
+import uuid
 from uuid import UUID
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any
@@ -7,7 +9,7 @@ from app.repositories.evidence_repository import EvidenceRepository
 from app.repositories.idempotency_repository import IdempotencyRepository
 from app.repositories.capture_setting_repository import CaptureSettingRepository
 from app.services.evidence_processing_service import EvidenceProcessingService
-from app.infrastructure.storage.object_storage import LocalDevObjectStorage
+from app.infrastructure.storage.object_storage import get_object_storage
 from app.models.financial_evidence import (
     FinancialEvidence,
     EvidenceType,
@@ -29,7 +31,8 @@ class CaptureIngestionService:
         self.idempotency_repo = IdempotencyRepository(db)
         self.setting_repo = CaptureSettingRepository(db)
         self.processor = EvidenceProcessingService(db)
-        self.storage = LocalDevObjectStorage()
+        self.storage = get_object_storage()
+
 
     def ingest_shared_text(self, merchant_id: UUID, text: str, metadata: Optional[Dict[str, Any]] = None) -> FinancialEvidence:
         if not text or not text.strip():
@@ -50,36 +53,55 @@ class CaptureIngestionService:
         return self.processor.process_evidence(evidence)
 
     def ingest_shared_file(self, merchant_id: UUID, file: UploadFile, metadata: Optional[Dict[str, Any]] = None) -> FinancialEvidence:
-        if file.content_type not in self.ALLOWED_MIME_TYPES:
-            raise ValidationError(f"Invalid file MIME type: {file.content_type}. Allowed: {self.ALLOWED_MIME_TYPES}")
+        from app.infrastructure.storage.validation import validate_file_signature_and_hash
+        from app.infrastructure.storage.base import StorageValidationError
 
-        file.file.seek(0, 2)
-        size = file.file.tell()
-        file.file.seek(0)
+        content_type = file.content_type or "application/octet-stream"
+        try:
+            sha256_hash, file_size = validate_file_signature_and_hash(
+                file.file,
+                content_type,
+                max_size=self.MAX_FILE_SIZE
+            )
+        except StorageValidationError as val_err:
+            raise ValidationError(str(val_err))
 
-        if size == 0:
-            raise ValidationError("Empty file payload rejected")
-        if size > self.MAX_FILE_SIZE:
-            raise ValidationError("File size exceeds 10MB limit")
+        evidence_id = uuid.uuid4()
+        raw_ext = os.path.splitext(file.filename or "")[1].lower() if file.filename and "." in file.filename else ""
+        ext = raw_ext if raw_ext in [".jpg", ".jpeg", ".png", ".pdf", ".webp"] else ""
+        object_key = f"merchants/{merchant_id}/shares/{evidence_id}{ext}"
 
-        object_key = f"merchants/{merchant_id}/shares/{file.filename}"
-        self.storage.upload(file.file, object_key, file.content_type)
+        stored_meta = self.storage.upload(file.file, object_key, content_type, sha256_hash=sha256_hash)
+        stored_key = stored_meta.object_key
 
         meta = metadata or {}
         meta["capture_method"] = "user_shared_file"
+        meta["original_filename"] = file.filename
+        meta["size_bytes"] = file_size
+        meta["sha256"] = sha256_hash
 
-        evidence = self.evidence_repo.create(
-            merchant_id=merchant_id,
-            evidence_type=EvidenceType.PAYMENT_SCREENSHOT,
-            evidence_source=EvidenceSource.USER_SHARED_FILE,
-            evidence_strength=EvidenceStrength.MERCHANT_DECLARED,
-            metadata_info=meta,
-            storage_object_key=object_key,
-            content_type=file.content_type,
-            original_filename=file.filename,
-            processing_status=ProcessingStatus.RECEIVED
-        )
-        return self.processor.process_evidence(evidence)
+        try:
+            evidence = self.evidence_repo.create(
+                evidence_id=evidence_id,
+                merchant_id=merchant_id,
+                evidence_type=EvidenceType.PAYMENT_SCREENSHOT,
+                evidence_source=EvidenceSource.USER_SHARED_FILE,
+                evidence_strength=EvidenceStrength.MERCHANT_DECLARED,
+                metadata_info=meta,
+                storage_object_key=stored_key,
+                content_type=content_type,
+                original_filename=file.filename,
+                processing_status=ProcessingStatus.RECEIVED
+            )
+            return self.processor.process_evidence(evidence)
+        except Exception as e:
+            try:
+                self.storage.delete(stored_key)
+            except Exception as cleanup_err:
+                from app.core.logging import logger
+                logger.warning(f"Failed compensating storage cleanup for shared file {stored_key}: {cleanup_err}")
+            raise e
+
 
     def ingest_notification(
         self,

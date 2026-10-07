@@ -126,6 +126,26 @@ def db_session() -> Generator[Session, None, None]:
     yield mock_db
 
 
+from app.infrastructure.storage.object_storage import LocalDevObjectStorage
+import app.infrastructure.storage.object_storage as storage_module
+import app.features.capture.services.capture_ingestion_service as capture_ingestion_module
+import app.services.evidence_service as evidence_service_module
+import tempfile
+import shutil
+
+
+@pytest.fixture(autouse=True)
+def override_storage_for_tests(monkeypatch):
+    test_storage_dir = tempfile.mkdtemp(prefix="test_storage_")
+    local_storage = LocalDevObjectStorage(upload_dir=test_storage_dir)
+    monkeypatch.setattr(storage_module, "get_object_storage", lambda: local_storage)
+    monkeypatch.setattr(capture_ingestion_module, "get_object_storage", lambda: local_storage)
+    monkeypatch.setattr(evidence_service_module, "get_object_storage", lambda: local_storage)
+    yield local_storage
+    shutil.rmtree(test_storage_dir, ignore_errors=True)
+
+
+
 @pytest.fixture
 def client(db_session: Session) -> Generator[TestClient, None, None]:
     def _get_test_db():
@@ -135,3 +155,4 @@ def client(db_session: Session) -> Generator[TestClient, None, None]:
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
+
