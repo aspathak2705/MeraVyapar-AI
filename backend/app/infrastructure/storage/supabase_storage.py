@@ -15,8 +15,9 @@ from app.core.logging import logger
 
 class SupabaseObjectStorage(ObjectStorage):
     """
-    Production Object Storage implementation for Supabase Private Storage.
-    Preserves existing ObjectStorage interface.
+    [DEPRECATED / TRANSITIONAL] Legacy Object Storage implementation for Supabase.
+    Retained strictly for read/delete compatibility with historical legacy evidence.
+    New evidence must use mobile app-private storage.
     """
     def __init__(self, supabase_url: Optional[str] = None, service_key_or_anon: Optional[str] = None, bucket_name: Optional[str] = None):
         self.supabase_url = (supabase_url or settings.SUPABASE_URL or "").rstrip("/")

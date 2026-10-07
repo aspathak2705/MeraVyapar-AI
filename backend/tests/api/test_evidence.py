@@ -204,3 +204,63 @@ def test_mobile_evidence_registration_validation_and_isolation(client, db_sessio
 
     app.dependency_overrides.clear()
 
+
+def test_decommissioning_and_untrusted_extraction_audit(client, db_session):
+    service = MerchantService(db_session)
+    merchant = service.initialize_merchant(uuid.uuid4(), "Store Audit")
+
+    # 1. Unauthenticated registration rejected (missing Authorization header)
+    res_unauth = client.post("/api/v1/evidence/register", json={
+        "evidence_id": str(uuid.uuid4()),
+        "content_type": "image/png",
+        "original_filename": "receipt.png",
+        "size_bytes": 1000,
+        "client_sha256": "b" * 64
+    })
+    assert res_unauth.status_code in (401, 403, 422)
+
+    # 2. Authenticated registration does NOT call Supabase Storage
+    app.dependency_overrides[get_current_merchant] = lambda: merchant
+    evidence_id = str(uuid.uuid4())
+    correct_hash = "c" * 64
+    wrong_hash = "d" * 64
+
+    res_reg = client.post("/api/v1/evidence/register", json={
+        "evidence_id": evidence_id,
+        "content_type": "image/png",
+        "original_filename": "receipt.png",
+        "size_bytes": 2048,
+        "client_sha256": correct_hash
+    })
+    assert res_reg.status_code in (200, 201)
+    ev_data = res_reg.json()["data"]
+    assert ev_data["metadata_info"]["submission_method"] == "mobile_app_private"
+    assert ev_data["metadata_info"]["storage_owner"] == "mobile_device"
+
+    # 3. SHA-256 mismatch on extraction submission is rejected
+    res_mismatch = client.post(f"/api/v1/evidence/{evidence_id}/extraction", json={
+        "client_sha256": wrong_hash,
+        "amount": "5000.00"
+    })
+    assert res_mismatch.status_code == 400
+
+    # 4. Untrusted client values are sanitized/normalized by backend (e.g. malformed amount)
+    res_clean_ext = client.post(f"/api/v1/evidence/{evidence_id}/extraction", json={
+        "client_sha256": correct_hash,
+        "amount": "  12,500.50  ",
+        "currency": "INR",
+        "counterparty_name": "  ABC Wholesale Dist  ",
+        "payment_mode": "BANK_TRANSFER",
+        "reference_number": "NEFT12345"
+    })
+    assert res_clean_ext.status_code == 200
+    res_cands = client.get("/api/v1/transaction-candidates")
+    cand = res_cands.json()["data"][0]
+    assert cand["amount"] == "12500.50"
+    assert cand["currency"] == "INR"
+    assert cand["counterparty_name"] == "ABC Wholesale Dist"
+    assert cand["payment_mode"] == "BANK_TRANSFER"
+
+    app.dependency_overrides.clear()
+
+

@@ -108,7 +108,13 @@ def submit_text_evidence(
     )
 
 
-@router.post("/evidence/file", response_model=APIResponse, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/evidence/file",
+    response_model=APIResponse,
+    status_code=status.HTTP_201_CREATED,
+    deprecated=True,
+    description="[DEPRECATED] Transitional legacy multipart evidence upload. New clients must use on-device storage with /evidence/register and /evidence/{id}/extraction."
+)
 async def upload_file_evidence(
     file: UploadFile = File(...),
     evidence_type: EvidenceType = Form(EvidenceType.PAYMENT_SCREENSHOT),
