@@ -17,6 +17,7 @@ from app.api.v1.endpoints import (
     communication_actions,
     cashflow,
     reference_intelligence,
+    insights,
     demo
 )
 
@@ -38,6 +39,7 @@ api_router.include_router(market_intelligence.router, tags=["market-intelligence
 api_router.include_router(communication_actions.router, tags=["communication-actions"])
 api_router.include_router(cashflow.router, tags=["cashflow"])
 api_router.include_router(reference_intelligence.router, tags=["reference-intelligence"])
+api_router.include_router(insights.router, tags=["insights"])
 api_router.include_router(demo.router, tags=["demo"])
 
 
