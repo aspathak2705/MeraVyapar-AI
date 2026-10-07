@@ -27,6 +27,13 @@ class Settings(BaseSettings):
     CLOUDFLARE_R2_ENDPOINT: Optional[str] = None
     CLOUDFLARE_R2_ACCESS_KEY_ID: Optional[str] = None
     CLOUDFLARE_R2_SECRET_ACCESS_KEY: Optional[str] = None
+
+    # SerpApi Intelligence Configuration (Backend Only)
+    SERPAPI_API_KEY: Optional[str] = None
+    SERPAPI_BASE_URL: str = "https://serpapi.com/search"
+    SERPAPI_CACHE_TTL_SECONDS: int = 86400  # 24-hour deterministic cache
+    SERPAPI_TIMEOUT_SECONDS: float = 10.0
+
     # OpenRouter & Nemotron Intelligence Configuration
     OPENROUTER_API_KEY: Optional[str] = None
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
