@@ -57,12 +57,23 @@ class LocalDevObjectStorage(ObjectStorage):
                     pass
             raise StorageUnavailableError(f"Failed to write local object: {str(e)}")
 
-        computed_hash = sha256_hash or hasher.hexdigest()
+        calculated_hash = hasher.hexdigest()
+        if sha256_hash and sha256_hash.lower() != calculated_hash.lower():
+            if os.path.exists(final_path):
+                try:
+                    os.remove(final_path)
+                except OSError:
+                    pass
+            from app.infrastructure.storage.base import StorageValidationError
+            raise StorageValidationError(
+                f"Checksum mismatch: expected {sha256_hash}, calculated {calculated_hash}"
+            )
+
         return StoredObjectMetadata(
             object_key=object_key,
             content_type=content_type,
             size_bytes=total_size,
-            sha256_hash=computed_hash,
+            sha256_hash=calculated_hash,
             created_at=datetime.now(timezone.utc)
         )
 

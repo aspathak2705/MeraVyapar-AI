@@ -43,10 +43,16 @@ class SupabaseObjectStorage(ObjectStorage):
         headers = self._get_headers(content_type)
         headers["x-upsert"] = "true"
 
-        # Read file contents and compute hash if not provided
+        # Read file contents and compute authoritative hash from actual bytes
         file_obj.seek(0)
         data = file_obj.read()
-        computed_hash = sha256_hash or hashlib.sha256(data).hexdigest()
+        calculated_hash = hashlib.sha256(data).hexdigest()
+
+        if sha256_hash and sha256_hash.lower() != calculated_hash.lower():
+            from app.infrastructure.storage.base import StorageValidationError
+            raise StorageValidationError(
+                f"Checksum mismatch: expected {sha256_hash}, calculated {calculated_hash}"
+            )
 
         try:
             response = requests.post(url, headers=headers, data=data)
@@ -62,7 +68,7 @@ class SupabaseObjectStorage(ObjectStorage):
             object_key=object_key,
             content_type=content_type,
             size_bytes=len(data),
-            sha256_hash=computed_hash,
+            sha256_hash=calculated_hash,
             created_at=datetime.now(timezone.utc)
         )
 

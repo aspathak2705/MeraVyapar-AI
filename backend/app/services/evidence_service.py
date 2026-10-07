@@ -112,7 +112,7 @@ class EvidenceService:
         evidence_id = uuid.uuid4()
         # Whitelist extension extraction cleanly
         raw_ext = os.path.splitext(filename)[1].lower() if filename and "." in filename else ""
-        ext = raw_ext if raw_ext in [".jpg", ".jpeg", ".png", ".pdf", ".webp"] else ""
+        ext = raw_ext if raw_ext in [".jpg", ".jpeg", ".png", ".pdf"] else ""
         object_key = f"merchants/{merchant_id}/evidence/{evidence_id}{ext}"
 
         stored_meta = self.storage.upload(file_obj, object_key, content_type, sha256_hash=sha256_hash)
