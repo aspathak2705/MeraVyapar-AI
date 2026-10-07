@@ -43,4 +43,16 @@ abstract class EvidenceFileStorage {
     required String merchantId,
     required String evidenceId,
   });
+
+  /// Lists all evidence IDs locally stored for an authenticated merchant.
+  Future<List<String>> listStoredEvidence({
+    required String merchantId,
+  });
+
+  /// Exports an authenticated merchant's evidence package (binary bytes + metadata)
+  /// without exposing physical filesystem paths.
+  Future<Map<String, dynamic>> exportEvidence({
+    required String merchantId,
+    required String evidenceId,
+  });
 }

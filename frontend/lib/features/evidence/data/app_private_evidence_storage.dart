@@ -288,4 +288,64 @@ class AppPrivateEvidenceStorage implements EvidenceFileStorage {
     }
     return false;
   }
+
+  @override
+  Future<List<String>> listStoredEvidence({
+    required String merchantId,
+  }) async {
+    _validateIdentifier(merchantId, 'merchantId');
+    final root = await _rootDirProvider();
+    final merchantDir = Directory(p.normalize(p.join(root.path, 'evidence', merchantId.trim())));
+    if (!await merchantDir.exists()) {
+      return [];
+    }
+
+    final List<String> evidenceIds = [];
+    final entities = await merchantDir.list().toList();
+    for (final entity in entities) {
+      if (entity is Directory) {
+        final id = p.basename(entity.path);
+        if (_uuidRegex.hasMatch(id)) {
+          final file = File(p.join(entity.path, 'original'));
+          if (await file.exists()) {
+            evidenceIds.add(id);
+          }
+        }
+      }
+    }
+    return evidenceIds;
+  }
+
+  @override
+  Future<Map<String, dynamic>> exportEvidence({
+    required String merchantId,
+    required String evidenceId,
+  }) async {
+    final file = await getEvidenceFile(merchantId: merchantId, evidenceId: evidenceId);
+    final metadata = await getMetadata(merchantId: merchantId, evidenceId: evidenceId);
+    if (metadata == null) {
+      throw const EvidenceStorageNotFoundException('Evidence metadata not found');
+    }
+
+    final bytes = await file.readAsBytes();
+    // Verify hash integrity before export
+    final currentHash = sha256.convert(bytes).toString();
+    if (currentHash.toLowerCase() != metadata.sha256Hash.toLowerCase()) {
+      throw const EvidenceStorageValidationException(
+        'Export aborted: evidence file corruption detected (hash mismatch)',
+      );
+    }
+
+    return {
+      'evidence_id': metadata.evidenceId,
+      'merchant_id': metadata.merchantId,
+      'original_filename': metadata.originalFilename,
+      'content_type': metadata.contentType,
+      'size_bytes': metadata.sizeBytes,
+      'sha256_hash': metadata.sha256Hash,
+      'created_at': metadata.createdAt.toUtc().toIso8601String(),
+      'storage_version': metadata.storageVersion,
+      'bytes': bytes,
+    };
+  }
 }

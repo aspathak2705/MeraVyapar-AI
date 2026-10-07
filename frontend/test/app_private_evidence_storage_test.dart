@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:crypto/crypto.dart';
@@ -10,9 +9,9 @@ void main() {
   late Directory tempRootDir;
   late AppPrivateEvidenceStorage storage;
 
-  final testMerchantId = '11111111-1111-1111-1111-111111111111';
-  final testEvidenceId = '22222222-2222-2222-2222-222222222222';
-  final otherMerchantId = '33333333-3333-3333-3333-333333333333';
+  const testMerchantId = '11111111-1111-1111-1111-111111111111';
+  const testEvidenceId = '22222222-2222-2222-2222-222222222222';
+  const otherMerchantId = '33333333-3333-3333-3333-333333333333';
 
   // Real valid file byte fixtures
   final jpegBytes = <int>[0xFF, 0xD8, 0xFF, 0xE0, 0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00];
@@ -279,7 +278,7 @@ void main() {
   });
 
   test('18. Delete removes intended evidence only', () async {
-    final evidenceId2 = '44444444-4444-4444-4444-444444444444';
+    const evidenceId2 = '44444444-4444-4444-4444-444444444444';
 
     await storage.saveEvidence(
       merchantId: testMerchantId,
@@ -338,5 +337,42 @@ void main() {
     expect(meta.sizeBytes, jpegBytes.length);
     expect(meta.sha256Hash, sha256.convert(jpegBytes).toString());
     expect(meta.storageVersion, 1);
+  });
+
+  test('21. List stored evidence returns merchant-scoped IDs', () async {
+    await storage.saveEvidence(
+      merchantId: testMerchantId,
+      evidenceId: testEvidenceId,
+      byteStream: byteStreamOf(jpegBytes),
+      declaredContentType: 'image/jpeg',
+      originalFilename: 'receipt.jpg',
+    );
+
+    final listA = await storage.listStoredEvidence(merchantId: testMerchantId);
+    expect(listA, contains(testEvidenceId));
+
+    final listB = await storage.listStoredEvidence(merchantId: otherMerchantId);
+    expect(listB, isEmpty);
+  });
+
+  test('22. Export evidence returns verified bytes and metadata with integrity check', () async {
+    await storage.saveEvidence(
+      merchantId: testMerchantId,
+      evidenceId: testEvidenceId,
+      byteStream: byteStreamOf(jpegBytes),
+      declaredContentType: 'image/jpeg',
+      originalFilename: 'receipt.jpg',
+    );
+
+    final exported = await storage.exportEvidence(
+      merchantId: testMerchantId,
+      evidenceId: testEvidenceId,
+    );
+
+    expect(exported['evidence_id'], testEvidenceId);
+    expect(exported['merchant_id'], testMerchantId);
+    expect(exported['original_filename'], 'receipt.jpg');
+    expect(exported['bytes'], jpegBytes);
+    expect(exported['sha256_hash'], sha256.convert(jpegBytes).toString());
   });
 }
