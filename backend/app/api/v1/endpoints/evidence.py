@@ -6,12 +6,62 @@ from app.db.session import get_db
 from app.dependencies.auth import get_current_merchant
 from app.services.evidence_service import EvidenceService
 from app.services.evidence_processing_service import EvidenceProcessingService
-from app.schemas.evidence import ManualEvidenceCreate, TextEvidenceCreate, EvidenceResponse
+from app.schemas.evidence import (
+    ManualEvidenceCreate,
+    TextEvidenceCreate,
+    EvidenceRegistrationCreate,
+    EvidenceExtractionSubmission,
+    EvidenceResponse
+)
 from app.schemas.common import APIResponse
 from app.models.merchant import Merchant
 from app.models.financial_evidence import EvidenceType
 
 router = APIRouter()
+
+
+@router.post("/evidence/register", response_model=APIResponse, status_code=status.HTTP_201_CREATED)
+def register_mobile_evidence(
+    payload: EvidenceRegistrationCreate,
+    x_idempotency_key: Optional[str] = Header(None, alias="X-Idempotency-Key"),
+    merchant: Merchant = Depends(get_current_merchant),
+    db: Session = Depends(get_db)
+):
+    service = EvidenceService(db)
+    evidence = service.register_mobile_evidence(
+        merchant_id=merchant.id,
+        payload=payload,
+        idempotency_key=x_idempotency_key
+    )
+
+    evidence_data = EvidenceResponse.model_validate(evidence).model_dump(mode="json")
+    return APIResponse(
+        success=True,
+        message="Mobile app-private evidence metadata registered successfully",
+        data=evidence_data
+    )
+
+
+@router.post("/evidence/{evidence_id}/extraction", response_model=APIResponse, status_code=status.HTTP_200_OK)
+def submit_evidence_extraction(
+    evidence_id: UUID,
+    payload: EvidenceExtractionSubmission,
+    merchant: Merchant = Depends(get_current_merchant),
+    db: Session = Depends(get_db)
+):
+    service = EvidenceService(db)
+    evidence = service.get_evidence(evidence_id, merchant.id)
+
+    processor = EvidenceProcessingService(db)
+    processed_evidence = processor.process_extraction_submission(evidence, payload)
+
+    evidence_data = EvidenceResponse.model_validate(processed_evidence).model_dump(mode="json")
+    return APIResponse(
+        success=True,
+        message="On-device extraction submitted and processed into financial pipeline",
+        data=evidence_data
+    )
+
 
 
 @router.post("/evidence/manual", response_model=APIResponse, status_code=status.HTTP_201_CREATED)

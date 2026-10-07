@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Exclude raw financial evidence from Android 12+ cloud backup -->
+        <exclude domain="file" path="evidence" />
+    </cloud-backup>
+    <device-transfer>
+        <!-- Allow or exclude device-to-device transfer as needed -->
+        <exclude domain="file" path="evidence" />
+    </device-transfer>
+</data-extraction-rules>

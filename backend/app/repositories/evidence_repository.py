@@ -22,6 +22,11 @@ class EvidenceRepository:
             FinancialEvidence.merchant_id == merchant_id
         ).first()
 
+    def get_by_id_any_merchant(self, evidence_id: UUID) -> Optional[FinancialEvidence]:
+        return self.db.query(FinancialEvidence).filter(
+            FinancialEvidence.id == evidence_id
+        ).first()
+
     def get_by_idempotency_key(self, merchant_id: UUID, key: str) -> Optional[FinancialEvidence]:
         return self.db.query(FinancialEvidence).filter(
             FinancialEvidence.merchant_id == merchant_id,

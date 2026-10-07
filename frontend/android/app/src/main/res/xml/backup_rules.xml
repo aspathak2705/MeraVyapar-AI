@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Exclude raw financial evidence from cloud backup -->
+    <exclude domain="file" path="evidence" />
+</full-backup-content>

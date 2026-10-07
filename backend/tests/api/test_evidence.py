@@ -93,3 +93,114 @@ def test_invalid_file_mime_type_validation(client, db_session):
     assert res.json()["success"] is False
 
     app.dependency_overrides.clear()
+
+
+def test_mobile_evidence_registration_and_extraction_pipeline(client, db_session):
+    service = MerchantService(db_session)
+    merchant_a = service.initialize_merchant(uuid.uuid4(), "Store A")
+    app.dependency_overrides[get_current_merchant] = lambda: merchant_a
+
+    evidence_id = str(uuid.uuid4())
+    fake_sha256 = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+
+    reg_payload = {
+        "evidence_id": evidence_id,
+        "evidence_type": "PAYMENT_SCREENSHOT",
+        "content_type": "image/jpeg",
+        "original_filename": "payment_proof.jpg",
+        "size_bytes": 10240,
+        "client_sha256": fake_sha256,
+        "storage_version": 1
+    }
+
+    # 1. Register evidence
+    res_reg = client.post("/api/v1/evidence/register", json=reg_payload)
+    assert res_reg.status_code in (200, 201)
+    reg_data = res_reg.json()["data"]
+    assert reg_data["id"] == evidence_id
+    assert reg_data["processing_status"] == "AWAITING_EXTRACTION"
+    assert "data/user" not in (reg_data["storage_object_key"] or "")
+
+    # 2. Duplicate registration is idempotent
+    res_reg_dup = client.post("/api/v1/evidence/register", json=reg_payload)
+    assert res_reg_dup.status_code in (200, 201)
+    assert res_reg_dup.json()["data"]["id"] == evidence_id
+
+    # 3. Submit extraction with matching hash
+    extract_payload = {
+        "client_sha256": fake_sha256,
+        "amount": "3500.00",
+        "currency": "INR",
+        "transaction_type": "MONEY_IN",
+        "counterparty_name": "Ramesh Kumar",
+        "payment_mode": "UPI",
+        "reference_number": "UPI9876543210",
+        "extraction_engine": "TFLiteExtractionEngine"
+    }
+
+    res_ext = client.post(f"/api/v1/evidence/{evidence_id}/extraction", json=extract_payload)
+    assert res_ext.status_code == 200
+    ext_data = res_ext.json()["data"]
+    assert ext_data["processing_status"] == "PARSED"
+
+    # 4. Verify candidate created with full provenance
+    res_cands = client.get("/api/v1/transaction-candidates")
+    assert res_cands.status_code == 200
+    cands = res_cands.json()["data"]
+    assert len(cands) == 1
+    assert cands[0]["primary_evidence_id"] == evidence_id
+    assert cands[0]["amount"] == "3500.00"
+    assert cands[0]["counterparty_name"] == "Ramesh Kumar"
+
+    app.dependency_overrides.clear()
+
+
+def test_mobile_evidence_registration_validation_and_isolation(client, db_session):
+    service = MerchantService(db_session)
+    merchant_a = service.initialize_merchant(uuid.uuid4(), "Store A")
+    merchant_b = service.initialize_merchant(uuid.uuid4(), "Store B")
+
+    app.dependency_overrides[get_current_merchant] = lambda: merchant_a
+    evidence_id = str(uuid.uuid4())
+
+    # Unsupported MIME type
+    res_bad_mime = client.post("/api/v1/evidence/register", json={
+        "evidence_id": evidence_id,
+        "content_type": "application/x-executable",
+        "original_filename": "bad.exe",
+        "size_bytes": 100,
+        "client_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    })
+    assert res_bad_mime.status_code == 400
+
+    # Invalid SHA-256 pattern
+    res_bad_hash = client.post("/api/v1/evidence/register", json={
+        "evidence_id": evidence_id,
+        "content_type": "image/png",
+        "original_filename": "valid.png",
+        "size_bytes": 100,
+        "client_sha256": "not_a_valid_sha256"
+    })
+    assert res_bad_hash.status_code == 422
+
+    # Register valid evidence under Merchant A
+    valid_hash = "a" * 64
+    res_ok = client.post("/api/v1/evidence/register", json={
+        "evidence_id": evidence_id,
+        "content_type": "image/png",
+        "original_filename": "valid.png",
+        "size_bytes": 1024,
+        "client_sha256": valid_hash
+    })
+    assert res_ok.status_code in (200, 201)
+
+    # Merchant B cannot submit extraction for Merchant A's evidence
+    app.dependency_overrides[get_current_merchant] = lambda: merchant_b
+    res_b_hack = client.post(f"/api/v1/evidence/{evidence_id}/extraction", json={
+        "client_sha256": valid_hash,
+        "amount": "999.00"
+    })
+    assert res_b_hack.status_code == 404
+
+    app.dependency_overrides.clear()
+

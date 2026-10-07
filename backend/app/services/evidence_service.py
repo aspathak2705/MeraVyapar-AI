@@ -1,3 +1,5 @@
+import os
+import uuid
 from uuid import UUID
 from typing import List, Optional, BinaryIO
 from sqlalchemy.orm import Session
@@ -84,6 +86,62 @@ class EvidenceService:
             metadata_info=meta,
             idempotency_key=idempotency_key,
             processing_status=ProcessingStatus.RECEIVED
+        )
+
+    def register_mobile_evidence(
+        self,
+        merchant_id: UUID,
+        payload,
+        idempotency_key: Optional[str] = None
+    ) -> FinancialEvidence:
+        # Validate format is allowed
+        allowed_types = {"image/jpeg", "image/png", "application/pdf"}
+        if payload.content_type.lower() not in allowed_types:
+            raise ValidationError(
+                f"Unsupported content type: {payload.content_type}. Allowed: {sorted(list(allowed_types))}"
+            )
+
+        # Idempotency check: by idempotency_key or exact evidence_id
+        if idempotency_key:
+            existing = self.repo.get_by_idempotency_key(merchant_id, idempotency_key)
+            if existing:
+                return existing
+
+        existing_evidence = self.repo.get_by_id(payload.evidence_id, merchant_id)
+        if existing_evidence:
+            return existing_evidence
+
+        # Check if evidence_id is claimed by another merchant (isolation check)
+        other_evidence = self.repo.get_by_id_any_merchant(payload.evidence_id) if hasattr(self.repo, 'get_by_id_any_merchant') else None
+        if other_evidence and other_evidence.merchant_id != merchant_id:
+            raise ValidationError("Evidence identifier belongs to another merchant")
+
+        meta = {
+            "submission_method": "mobile_app_private",
+            "storage_owner": "mobile_device",
+            "storage_version": payload.storage_version,
+            "original_filename": os.path.basename(payload.original_filename),
+            "content_type": payload.content_type,
+            "size_bytes": payload.size_bytes,
+            "client_sha256": payload.client_sha256.lower(),
+            "sha256_verified_by_backend": False
+        }
+
+        # Logical object key (logical identity only, no physical OS path)
+        logical_key = f"merchants/{merchant_id}/evidence/{payload.evidence_id}"
+
+        return self.repo.create(
+            evidence_id=payload.evidence_id,
+            merchant_id=merchant_id,
+            evidence_type=payload.evidence_type,
+            evidence_source=EvidenceSource.USER_SHARED_FILE,
+            evidence_strength=EvidenceStrength.STRONG,
+            metadata_info=meta,
+            storage_object_key=logical_key,
+            content_type=payload.content_type,
+            original_filename=os.path.basename(payload.original_filename),
+            idempotency_key=idempotency_key,
+            processing_status=ProcessingStatus.AWAITING_EXTRACTION
         )
 
     def create_file_evidence(

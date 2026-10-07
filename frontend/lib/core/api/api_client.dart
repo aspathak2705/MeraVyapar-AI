@@ -29,7 +29,11 @@ class ApiClient {
     return _handleResponse(response);
   }
 
-  Future<Map<String, dynamic>> post(String path, {Map<String, dynamic>? body}) async {
+  Future<Map<String, dynamic>> post(
+    String path, {
+    Map<String, dynamic>? body,
+    Map<String, String>? headers,
+  }) async {
     final token = await _getToken();
     final url = Uri.parse('${Env.apiBaseUrl}$path');
 
@@ -38,6 +42,7 @@ class ApiClient {
       headers: {
         'Content-Type': 'application/json',
         if (token != null) 'Authorization': 'Bearer $token',
+        if (headers != null) ...headers,
       },
       body: body != null ? jsonEncode(body) : null,
     );
@@ -45,7 +50,11 @@ class ApiClient {
     return _handleResponse(response);
   }
 
-  Future<Map<String, dynamic>> put(String path, {required Map<String, dynamic> body}) async {
+  Future<Map<String, dynamic>> put(
+    String path, {
+    required Map<String, dynamic> body,
+    Map<String, String>? headers,
+  }) async {
     final token = await _getToken();
     final url = Uri.parse('${Env.apiBaseUrl}$path');
 
@@ -54,6 +63,7 @@ class ApiClient {
       headers: {
         'Content-Type': 'application/json',
         if (token != null) 'Authorization': 'Bearer $token',
+        if (headers != null) ...headers,
       },
       body: jsonEncode(body),
     );
