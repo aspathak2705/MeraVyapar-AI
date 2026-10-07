@@ -48,6 +48,7 @@ class SerpApiMarketFeedAdapter(MarketIntelligenceProvider):
             source_name = item.source_name or f"SerpApi {result.engine}"
             summary = item.snippet or item.title
 
+            # Persist only compact, essential provenance and evidence fields (Part 3 raw payload audit)
             metadata_info = {
                 "engine": result.engine,
                 "query": result.query,
@@ -57,7 +58,7 @@ class SerpApiMarketFeedAdapter(MarketIntelligenceProvider):
                 "reviews": item.reviews,
                 "location": item.location,
                 "metrics": item.metrics,
-                "raw_payload": item.raw_payload,
+                "source_name": source_name,
             }
 
             requests.append(MarketIngestRequest(
