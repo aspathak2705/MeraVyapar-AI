@@ -3,7 +3,7 @@
 /// Preserves financial precision using integer minor units (paise: 1 INR = 100 paise)
 /// and ISO-8601 UTC timestamp strings.
 class LocalDatabaseSchema {
-  static const int version = 2;
+  static const int version = 3;
   static const String databaseFileName = 'meravyapar_local.db';
 
   // Table Names
@@ -13,12 +13,13 @@ class LocalDatabaseSchema {
   static const String tablePaymentPromises = 'payment_promises';
   static const String tableFinancialEvents = 'financial_events';
   static const String tableEvidenceMetadata = 'evidence_metadata';
+  static const String tableTransactionCandidates = 'transaction_candidates';
   static const String tableCommunicationDrafts = 'communication_drafts';
   static const String tableAuditLog = 'local_audit_log';
   static const String tableMigrationMetadata = 'migration_metadata';
 
-  // SQL DDL statements for version 2
-  static const List<String> createStatementsV2 = [
+  // SQL DDL statements for version 3
+  static const List<String> createStatementsV3 = [
     '''
     CREATE TABLE IF NOT EXISTS $tableMerchantProfile (
       id TEXT PRIMARY KEY,
@@ -133,6 +134,31 @@ class LocalDatabaseSchema {
     '''
     CREATE INDEX IF NOT EXISTS idx_evidence_merchant_sha 
     ON $tableEvidenceMetadata(merchant_id, sha256_hash);
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS $tableTransactionCandidates (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      primary_evidence_id TEXT NOT NULL,
+      transaction_type TEXT NOT NULL,
+      amount_minor_units INTEGER,
+      currency TEXT NOT NULL DEFAULT 'INR',
+      transaction_timestamp TEXT,
+      counterparty_name TEXT,
+      payment_mode TEXT NOT NULL DEFAULT 'UNKNOWN',
+      description TEXT,
+      lifecycle_status TEXT NOT NULL DEFAULT 'EXTRACTED',
+      reconciliation_match_id TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT,
+      FOREIGN KEY (primary_evidence_id) REFERENCES $tableEvidenceMetadata(id) ON DELETE CASCADE,
+      FOREIGN KEY (reconciliation_match_id) REFERENCES $tableCanonicalTransactions(id) ON DELETE SET NULL
+    );
+    ''',
+    '''
+    CREATE INDEX IF NOT EXISTS idx_candidates_merchant_status 
+    ON $tableTransactionCandidates(merchant_id, lifecycle_status);
     ''',
     '''
     CREATE TABLE IF NOT EXISTS $tableCommunicationDrafts (

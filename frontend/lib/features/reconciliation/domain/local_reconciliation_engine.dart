@@ -43,7 +43,7 @@ class LocalReconciliationEngine {
   LocalReconciliationEngine({LocalDatabaseService? dbService})
       : _dbService = dbService ?? LocalDatabaseService.instance;
 
-  /// Compares candidate against canonical transactions within a temporal window (+/- 3 days).
+  /// Compares candidate against canonical transactions within a temporal window.
   Future<ReconciliationMatch> evaluateCandidate({
     required String merchantId,
     required TransactionCandidateModel candidate,
@@ -87,7 +87,6 @@ class LocalReconciliationEngine {
       final existingCp = (row['counterparty_name'] as String?)?.toLowerCase();
       final candCp = candidate.counterpartyName?.toLowerCase();
 
-      // Check for exact UTR match if available
       final existingTx = CanonicalTransactionModel(
         id: row['id'] as String,
         merchantId: row['merchant_id'] as String,
@@ -105,7 +104,18 @@ class LocalReconciliationEngine {
         candidateLinks: const [],
       );
 
-      // Exact counterparty match or same day
+      // 1. Strong Match: If UTR matches
+      if (existingUtr != null && candidate.description != null && candidate.description!.contains(existingUtr)) {
+        return ReconciliationMatch(
+          type: MatchType.exact,
+          candidate: candidate,
+          existingTransaction: existingTx,
+          confidenceScore: 1.0,
+          explanation: 'Exact match on payment reference/UTR ($existingUtr)',
+        );
+      }
+
+      // 2. Exact match: Amount, direction, and normalized counterparty
       if (existingCp != null && candCp != null && existingCp == candCp) {
         return ReconciliationMatch(
           type: MatchType.exact,
@@ -116,7 +126,7 @@ class LocalReconciliationEngine {
         );
       }
 
-      // Probable match (identical amount & direction, counterparty pending)
+      // 3. Probable match
       return ReconciliationMatch(
         type: MatchType.probable,
         candidate: candidate,
@@ -134,7 +144,8 @@ class LocalReconciliationEngine {
     );
   }
 
-  /// Confirm candidate into canonical ledger atomically.
+  /// Confirm candidate into canonical ledger atomically with cross-evidence idempotency protection.
+  /// Updates candidate lifecycle state in SQLite.
   Future<CanonicalTransactionModel> confirmCandidateIntoLedger({
     required String merchantId,
     required TransactionCandidateModel candidate,
@@ -145,39 +156,98 @@ class LocalReconciliationEngine {
     if (driver == null) throw StateError('Local database driver not initialized');
 
     final candidatePaise = MigrationVerificationService.parseExactPaise(candidate.amount);
-    final txId = const Uuid().v4();
     final nowIso = DateTime.now().toUtc().toIso8601String();
-    final idempotency = 'cand_${candidate.id}';
 
-    await driver.execute(
+    // Cross-evidence idempotency key construction:
+    final idempotencyKey = transactionReference != null && transactionReference.isNotEmpty
+        ? 'ref_${merchantId}_$transactionReference'
+        : 'cand_${candidate.id}';
+
+    // Check if canonical transaction already exists under this idempotency key
+    final existingRows = await driver.query(
       '''
-      INSERT INTO ${LocalDatabaseSchema.tableCanonicalTransactions} (
-        id, merchant_id, amount_minor_units, currency, transaction_type,
-        payment_mode, counterparty_name, counterparty_id, transaction_reference,
-        description, occurred_at, reconciliation_status, source_type,
-        source_provider, is_simulated, idempotency_key, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      SELECT * FROM ${LocalDatabaseSchema.tableCanonicalTransactions}
+      WHERE idempotency_key = ?
       ''',
-      [
-        txId,
-        merchantId,
-        candidatePaise,
-        candidate.currency,
-        candidate.transactionType,
-        candidate.paymentMode,
-        candidate.counterpartyName,
-        counterpartyId,
-        transactionReference,
-        candidate.description,
-        candidate.transactionTimestamp ?? nowIso,
-        'RECONCILED',
-        'CANDIDATE_CONFIRMED',
-        'LOCAL_RECONCILIATION',
-        0,
-        idempotency,
-        nowIso,
-      ],
+      [idempotencyKey],
     );
+
+    if (existingRows.isNotEmpty) {
+      final row = existingRows.first;
+      final existingId = row['id'] as String;
+
+      // Update candidate status to CONFIRMED
+      await driver.execute(
+        '''
+        UPDATE ${LocalDatabaseSchema.tableTransactionCandidates}
+        SET lifecycle_status = 'CONFIRMED', reconciliation_match_id = ?, updated_at = ?
+        WHERE id = ? AND merchant_id = ?
+        ''',
+        [existingId, nowIso, candidate.id, merchantId],
+      );
+
+      return CanonicalTransactionModel(
+        id: existingId,
+        merchantId: row['merchant_id'] as String,
+        amount: ((row['amount_minor_units'] as int) / 100.0).toStringAsFixed(2),
+        currency: row['currency'] as String? ?? 'INR',
+        transactionType: row['transaction_type'] as String,
+        paymentMode: row['payment_mode'] as String,
+        counterpartyName: row['counterparty_name'] as String?,
+        transactionReference: row['transaction_reference'] as String?,
+        description: row['description'] as String?,
+        occurredAt: row['occurred_at'] as String?,
+        reconciliationStatus: row['reconciliation_status'] as String? ?? 'UNRESOLVED',
+        sourceType: row['source_type'] as String?,
+        sourceProvider: row['source_provider'] as String?,
+        isSimulated: false,
+        candidateLinks: const [],
+      );
+    }
+
+    final txId = const Uuid().v4();
+
+    // Execute ledger insert and candidate status update atomically inside transaction
+    await driver.transaction((txn) async {
+      await txn.execute(
+        '''
+        INSERT INTO ${LocalDatabaseSchema.tableCanonicalTransactions} (
+          id, merchant_id, amount_minor_units, currency, transaction_type,
+          payment_mode, counterparty_name, counterparty_id, transaction_reference,
+          description, occurred_at, reconciliation_status, source_type,
+          source_provider, is_simulated, idempotency_key, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''',
+        [
+          txId,
+          merchantId,
+          candidatePaise,
+          candidate.currency,
+          candidate.transactionType,
+          candidate.paymentMode,
+          candidate.counterpartyName,
+          counterpartyId,
+          transactionReference,
+          candidate.description,
+          candidate.transactionTimestamp ?? nowIso,
+          'RECONCILED',
+          'CANDIDATE_CONFIRMED',
+          'LOCAL_RECONCILIATION',
+          0,
+          idempotencyKey,
+          nowIso,
+        ],
+      );
+
+      await txn.execute(
+        '''
+        UPDATE ${LocalDatabaseSchema.tableTransactionCandidates}
+        SET lifecycle_status = 'CONFIRMED', reconciliation_match_id = ?, updated_at = ?
+        WHERE id = ? AND merchant_id = ?
+        ''',
+        [txId, nowIso, candidate.id, merchantId],
+      );
+    });
 
     return CanonicalTransactionModel(
       id: txId,
