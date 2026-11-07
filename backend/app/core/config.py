@@ -34,6 +34,15 @@ class Settings(BaseSettings):
     SERPAPI_CACHE_TTL_SECONDS: int = 86400  # 24-hour deterministic cache
     SERPAPI_TIMEOUT_SECONDS: float = 10.0
 
+    # Gnani AI Speech Stack Configuration (Backend Only)
+    GNANI_API_KEY: Optional[str] = None
+    GNANI_API_BASE_URL: str = "https://api.vachana.ai"
+    GNANI_STT_MODEL: str = "prisma-v2.5"
+    GNANI_TTS_MODEL: str = "timbre-v2.5"
+    GNANI_DEFAULT_VOICE: str = "Nalini"
+    GNANI_DEFAULT_LANGUAGE: str = "hi-IN"
+    GNANI_TIMEOUT_SECONDS: float = 10.0
+
     # OpenRouter & Nemotron Intelligence Configuration
     OPENROUTER_API_KEY: Optional[str] = None
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
