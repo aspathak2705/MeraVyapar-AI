@@ -27,6 +27,7 @@ class VoiceInteractionState {
   final CommunicationAction? committedAction;
   final String? audioBase64;
   final bool isPlayingAudio;
+  final int recordingDurationSeconds;
   final String? errorMessage;
 
   const VoiceInteractionState({
@@ -39,6 +40,7 @@ class VoiceInteractionState {
     this.committedAction,
     this.audioBase64,
     this.isPlayingAudio = false,
+    this.recordingDurationSeconds = 0,
     this.errorMessage,
   });
 
@@ -52,6 +54,7 @@ class VoiceInteractionState {
     CommunicationAction? committedAction,
     String? audioBase64,
     bool? isPlayingAudio,
+    int? recordingDurationSeconds,
     String? errorMessage,
   }) {
     return VoiceInteractionState(
@@ -64,6 +67,7 @@ class VoiceInteractionState {
       committedAction: committedAction ?? this.committedAction,
       audioBase64: audioBase64 ?? this.audioBase64,
       isPlayingAudio: isPlayingAudio ?? this.isPlayingAudio,
+      recordingDurationSeconds: recordingDurationSeconds ?? this.recordingDurationSeconds,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }

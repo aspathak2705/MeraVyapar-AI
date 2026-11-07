@@ -132,21 +132,21 @@ class VoiceAssistantSheet extends ConsumerWidget {
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: const Color(0xFFFCA5A5)),
           ),
-          child: const Column(
+          child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.fiber_manual_record, color: Colors.red, size: 16),
-                  SizedBox(width: 8),
+                  const Icon(Icons.fiber_manual_record, color: Colors.red, size: 16),
+                  const SizedBox(width: 8),
                   Text(
-                    'Listening...',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red),
+                    'Listening... (${state.recordingDurationSeconds}s)',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red),
                   ),
                 ],
               ),
-              SizedBox(height: 8),
-              Text(
+              const SizedBox(height: 8),
+              const Text(
                 'Speak your query in your chosen language.',
                 style: TextStyle(fontSize: 13, color: Color(0xFF7F1D1D)),
               ),

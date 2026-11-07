@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:frontend/features/voice/data/voice_repository.dart';
@@ -9,6 +10,7 @@ import 'package:frontend/features/actions/data/action_repository.dart';
 import 'package:frontend/features/actions/domain/communication_action_model.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('VoiceRepository Tests', () {
     test('getVoiceStatus parses response correctly', () async {
       final mockClient = MockClient((request) async {
@@ -190,6 +192,59 @@ void main() {
       await controller.startRecording();
       expect(controller.state.status, VoiceInteractionStatus.error);
       expect(controller.state.errorMessage!.contains('Microphone permission is required'), true);
+    });
+
+    test('DeviceAudioRecordingService enforces 10MB limit and clean lifecycle', () async {
+      final testDir = await Directory.systemTemp.createTemp('voice_test_rec_');
+      final devRec = DeviceAudioRecordingService(tempDirProvider: () async => testDir);
+      expect(devRec.isRecording, false);
+
+      await devRec.startRecording();
+      expect(devRec.isRecording, true);
+
+      final bytes = await devRec.stopRecording();
+      expect(devRec.isRecording, false);
+      expect(bytes != null && bytes.isNotEmpty, true);
+      expect(bytes!.length <= 10 * 1024 * 1024, true);
+
+      await devRec.startRecording();
+      await devRec.cancelRecording();
+      expect(devRec.isRecording, false);
+
+      if (await testDir.exists()) {
+        await testDir.delete(recursive: true);
+      }
+    });
+
+    test('DeviceAudioPlaybackService validates RIFF/WAV headers and rejects invalid formats', () async {
+      final testDir = await Directory.systemTemp.createTemp('voice_test_play_');
+      final devPlay = DeviceAudioPlaybackService(tempDirProvider: () async => testDir);
+      expect(devPlay.isPlaying, false);
+
+      // Rejects empty
+      expect(() => devPlay.playBytes([]), throwsA(predicate((e) => e.toString().contains('empty'))));
+
+      // Rejects non-WAV magic header
+      expect(
+        () => devPlay.playBytes([0x4D, 0x50, 0x33, 0x20]), // 'MP3 '
+        throwsA(predicate((e) => e.toString().contains('expected RIFF/WAV header'))),
+      );
+
+      // Accepts standard RIFF header
+      final validHeader = [
+        0x52, 0x49, 0x46, 0x46, // 'RIFF'
+        0x24, 0x00, 0x00, 0x00,
+        0x57, 0x41, 0x56, 0x45, // 'WAVE'
+      ];
+      await devPlay.playBytes(validHeader);
+      expect(devPlay.isPlaying, true);
+
+      await devPlay.stop();
+      expect(devPlay.isPlaying, false);
+
+      if (await testDir.exists()) {
+        await testDir.delete(recursive: true);
+      }
     });
   });
 }

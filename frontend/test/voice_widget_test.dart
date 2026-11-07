@@ -62,7 +62,7 @@ void main() {
     await tester.tap(find.text('Start Speaking'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Listening...'), findsOneWidget);
+    expect(find.textContaining('Listening...'), findsOneWidget);
     expect(find.text('Cancel'), findsOneWidget);
     expect(find.text('Send'), findsOneWidget);
   });
