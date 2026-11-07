@@ -63,10 +63,12 @@ class BackupPackageResult {
   });
 }
 
-/// Hardened merchant-controlled encrypted backup & atomic crash-recoverable restore service.
+/// Production-grade authenticated backup and crash-recoverable restore service.
+/// Uses independent encryption and MAC keys derived via PBKDF2-HMAC-SHA256 (60,000 rounds)
+/// with standard encrypt-then-MAC (EtM) authentication over nonce, version, and ciphertext.
 class EncryptedLocalBackupService {
-  static const int currentBackupVersion = 2; // Hardened authenticated container format
-  static const int pbkdf2Iterations = 60000; // Aligned with modern mobile security baseline
+  static const int currentBackupVersion = 3; // EtM authenticated container format
+  static const int pbkdf2Iterations = 60000;
 
   final LocalDatabaseService _dbService;
 
@@ -92,6 +94,7 @@ class EncryptedLocalBackupService {
       final liveDbPath = p.join(docsDir.path, 'database', LocalDatabaseSchema.databaseFileName);
       final backupOldPath = '$liveDbPath.old';
       final stagingDirPath = p.join(docsDir.path, 'staging_restore');
+      final merchantId = journal['merchant_id'] as String?;
 
       if (stage != 'COMPLETED') {
         // Rollback: restore previous database if available
@@ -101,9 +104,19 @@ class EncryptedLocalBackupService {
           if (await liveDb.exists()) await liveDb.delete();
           await backupOld.rename(liveDbPath);
         }
+
+        // Rollback evidence directory if backup exists
+        if (merchantId != null) {
+          final oldEvidenceDir = Directory(p.join(docsDir.path, 'evidence', '${merchantId}_old'));
+          final liveEvidenceDir = Directory(p.join(docsDir.path, 'evidence', merchantId));
+          if (await oldEvidenceDir.exists()) {
+            if (await liveEvidenceDir.exists()) await liveEvidenceDir.delete(recursive: true);
+            await oldEvidenceDir.rename(liveEvidenceDir.path);
+          }
+        }
       }
 
-      // Cleanup temporary staging
+      // Cleanup staging
       final stagingDir = Directory(stagingDirPath);
       if (await stagingDir.exists()) {
         await stagingDir.delete(recursive: true);
@@ -141,7 +154,6 @@ class EncryptedLocalBackupService {
       final driver = _dbService.driver;
       if (driver != null) {
         final res = await driver.query('PRAGMA wal_checkpoint(FULL);');
-        // Busy connection check
         if (res.isNotEmpty && (res.first['busy'] as int? ?? 0) > 0) {
           return const BackupPackageResult(
             success: false,
@@ -190,22 +202,28 @@ class EncryptedLocalBackupService {
       };
       final plaintext = utf8.encode(jsonEncode(packageMap));
 
-      // 5. Cryptographic Key Derivation & Nonce Generation
+      // 5. Independent Key Derivation (Encryption Key & MAC Key)
       final salt = const Uuid().v4();
       final nonceBytes = _generateSecureRandomBytes(16);
       final nonceHex = _bytesToHex(nonceBytes);
 
-      final key = _deriveKey(passphrase, salt, pbkdf2Iterations);
-      final encrypted = _encryptAuthenticated(plaintext, key, nonceBytes);
+      final derivedMaster = _deriveKey(passphrase, salt, pbkdf2Iterations);
+      final encKey = Hmac(sha256, derivedMaster).convert(utf8.encode('ENC_KEY_V3')).bytes;
+      final macKey = Hmac(sha256, derivedMaster).convert(utf8.encode('MAC_KEY_V3')).bytes;
+
+      // 6. Encrypt-then-MAC with counter keystream and nonce
+      final ciphertext = _ctrCipher(plaintext, encKey, nonceBytes);
+      final aad = utf8.encode('MERAVYAPAR_ENCRYPTED_BACKUP_V3:$currentBackupVersion:$salt:$nonceHex');
+      final authTag = Hmac(sha256, macKey).convert([...aad, ...ciphertext]).toString();
 
       final container = {
-        'format': 'MERAVYAPAR_ENCRYPTED_BACKUP_V2',
+        'format': 'MERAVYAPAR_ENCRYPTED_BACKUP_V3',
         'version': currentBackupVersion,
         'salt': salt,
         'nonce': nonceHex,
         'iterations': pbkdf2Iterations,
-        'payload_b64': base64Encode(encrypted.ciphertext),
-        'auth_tag': encrypted.authTag,
+        'payload_b64': base64Encode(ciphertext),
+        'auth_tag': authTag,
       };
 
       final backupFilename = 'meravyapar_backup_${DateTime.now().millisecondsSinceEpoch}.mvbak';
@@ -227,7 +245,7 @@ class EncryptedLocalBackupService {
     }
   }
 
-  /// Restore encrypted backup package using atomic, recoverable journal.
+  /// Restore encrypted backup package using atomic, recoverable journal with evidence rollback.
   Future<BackupPackageResult> restoreEncryptedBackup({
     required String backupFilePath,
     required String passphrase,
@@ -244,28 +262,38 @@ class EncryptedLocalBackupService {
 
       final content = jsonDecode(await file.readAsString()) as Map<String, dynamic>;
       final format = content['format'] as String?;
-      if (format != 'MERAVYAPAR_ENCRYPTED_BACKUP_V2' && format != 'MERAVYAPAR_ENCRYPTED_BACKUP') {
-        return const BackupPackageResult(success: false, errorMessage: 'Unsupported backup format');
+      if (format != 'MERAVYAPAR_ENCRYPTED_BACKUP_V3') {
+        return const BackupPackageResult(
+          success: false,
+          errorMessage: 'Unsupported backup format: archive is from a deprecated or invalid version',
+        );
       }
 
       final salt = content['salt'] as String;
       final iterations = content['iterations'] as int;
       final ciphertext = base64Decode(content['payload_b64'] as String);
       final authTag = content['auth_tag'] as String;
-      final nonceHex = content['nonce'] as String? ?? '';
-      final nonceBytes = nonceHex.isNotEmpty ? _hexToBytes(nonceHex) : <int>[];
+      final nonceHex = content['nonce'] as String;
+      final nonceBytes = _hexToBytes(nonceHex);
 
-      // Decrypt and verify auth tag
-      final key = _deriveKey(passphrase, salt, iterations);
-      final decrypted = _decryptAuthenticated(ciphertext, key, nonceBytes, authTag);
-      if (decrypted == null) {
+      // Verify Authenticated Data (EtM verification before any decryption)
+      final derivedMaster = _deriveKey(passphrase, salt, iterations);
+      final encKey = Hmac(sha256, derivedMaster).convert(utf8.encode('ENC_KEY_V3')).bytes;
+      final macKey = Hmac(sha256, derivedMaster).convert(utf8.encode('MAC_KEY_V3')).bytes;
+
+      final aad = utf8.encode('MERAVYAPAR_ENCRYPTED_BACKUP_V3:$currentBackupVersion:$salt:$nonceHex');
+      final computedTag = Hmac(sha256, macKey).convert([...aad, ...ciphertext]).toString();
+
+      if (computedTag != authTag) {
         return const BackupPackageResult(
           success: false,
-          errorMessage: 'Authentication failed: invalid passphrase or corrupted backup',
+          errorMessage: 'Authentication failed: invalid passphrase or tampered backup payload',
         );
       }
 
-      final packageMap = jsonDecode(utf8.decode(decrypted)) as Map<String, dynamic>;
+      // Safe to decrypt after MAC verified
+      final plaintext = _ctrCipher(ciphertext, encKey, nonceBytes);
+      final packageMap = jsonDecode(utf8.decode(plaintext)) as Map<String, dynamic>;
       final manifest = BackupManifest.fromJson(packageMap['manifest']);
 
       // 1. Verify DB Checksum
@@ -293,11 +321,14 @@ class EncryptedLocalBackupService {
       await stagingDbFile.writeAsBytes(dbBytes, flush: true);
 
       final evidenceMap = packageMap['evidence_files_b64'] as Map<String, dynamic>? ?? {};
+      final stagingEvidenceDir = Directory(p.join(stagingDir.path, 'evidence'));
+      await stagingEvidenceDir.create(recursive: true);
+
       for (final entry in evidenceMap.entries) {
         final relPath = p.normalize(entry.key).replaceAll('\\', '/');
         // Canonical Path Traversal Protection
         if (relPath.startsWith('/') || relPath.contains('../') || relPath.contains('..\\')) {
-          throw StateError('Security violation: illegal path in backup package');
+          throw StateError('Security violation: illegal path in backup package: $relPath');
         }
 
         final bytes = base64Decode(entry.value as String);
@@ -311,10 +342,11 @@ class EncryptedLocalBackupService {
         await targetFile.writeAsBytes(bytes, flush: true);
       }
 
-      // 4. Atomic Database Swap
+      // 4. Coordinated Atomic Swap of DB and Evidence Directory
       await journalFile.writeAsString(jsonEncode({
         'stage': 'SWAPPING',
         'swapped_at': DateTime.now().toUtc().toIso8601String(),
+        'merchant_id': manifest.merchantId,
       }), flush: true);
 
       _dbService.reset();
@@ -340,7 +372,6 @@ class EncryptedLocalBackupService {
         manifest: manifest,
       );
     } catch (e) {
-      // Trigger rollback if journal was written
       if (await journalFile.exists()) {
         await recoverInterruptedRestore();
       }
@@ -368,32 +399,32 @@ class EncryptedLocalBackupService {
     return result;
   }
 
-  _AuthEncrypted _encryptAuthenticated(List<int> plaintext, List<int> key, List<int> nonce) {
-    // Authenticated key-stream construction with nonce binding
-    final keyWithNonce = Hmac(sha256, key).convert(nonce).bytes;
-    final keystream = Hmac(sha256, keyWithNonce).convert(plaintext.length > 32 ? plaintext.sublist(0, 32) : plaintext).bytes;
+  /// CTR Keystream Cipher with explicit nonce and block counter
+  List<int> _ctrCipher(List<int> data, List<int> key, List<int> nonce) {
+    final result = List<int>.filled(data.length, 0);
+    final hmac = Hmac(sha256, key);
+    int blockIndex = 0;
+    int processed = 0;
 
-    final ciphertext = List<int>.filled(plaintext.length, 0);
-    for (int i = 0; i < plaintext.length; i++) {
-      ciphertext[i] = plaintext[i] ^ keystream[i % keystream.length];
+    while (processed < data.length) {
+      final counterBytes = [
+        (blockIndex >> 24) & 0xFF,
+        (blockIndex >> 16) & 0xFF,
+        (blockIndex >> 8) & 0xFF,
+        blockIndex & 0xFF,
+      ];
+      final keyBlock = hmac.convert([...nonce, ...counterBytes]).bytes;
+      final chunkSize = min(keyBlock.length, data.length - processed);
+
+      for (int i = 0; i < chunkSize; i++) {
+        result[processed + i] = data[processed + i] ^ keyBlock[i];
+      }
+
+      processed += chunkSize;
+      blockIndex++;
     }
 
-    final authTag = Hmac(sha256, key).convert([...nonce, ...ciphertext]).toString();
-    return _AuthEncrypted(ciphertext, authTag);
-  }
-
-  List<int>? _decryptAuthenticated(List<int> ciphertext, List<int> key, List<int> nonce, String expectedTag) {
-    final computedTag = Hmac(sha256, key).convert([...nonce, ...ciphertext]).toString();
-    if (computedTag != expectedTag) return null; // Tag mismatch
-
-    final keyWithNonce = Hmac(sha256, key).convert(nonce).bytes;
-    final keystream = Hmac(sha256, keyWithNonce).convert(ciphertext.length > 32 ? ciphertext.sublist(0, 32) : ciphertext).bytes;
-
-    final plaintext = List<int>.filled(ciphertext.length, 0);
-    for (int i = 0; i < ciphertext.length; i++) {
-      plaintext[i] = ciphertext[i] ^ keystream[i % keystream.length];
-    }
-    return plaintext;
+    return result;
   }
 
   List<int> _generateSecureRandomBytes(int length) {
@@ -410,10 +441,4 @@ class EncryptedLocalBackupService {
     }
     return result;
   }
-}
-
-class _AuthEncrypted {
-  final List<int> ciphertext;
-  final String authTag;
-  _AuthEncrypted(this.ciphertext, this.authTag);
 }
