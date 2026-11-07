@@ -44,6 +44,12 @@ import '../../features/market_intelligence/data/market_intelligence_repository.d
 import '../../features/market_intelligence/domain/merchant_market_relevance_model.dart';
 import '../../features/market_intelligence/presentation/relevant_market_signals_screen.dart';
 import '../../features/market_intelligence/presentation/market_signal_detail_screen.dart';
+import '../../features/voice/data/voice_repository.dart';
+import '../../features/voice/services/audio_recording_service.dart';
+import '../../features/voice/services/audio_playback_service.dart';
+import '../../features/voice/presentation/voice_interaction_controller.dart';
+import '../../features/voice/presentation/voice_assistant_sheet.dart';
+import '../../features/actions/data/action_repository.dart';
 
 final authRepositoryProvider = Provider((ref) => AuthRepository());
 final profileRepositoryProvider = Provider((ref) => BusinessProfileRepository());
@@ -54,6 +60,22 @@ final memoryRepositoryProvider = Provider((ref) => MemoryRepository());
 final eventRepositoryProvider = Provider((ref) => EventRepository());
 final intelligenceRepositoryProvider = Provider((ref) => IntelligenceRepository());
 final marketIntelligenceRepositoryProvider = Provider((ref) => MarketIntelligenceRepository());
+final voiceRepositoryProvider = Provider((ref) => VoiceRepository(baseUrl: Env.apiBaseUrl));
+final actionRepositoryProvider = Provider((ref) => ActionRepository(baseUrl: Env.apiBaseUrl));
+final audioRecordingServiceProvider = Provider<AudioRecordingService>((ref) => DeviceAudioRecordingService());
+final audioPlaybackServiceProvider = Provider<AudioPlaybackService>((ref) => DeviceAudioPlaybackService());
+
+final voiceControllerProvider = StateNotifierProvider.autoDispose<VoiceInteractionController, VoiceInteractionState>((ref) {
+  final authRepo = ref.watch(authRepositoryProvider);
+  final token = authRepo.currentSession?.accessToken ?? '';
+  return VoiceInteractionController(
+    voiceRepository: ref.watch(voiceRepositoryProvider),
+    recordingService: ref.watch(audioRecordingServiceProvider),
+    playbackService: ref.watch(audioPlaybackServiceProvider),
+    actionRepository: ref.watch(actionRepositoryProvider),
+    authToken: token,
+  );
+});
 
 class AppRouter extends ConsumerStatefulWidget {
   const AppRouter({super.key});
@@ -563,6 +585,15 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     }
   }
 
+  void _openVoiceAssistant(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => VoiceAssistantSheet(autoDisposeControllerProvider: voiceControllerProvider),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!Env.isConfigured) {
@@ -601,6 +632,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onOpenEvents: () => _openEvents(context),
           onOpenReceivables: () => _openReceivables(context),
           onOpenAssistant: () => _openAssistant(context),
+          onOpenVoiceAssistant: () => _openVoiceAssistant(context),
           onOpenMarketSignals: () => _openMarketSignals(context),
         );
     }

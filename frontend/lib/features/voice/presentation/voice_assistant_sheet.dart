@@ -4,17 +4,23 @@ import 'voice_interaction_controller.dart';
 import 'voice_confirmation_card.dart';
 
 class VoiceAssistantSheet extends ConsumerWidget {
-  final StateNotifierProvider<VoiceInteractionController, VoiceInteractionState> controllerProvider;
+  final StateNotifierProvider<VoiceInteractionController, VoiceInteractionState>? controllerProvider;
+  final AutoDisposeStateNotifierProvider<VoiceInteractionController, VoiceInteractionState>? autoDisposeControllerProvider;
 
   const VoiceAssistantSheet({
     super.key,
-    required this.controllerProvider,
+    this.controllerProvider,
+    this.autoDisposeControllerProvider,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(controllerProvider);
-    final controller = ref.read(controllerProvider.notifier);
+    final state = autoDisposeControllerProvider != null
+        ? ref.watch(autoDisposeControllerProvider!)
+        : ref.watch(controllerProvider!);
+    final controller = autoDisposeControllerProvider != null
+        ? ref.read(autoDisposeControllerProvider!.notifier)
+        : ref.read(controllerProvider!.notifier);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),

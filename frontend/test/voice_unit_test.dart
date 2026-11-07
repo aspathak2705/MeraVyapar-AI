@@ -246,5 +246,39 @@ void main() {
         await testDir.delete(recursive: true);
       }
     });
+
+    test('VoiceInteractionController lifecycle: duration, cancellation and disposal safety', () async {
+      final voiceRepo = VoiceRepository(baseUrl: 'http://localhost:8000');
+      final recordingSvc = SimulatedAudioRecordingService();
+      final playbackSvc = SimulatedAudioPlaybackService();
+      final actionRepo = ActionRepository(baseUrl: 'http://localhost:8000');
+
+      final controller = VoiceInteractionController(
+        voiceRepository: voiceRepo,
+        recordingService: recordingSvc,
+        playbackService: playbackSvc,
+        actionRepository: actionRepo,
+        authToken: 'fake_token',
+      );
+
+      // Start recording initializes timer
+      await controller.startRecording();
+      expect(controller.state.status, VoiceInteractionStatus.recording);
+      expect(controller.state.recordingDurationSeconds, 0);
+
+      // Cancel recording stops recording and resets duration to 0
+      await controller.cancelRecording();
+      expect(controller.state.status, VoiceInteractionStatus.idle);
+      expect(controller.state.recordingDurationSeconds, 0);
+      expect(recordingSvc.isRecording, false);
+
+      // Start again and test dispose
+      await controller.startRecording();
+      expect(recordingSvc.isRecording, true);
+
+      controller.dispose();
+      expect(recordingSvc.isRecording, false);
+      expect(playbackSvc.isPlaying, false);
+    });
   });
 }
