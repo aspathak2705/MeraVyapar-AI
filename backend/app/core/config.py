@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
 
     # Database
-    DATABASE_URL: str = "postgresql://postgres:postgrespassword@localhost:5432/meravyapar_db"
+    DATABASE_URL: Optional[str] = None
 
     # Supabase Auth
     SUPABASE_URL: Optional[str] = None
