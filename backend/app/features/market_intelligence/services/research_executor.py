@@ -38,14 +38,8 @@ def map_engine_to_market_event_type(engine: SerpApiEngine, financial_event_type:
     """
     if engine == SerpApiEngine.SHOPPING:
         return MarketEventType.COMMODITY_PRICE_MOVEMENT
-    elif engine == SerpApiEngine.TRENDS:
-        return MarketEventType.SECTOR_DEVELOPMENT
     elif engine == SerpApiEngine.NEWS:
         return MarketEventType.ECONOMIC_EVENT
-    elif engine == SerpApiEngine.FINANCE:
-        return MarketEventType.ECONOMIC_EVENT
-    elif engine == SerpApiEngine.LOCAL:
-        return MarketEventType.SUPPLY_CHAIN_EVENT
     elif engine == SerpApiEngine.SEARCH:
         if "EXPENSE" in financial_event_type or "COST" in financial_event_type:
             return MarketEventType.COMMODITY_PRICE_MOVEMENT
@@ -109,16 +103,10 @@ class ResearchExecutor:
                 res = self.client.search(query=query, location=geographic_context)
             elif engine == SerpApiEngine.SHOPPING:
                 res = self.client.shopping(query=query, location=geographic_context)
-            elif engine == SerpApiEngine.TRENDS:
-                res = self.client.trends(query=query, geo="IN")
             elif engine == SerpApiEngine.NEWS:
                 res = self.client.news(query=query, gl="in")
-            elif engine == SerpApiEngine.LOCAL:
-                res = self.client.local(query=query, location=geographic_context)
-            elif engine == SerpApiEngine.FINANCE:
-                res = self.client.finance(query=query, gl="in")
             else:
-                return None, "ERROR", f"Unsupported engine: {engine.value}"
+                return None, "ERROR", f"Unsupported engine: {engine.value if hasattr(engine, 'value') else engine}"
 
             return res, "SUCCESS", None
 

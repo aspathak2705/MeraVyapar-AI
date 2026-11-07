@@ -6,11 +6,8 @@ from pydantic import BaseModel, Field
 
 class SerpApiEngine(str, Enum):
     SEARCH = "google"
-    TRENDS = "google_trends"
     SHOPPING = "google_shopping"
     NEWS = "google_news"
-    LOCAL = "google_maps"
-    FINANCE = "google_finance"
 
 
 class ExternalEvidenceSource(BaseModel):

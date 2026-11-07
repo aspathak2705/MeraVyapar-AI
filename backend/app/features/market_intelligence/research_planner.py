@@ -85,47 +85,53 @@ class DeterministicResearchPlanner:
                 f"evaluating external market wholesale prices and commercial shopping baselines."
             )
 
-        # 2. REVENUE_DROP -> Google Trends + Google News
+        # 2. REVENUE_DROP -> Google News + Google Search
         elif event_type == "REVENUE_DROP":
-            selected_engines = [SerpApiEngine.TRENDS, SerpApiEngine.NEWS]
+            selected_engines = [SerpApiEngine.NEWS, SerpApiEngine.SEARCH]
 
-            trend_topic = subject or business_type or "retail demand"
-            news_query_parts = [trend_topic, "market demand economic trends"]
+            topic = subject or business_type or "retail sales demand"
+            news_query_parts = [topic, "market demand economic trends"]
             if loc_parts:
                 news_query_parts.append(geo_str)
             news_query = " ".join(news_query_parts)
 
+            search_query_parts = [topic, "industry slowdown sales trends"]
+            if loc_parts:
+                search_query_parts.append(geo_str)
+            search_query = " ".join(search_query_parts)
+
             queries = {
-                SerpApiEngine.TRENDS.value: trend_topic,
                 SerpApiEngine.NEWS.value: news_query,
+                SerpApiEngine.SEARCH.value: search_query,
             }
             rationale = (
                 f"Revenue contraction detected for '{business_type or 'merchant'}'; "
-                f"inspecting external search demand trends and macroeconomic news developments."
+                f"inspecting external industry news developments and regional market trends."
             )
 
-        # 3. LOCAL_SUPPLIER_RISK -> Google Local / Maps (1 engine)
+        # 3. LOCAL_SUPPLIER_RISK or SUPPLIER_DEPENDENCY -> Google Search (retained engine)
         elif event_type in ("LOCAL_SUPPLIER_RISK", "SUPPLIER_DEPENDENCY"):
-            selected_engines = [SerpApiEngine.LOCAL]
+            selected_engines = [SerpApiEngine.SEARCH]
             target_entity = sanitize_research_term(intent.counterparty_name) or subject or business_type or "wholesale supplier"
-            local_query = f"{target_entity} in {geo_str}"
+            search_query = f"{target_entity} suppliers wholesale in {geo_str}"
             queries = {
-                SerpApiEngine.LOCAL.value: local_query,
+                SerpApiEngine.SEARCH.value: search_query,
             }
             rationale = (
                 f"Local supplier concentration or counterparty exposure detected; "
-                f"surveying local supplier presence and alternative wholesale entities in {geo_str}."
+                f"surveying supplier presence and alternative wholesale entities in {geo_str} via web search."
             )
 
-        # 4. MACRO_INFLATION or COMMODITY_PRICE_MOVEMENT -> Google Finance (1 engine)
+        # 4. MACRO_INFLATION or COMMODITY_PRICE_MOVEMENT -> Google News + Google Search
         elif event_type in ("MACRO_INFLATION", "COMMODITY_PRICE_MOVEMENT"):
-            selected_engines = [SerpApiEngine.FINANCE]
-            finance_query = subject or "INR inflation index"
+            selected_engines = [SerpApiEngine.NEWS, SerpApiEngine.SEARCH]
+            target = subject or "commodity inflation"
             queries = {
-                SerpApiEngine.FINANCE.value: finance_query,
+                SerpApiEngine.NEWS.value: f"{target} price inflation index India",
+                SerpApiEngine.SEARCH.value: f"{target} commercial wholesale price trend India",
             }
             rationale = (
-                f"Broad economic pressure detected; checking contextual financial indicator indices."
+                f"Broad economic or commodity price pressure detected; checking news reports and commercial market trends."
             )
 
         else:

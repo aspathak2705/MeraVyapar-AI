@@ -21,17 +21,19 @@ class SerpApiNormalizer:
 
     @staticmethod
     def normalize(engine: SerpApiEngine, raw_response: Dict[str, Any], query: str) -> List[ExternalEvidenceItem]:
-        if engine == SerpApiEngine.SEARCH:
+        # Handle string engine values for backwards compatibility with historical records
+        eng_val = engine.value if isinstance(engine, SerpApiEngine) else str(engine)
+        if eng_val == "google" or engine == SerpApiEngine.SEARCH:
             return SerpApiNormalizer._normalize_search(raw_response)
-        elif engine == SerpApiEngine.TRENDS:
-            return SerpApiNormalizer._normalize_trends(raw_response)
-        elif engine == SerpApiEngine.SHOPPING:
+        elif eng_val == "google_shopping" or engine == SerpApiEngine.SHOPPING:
             return SerpApiNormalizer._normalize_shopping(raw_response)
-        elif engine == SerpApiEngine.NEWS:
+        elif eng_val == "google_news" or engine == SerpApiEngine.NEWS:
             return SerpApiNormalizer._normalize_news(raw_response)
-        elif engine == SerpApiEngine.LOCAL:
+        elif eng_val == "google_trends":
+            return SerpApiNormalizer._normalize_trends(raw_response)
+        elif eng_val == "google_maps":
             return SerpApiNormalizer._normalize_local(raw_response)
-        elif engine == SerpApiEngine.FINANCE:
+        elif eng_val == "google_finance":
             return SerpApiNormalizer._normalize_finance(raw_response)
         return []
 

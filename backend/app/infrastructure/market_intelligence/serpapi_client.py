@@ -27,13 +27,10 @@ logger = logging.getLogger(__name__)
 class SerpApiClient:
     """
     Production client for SerpApi external market intelligence foundation.
-    Provides locked access to exactly 6 Google engines:
+    Provides locked access to exactly 3 Google engines:
     - Google Search
-    - Google Trends
     - Google Shopping
     - Google News
-    - Google Local / Maps
-    - Google Finance
 
     Features:
     - Strict server-side isolation (API key never leaked or returned in response)
@@ -169,25 +166,7 @@ class SerpApiClient:
 
         return self._execute_query(SerpApiEngine.SEARCH, params, bypass_cache=bypass_cache)
 
-    # 2. Google Trends API
-    def trends(
-        self,
-        query: str,
-        geo: Optional[str] = "IN",
-        data_type: Optional[str] = "TIMESERIES",
-        date: Optional[str] = "today 12-m",
-        bypass_cache: bool = False,
-    ) -> SerpApiResult:
-        q = self._validate_common_query(query)
-        params = {
-            "q": q,
-            "geo": geo or "IN",
-            "data_type": data_type or "TIMESERIES",
-            "date": date or "today 12-m",
-        }
-        return self._execute_query(SerpApiEngine.TRENDS, params, bypass_cache=bypass_cache)
-
-    # 3. Google Shopping API
+    # 2. Google Shopping API
     def shopping(
         self,
         query: str,
@@ -223,41 +202,3 @@ class SerpApiClient:
             "hl": hl or "en",
         }
         return self._execute_query(SerpApiEngine.NEWS, params, bypass_cache=bypass_cache)
-
-    # 5. Google Local / Maps API
-    def local(
-        self,
-        query: str,
-        location: Optional[str] = "India",
-        hl: Optional[str] = "en",
-        gl: Optional[str] = "in",
-        ll: Optional[str] = None,
-        bypass_cache: bool = False,
-    ) -> SerpApiResult:
-        q = self._validate_common_query(query)
-        params = {
-            "q": q,
-            "hl": hl or "en",
-            "gl": gl or "in",
-        }
-        if location:
-            params["location"] = location
-        if ll:
-            params["ll"] = ll
-        return self._execute_query(SerpApiEngine.LOCAL, params, bypass_cache=bypass_cache)
-
-    # 6. Google Finance API
-    def finance(
-        self,
-        query: str,
-        hl: Optional[str] = "en",
-        gl: Optional[str] = "in",
-        bypass_cache: bool = False,
-    ) -> SerpApiResult:
-        q = self._validate_common_query(query)
-        params = {
-            "q": q,
-            "hl": hl or "en",
-            "gl": gl or "in",
-        }
-        return self._execute_query(SerpApiEngine.FINANCE, params, bypass_cache=bypass_cache)
