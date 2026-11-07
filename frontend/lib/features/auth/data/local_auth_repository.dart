@@ -23,6 +23,8 @@ class LocalMerchantSession {
 
 /// Secure local authentication repository backed by platform keystore (FlutterSecureStorage).
 /// Completely eliminates Supabase Auth dependency.
+/// 
+/// Uses standard PBKDF2-HMAC-SHA256 (10,000 iterations) key derivation function.
 class LocalAuthRepository {
   static const String _keyMerchantId = 'mv_local_merchant_id';
   static const String _keyMerchantName = 'mv_local_merchant_name';
@@ -33,6 +35,7 @@ class LocalAuthRepository {
 
   static const int maxFailedAttempts = 5;
   static const Duration lockoutDuration = Duration(minutes: 5);
+  static const int pbkdf2Iterations = 10000;
 
   final FlutterSecureStorage _secureStorage;
   LocalMerchantSession? _currentSession;
@@ -44,6 +47,7 @@ class LocalAuthRepository {
 
   LocalMerchantSession? get currentSession => _currentSession;
   bool get isAuthenticated => _currentSession != null;
+  String? get activeMerchantId => _currentSession?.merchantId;
 
   /// Check whether a local merchant account is already configured.
   Future<bool> hasLocalMerchant() async {
@@ -63,7 +67,7 @@ class LocalAuthRepository {
 
     final merchantId = const Uuid().v4();
     final salt = const Uuid().v4();
-    final pinHash = _hashPin(pin, salt);
+    final pinHash = _pbkdf2HmacSha256(pin, salt, pbkdf2Iterations);
 
     await _secureStorage.write(key: _keyMerchantId, value: merchantId);
     await _secureStorage.write(key: _keyMerchantName, value: displayName);
@@ -100,7 +104,7 @@ class LocalAuthRepository {
       throw StateError('No local merchant account found.');
     }
 
-    final computedHash = _hashPin(pin, salt);
+    final computedHash = _pbkdf2HmacSha256(pin, salt, pbkdf2Iterations);
     if (computedHash == storedHash) {
       // Reset failed attempts on success
       await _secureStorage.write(key: _keyFailedAttempts, value: '0');
@@ -131,12 +135,25 @@ class LocalAuthRepository {
     _currentSession = null;
   }
 
-  /// PBKDF2 / SHA-256 multi-round cryptographic hash with salt.
-  String _hashPin(String pin, String salt) {
-    var bytes = utf8.encode('$salt:$pin:$salt');
-    for (int i = 0; i < 5000; i++) {
-      bytes = sha256.convert(bytes).bytes;
+  /// Standard PBKDF2-HMAC-SHA256 implementation
+  String _pbkdf2HmacSha256(String password, String salt, int iterations) {
+    final passwordBytes = utf8.encode(password);
+    final saltBytes = utf8.encode(salt);
+    final hmac = Hmac(sha256, passwordBytes);
+
+    // Initial round: U1 = HMAC(password, salt || INT(1))
+    final int1 = [0, 0, 0, 1];
+    var u = hmac.convert([...saltBytes, ...int1]).bytes;
+    var result = List<int>.from(u);
+
+    // Iterative rounds: U_i = HMAC(password, U_{i-1})
+    for (int i = 1; i < iterations; i++) {
+      u = hmac.convert(u).bytes;
+      for (int k = 0; k < result.length; k++) {
+        result[k] ^= u[k];
+      }
     }
-    return sha256.convert(bytes).toString();
+
+    return base64Encode(result);
   }
 }

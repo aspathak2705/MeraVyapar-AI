@@ -3,7 +3,7 @@
 /// Preserves financial precision using integer minor units (paise: 1 INR = 100 paise)
 /// and ISO-8601 UTC timestamp strings.
 class LocalDatabaseSchema {
-  static const int version = 1;
+  static const int version = 2;
   static const String databaseFileName = 'meravyapar_local.db';
 
   // Table Names
@@ -15,9 +15,10 @@ class LocalDatabaseSchema {
   static const String tableEvidenceMetadata = 'evidence_metadata';
   static const String tableCommunicationDrafts = 'communication_drafts';
   static const String tableAuditLog = 'local_audit_log';
+  static const String tableMigrationMetadata = 'migration_metadata';
 
-  // SQL DDL statements for version 1
-  static const List<String> createStatementsV1 = [
+  // SQL DDL statements for version 2
+  static const List<String> createStatementsV2 = [
     '''
     CREATE TABLE IF NOT EXISTS $tableMerchantProfile (
       id TEXT PRIMARY KEY,
@@ -39,7 +40,7 @@ class LocalDatabaseSchema {
       category TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
-      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE CASCADE
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
     );
     ''',
     '''
@@ -62,14 +63,20 @@ class LocalDatabaseSchema {
       reconciliation_status TEXT NOT NULL DEFAULT 'UNRESOLVED',
       source_type TEXT,
       source_provider TEXT,
+      is_simulated INTEGER NOT NULL DEFAULT 0,
+      idempotency_key TEXT UNIQUE,
       created_at TEXT NOT NULL,
-      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE CASCADE,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT,
       FOREIGN KEY (counterparty_id) REFERENCES $tableFinancialCounterparties(id) ON DELETE SET NULL
     );
     ''',
     '''
     CREATE INDEX IF NOT EXISTS idx_transactions_merchant_occurred 
     ON $tableCanonicalTransactions(merchant_id, occurred_at);
+    ''',
+    '''
+    CREATE INDEX IF NOT EXISTS idx_transactions_idempotency
+    ON $tableCanonicalTransactions(idempotency_key);
     ''',
     '''
     CREATE TABLE IF NOT EXISTS $tablePaymentPromises (
@@ -86,7 +93,7 @@ class LocalDatabaseSchema {
       created_at TEXT NOT NULL,
       fulfilled_at TEXT,
       notes TEXT,
-      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE CASCADE,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT,
       FOREIGN KEY (counterparty_id) REFERENCES $tableFinancialCounterparties(id) ON DELETE SET NULL
     );
     ''',
@@ -106,7 +113,7 @@ class LocalDatabaseSchema {
       severity TEXT NOT NULL DEFAULT 'NORMAL',
       status TEXT NOT NULL DEFAULT 'ACTIVE',
       created_at TEXT NOT NULL,
-      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE CASCADE
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
     );
     ''',
     '''
@@ -120,7 +127,7 @@ class LocalDatabaseSchema {
       storage_relative_path TEXT NOT NULL,
       captured_at TEXT NOT NULL,
       source_type TEXT NOT NULL,
-      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE CASCADE
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
     );
     ''',
     '''
@@ -139,7 +146,7 @@ class LocalDatabaseSchema {
       status TEXT NOT NULL DEFAULT 'DRAFT',
       created_at TEXT NOT NULL,
       dispatched_at TEXT,
-      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE CASCADE,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT,
       FOREIGN KEY (promise_id) REFERENCES $tablePaymentPromises(id) ON DELETE SET NULL
     );
     ''',
@@ -152,7 +159,16 @@ class LocalDatabaseSchema {
       entity_id TEXT NOT NULL,
       details_json TEXT,
       occurred_at TEXT NOT NULL,
-      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE CASCADE
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS $tableMigrationMetadata (
+      migration_key TEXT PRIMARY KEY,
+      source_system TEXT NOT NULL,
+      migrated_records_count INTEGER NOT NULL,
+      migrated_at TEXT NOT NULL,
+      checksum TEXT NOT NULL
     );
     '''
   ];

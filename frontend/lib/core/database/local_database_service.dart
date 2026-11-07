@@ -18,6 +18,7 @@ class LocalDatabaseService {
   static LocalDatabaseService? _instance;
   bool _isInitialized = false;
   String? _databaseFilePath;
+  LocalDatabaseDriver? _activeDriver;
 
   LocalDatabaseService._();
 
@@ -28,6 +29,7 @@ class LocalDatabaseService {
 
   bool get isInitialized => _isInitialized;
   String? get databasePath => _databaseFilePath;
+  LocalDatabaseDriver? get driver => _activeDriver;
 
   /// Resolves the app-private database file path inside ApplicationDocumentsDirectory.
   static Future<String> getDatabasePath() async {
@@ -44,11 +46,12 @@ class LocalDatabaseService {
     if (_isInitialized) return;
 
     _databaseFilePath = await getDatabasePath();
+    _activeDriver = customDriver;
 
-    if (customDriver != null) {
-      await customDriver.open(_databaseFilePath!);
-      for (final sql in LocalDatabaseSchema.createStatementsV1) {
-        await customDriver.execute(sql);
+    if (_activeDriver != null) {
+      await _activeDriver!.open(_databaseFilePath!);
+      for (final sql in LocalDatabaseSchema.createStatementsV2) {
+        await _activeDriver!.execute(sql);
       }
     }
 
@@ -59,5 +62,6 @@ class LocalDatabaseService {
   void reset() {
     _isInitialized = false;
     _databaseFilePath = null;
+    _activeDriver = null;
   }
 }
