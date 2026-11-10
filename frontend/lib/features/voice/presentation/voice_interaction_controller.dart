@@ -4,7 +4,7 @@ import '../domain/voice_models.dart';
 import '../data/voice_repository.dart';
 import '../services/audio_recording_service.dart';
 import '../services/audio_playback_service.dart';
-import '../../actions/data/action_repository.dart';
+import '../../actions/data/local_action_repository.dart';
 import '../../actions/domain/communication_action_model.dart';
 
 enum VoiceInteractionStatus {
@@ -78,7 +78,7 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
   final VoiceRepository voiceRepository;
   final AudioRecordingService recordingService;
   final AudioPlaybackService playbackService;
-  final ActionRepository actionRepository;
+  final LocalActionRepository actionRepository;
   final String authToken;
   Timer? _timer;
 
@@ -236,17 +236,17 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
     try {
       state = state.copyWith(status: VoiceInteractionStatus.processing);
 
-      // Phase 1: Draft the reminder via existing ActionRepository
+      // Phase 1: Draft the reminder via existing LocalActionRepository
       final draft = await actionRepository.draftPaymentReminder(
         promiseId: candidate.promiseId,
         channel: candidate.channel,
-        authToken: authToken,
+        merchantId: authToken,
       );
 
       // Phase 2: Confirm the action explicitly
       final confirmed = await actionRepository.confirmAction(
         actionId: draft.id,
-        authToken: authToken,
+        merchantId: authToken,
       );
 
       if (!mounted) return;

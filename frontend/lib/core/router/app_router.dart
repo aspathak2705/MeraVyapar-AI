@@ -66,7 +66,7 @@ final voiceControllerProvider = StateNotifierProvider.autoDispose<VoiceInteracti
     voiceRepository: ref.watch(voiceRepositoryProvider),
     recordingService: ref.watch(audioRecordingServiceProvider),
     playbackService: ref.watch(audioPlaybackServiceProvider),
-    actionRepository: ref.watch(actionRepositoryProvider),
+    actionRepository: ref.watch(localActionRepositoryProvider),
     authToken: token,
   );
 });
