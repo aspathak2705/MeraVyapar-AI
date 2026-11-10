@@ -106,10 +106,8 @@ class LocalDevObjectStorage(ObjectStorage):
         return False
 
 
-from app.infrastructure.storage.supabase_storage import SupabaseObjectStorage
-
-
 def get_object_storage() -> ObjectStorage:
     if settings.SUPABASE_URL:
+        from app.infrastructure.storage.supabase_storage import SupabaseObjectStorage
         return SupabaseObjectStorage()
     return LocalDevObjectStorage()

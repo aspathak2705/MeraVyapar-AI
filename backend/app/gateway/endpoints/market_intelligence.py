@@ -1,8 +1,11 @@
 from uuid import UUID
 import logging
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from app.dependencies.auth import verify_internal_ingest_key
-from app.gateway.installation_auth import verify_installation_request, AuthenticatedInstallation
+from app.gateway.installation_auth import (
+    verify_internal_ingest_key,
+    verify_installation_request,
+    AuthenticatedInstallation,
+)
 from app.gateway.rate_limiter import rate_limiter
 from app.schemas.market_intelligence import (
     MarketIngestRequest,

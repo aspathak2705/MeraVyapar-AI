@@ -103,7 +103,31 @@ def verify_installation_request(
     if settings.ENVIRONMENT == "development" and len(token) >= 16:
         return AuthenticatedInstallation(installation_id=token, is_enrolled=False)
 
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Unauthorized installation. Caller must present a cryptographically signed gateway token."
-    )
+def verify_internal_ingest_key(
+    x_ingest_key: Optional[str] = Header(None, alias="X-Internal-Ingest-Key"),
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+) -> bool:
+    """
+    Stateless check verifying that the caller provides the internal ingestion key.
+    Zero database or SQLAlchemy imports.
+    """
+    key_to_check = x_ingest_key
+    if not key_to_check and authorization and authorization.startswith("Bearer "):
+        key_to_check = authorization.split(" ", 1)[1]
+
+    expected_key = settings.INTERNAL_INGEST_API_KEY
+    if not expected_key:
+        if settings.ALLOW_INSECURE_INTERNAL_INGEST:
+            return True
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Internal market ingestion is disabled: INTERNAL_INGEST_API_KEY not configured"
+        )
+
+    if not key_to_check or not hmac.compare_digest(key_to_check, expected_key):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing internal ingestion authorization key"
+        )
+
+    return True
