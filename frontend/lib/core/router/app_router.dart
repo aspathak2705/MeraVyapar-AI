@@ -39,6 +39,8 @@ import '../../features/market_intelligence/presentation/relevant_market_signals_
 import '../../features/market_intelligence/presentation/market_signal_detail_screen.dart';
 import '../../features/actions/data/local_action_repository.dart';
 import '../../features/actions/presentation/action_center_screen.dart';
+import '../../features/voice/services/wake_word_detector_service.dart';
+import '../../features/voice/presentation/wake_word_controller.dart';
 import '../../features/actions/presentation/action_detail_screen.dart';
 import '../../features/actions/presentation/reminder_draft_screen.dart';
 import '../../features/intelligence/presentation/unified_financial_intelligence_screen.dart';
@@ -70,6 +72,16 @@ final voiceControllerProvider = StateNotifierProvider.autoDispose<VoiceInteracti
     playbackService: ref.watch(audioPlaybackServiceProvider),
     actionRepository: ref.watch(localActionRepositoryProvider),
     authToken: token,
+  );
+});
+
+final wakeWordEngineProvider = Provider<WakeWordDetectorEngine>((ref) => LocalAcousticWakeWordEngine());
+
+final wakeWordControllerProvider = StateNotifierProvider<WakeWordController, WakeWordStateData>((ref) {
+  return WakeWordController(
+    detectorEngine: ref.watch(wakeWordEngineProvider),
+    recordingService: ref.watch(audioRecordingServiceProvider),
+    voiceController: ref.watch(voiceControllerProvider.notifier),
   );
 });
 
@@ -473,6 +485,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
               backgroundColor: Colors.transparent,
               builder: (ctx) => VoiceAssistantSheet(
                 controllerProvider: voiceControllerProvider,
+                wakeWordProvider: wakeWordControllerProvider,
                 onNavigateToRoute: _navigateTo,
               ),
             );

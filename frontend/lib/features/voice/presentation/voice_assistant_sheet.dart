@@ -4,16 +4,19 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import 'voice_interaction_controller.dart';
 import 'voice_confirmation_card.dart';
+import 'wake_word_controller.dart';
 
 class VoiceAssistantSheet extends ConsumerWidget {
   final StateNotifierProvider<VoiceInteractionController, VoiceInteractionState>? controllerProvider;
   final AutoDisposeStateNotifierProvider<VoiceInteractionController, VoiceInteractionState>? autoDisposeControllerProvider;
+  final StateNotifierProvider<WakeWordController, WakeWordStateData>? wakeWordProvider;
   final void Function(String route)? onNavigateToRoute;
 
   const VoiceAssistantSheet({
     super.key,
     this.controllerProvider,
     this.autoDisposeControllerProvider,
+    this.wakeWordProvider,
     this.onNavigateToRoute,
   });
 
@@ -70,7 +73,12 @@ class VoiceAssistantSheet extends ConsumerWidget {
                 _buildLanguageSelector(state.selectedLanguage, controller),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+
+            // Namaste Vyapar Foreground Wake-Word Opt-In Bar
+            if (wakeWordProvider != null) _buildWakeWordToggle(context, ref, isDark),
+
+            const SizedBox(height: 16),
 
             // Main Status Visualizer
             _buildStatusArea(context, state, controller),
@@ -371,5 +379,65 @@ class VoiceAssistantSheet extends ConsumerWidget {
     }
 
     return const SizedBox.shrink();
+  }
+
+  Widget _buildWakeWordToggle(BuildContext context, WidgetRef ref, bool isDark) {
+    final wakeData = ref.watch(wakeWordProvider!);
+    final wakeController = ref.read(wakeWordProvider!.notifier);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.subtleLavender,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.lightBorder),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                AppIcons.assistant,
+                size: 16,
+                color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+              ),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Say "Namaste Vyapar"',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    wakeData.isEnabled
+                        ? (wakeData.state == WakeWordState.listeningForWakeWord
+                            ? 'Listening (Foreground)'
+                            : 'Active')
+                        : 'Tap switch to enable wake-word',
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Switch(
+            value: wakeData.isEnabled,
+            activeColor: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+            onChanged: (val) {
+              if (val) {
+                wakeController.enableWakeWord();
+              } else {
+                wakeController.disableWakeWord();
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
