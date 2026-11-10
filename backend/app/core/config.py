@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     FINANCIAL_INTELLIGENCE_MODEL: str = "nvidia/nemotron-3-super-120b-a12b:free"
     NEMOTRON_REASONING_ENABLED: bool = True
 
+    # Market Intelligence Internal Ingestion Security
+    INTERNAL_INGEST_API_KEY: Optional[str] = None
+    ALLOW_INSECURE_INTERNAL_INGEST: bool = False
+
     # External Provider Configuration & Modes
     EXTERNAL_PROVIDER_MODE: str = "simulation"  # Options: simulation, production, disabled
     ENABLE_DEMO_ENDPOINTS: bool = True

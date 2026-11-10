@@ -1,11 +1,38 @@
+import hmac
+from typing import Optional
 from uuid import UUID
 from fastapi import Depends, Header
 from sqlalchemy.orm import Session
 from app.db.session import get_db
+from app.core.config import settings
 from app.core.security import verify_supabase_jwt
 from app.core.exceptions import AuthenticationError, NotFoundError
 from app.repositories.merchant_repository import MerchantRepository
 from app.models.merchant import Merchant
+
+
+def verify_internal_ingest_key(
+    x_ingest_key: Optional[str] = Header(None, alias="X-Internal-Ingest-Key"),
+    authorization: Optional[str] = Header(None, alias="Authorization"),
+) -> bool:
+    """
+    Verifies that the caller provides the required internal ingestion key.
+    Rejects unauthorized access to administrative market event ingestion.
+    """
+    key_to_check = x_ingest_key
+    if not key_to_check and authorization and authorization.startswith("Bearer "):
+        key_to_check = authorization.split(" ", 1)[1]
+
+    expected_key = settings.INTERNAL_INGEST_API_KEY
+    if not expected_key:
+        if settings.ALLOW_INSECURE_INTERNAL_INGEST:
+            return True
+        raise AuthenticationError("Internal market ingestion is disabled: INTERNAL_INGEST_API_KEY not configured")
+
+    if not key_to_check or not hmac.compare_digest(key_to_check, expected_key):
+        raise AuthenticationError("Invalid or missing internal ingestion authorization key")
+
+    return True
 
 
 def get_current_user_id(authorization: str = Header(..., alias="Authorization")) -> UUID:

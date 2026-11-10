@@ -3,7 +3,7 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.dependencies.auth import get_current_merchant
+from app.dependencies.auth import get_current_merchant, verify_internal_ingest_key
 from app.repositories.market_intelligence_repository import MarketIntelligenceRepository
 from app.features.market_intelligence.services.normalization_service import MarketEventNormalizationService
 from app.features.market_intelligence.services.context_builder import MerchantMarketContextBuilder
@@ -26,7 +26,8 @@ router = APIRouter()
 @router.post("/market-intelligence/ingest", response_model=APIResponse)
 def ingest_market_event(
     payload: MarketIngestRequest,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _authorized: bool = Depends(verify_internal_ingest_key)
 ):
     service = MarketEventNormalizationService(db)
     event, created = service.ingest_market_event(payload)
