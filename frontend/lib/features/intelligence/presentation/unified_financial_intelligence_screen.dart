@@ -40,7 +40,9 @@ final cashFlowForecastProvider = FutureProvider.autoDispose<CashFlowForecastResu
 
 /// Comprehensive Financial Intelligence Dashboard Screen
 class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
-  const UnifiedFinancialIntelligenceScreen({super.key});
+  final VoidCallback? onBack;
+
+  const UnifiedFinancialIntelligenceScreen({super.key, this.onBack});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,6 +53,13 @@ class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Financial & Business Intelligence'),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: onBack,
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

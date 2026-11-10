@@ -38,6 +38,7 @@ import '../../features/market_intelligence/presentation/market_signal_detail_scr
 import '../../features/actions/presentation/action_center_screen.dart';
 import '../../features/actions/presentation/action_detail_screen.dart';
 import '../../features/actions/presentation/reminder_draft_screen.dart';
+import '../../features/intelligence/presentation/unified_financial_intelligence_screen.dart';
 import '../../core/database/local_database_service.dart';
 
 // --- Local Repository Providers ---
@@ -276,6 +277,9 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
   Widget _buildCurrentScreen(String merchantId) {
     switch (_currentRoute) {
+      case '/intelligence':
+        return UnifiedFinancialIntelligenceScreen(onBack: _popRoute);
+
       case '/transactions':
         final txRepo = ref.read(localCanonicalTransactionRepositoryProvider);
         return FutureBuilder(

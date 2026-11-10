@@ -16,10 +16,12 @@ class HomeShellScreen extends StatelessWidget {
   final VoidCallback? onOpenVoiceAssistant;
   final VoidCallback? onOpenMarketSignals;
   final VoidCallback? onOpenActionCenter;
+  final VoidCallback? onOpenFinancialIntelligence;
+  final void Function(String route)? onNavigateToRoute;
 
   const HomeShellScreen({
     super.key,
-    required this.onSignOut,
+    this.onSignOut,
     this.onAddPaymentReceived,
     this.onAddExpense,
     this.onUploadProof,
@@ -34,6 +36,8 @@ class HomeShellScreen extends StatelessWidget {
     this.onOpenVoiceAssistant,
     this.onOpenMarketSignals,
     this.onOpenActionCenter,
+    this.onOpenFinancialIntelligence,
+    this.onNavigateToRoute,
   });
 
 
@@ -43,6 +47,11 @@ class HomeShellScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('MeraVyapar AI'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.analytics_outlined),
+            tooltip: 'Financial Intelligence',
+            onPressed: onOpenFinancialIntelligence ?? () => onNavigateToRoute?.call('/intelligence'),
+          ),
           IconButton(
             icon: const Icon(Icons.mic),
             tooltip: 'Voice Assistant',
@@ -131,6 +140,16 @@ class HomeShellScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.analytics_outlined),
+                label: const Text('Financial & Cash Flow Intelligence'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF047857),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                onPressed: onOpenFinancialIntelligence ?? () => onNavigateToRoute?.call('/intelligence'),
+              ),
+              const SizedBox(height: 10),
               ElevatedButton.icon(
                 icon: const Icon(Icons.mic),
                 label: const Text('Voice Assistant (हिंदी / मराठी / Eng)'),
