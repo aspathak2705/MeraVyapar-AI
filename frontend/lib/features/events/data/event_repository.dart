@@ -1,12 +1,17 @@
 import '../../../core/api/api_client.dart';
+import '../../intelligence/domain/local_financial_intelligence_engine.dart';
 import '../domain/financial_event_model.dart';
 import '../domain/receivable_model.dart';
 
 class EventRepository {
   final ApiClient _apiClient;
+  final LocalFinancialIntelligenceEngine _localEngine;
 
-  EventRepository({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient();
+  EventRepository({
+    ApiClient? apiClient,
+    LocalFinancialIntelligenceEngine? localEngine,
+  })  : _apiClient = apiClient ?? ApiClient(),
+        _localEngine = localEngine ?? LocalFinancialIntelligenceEngine();
 
   Future<void> evaluateEvents() async {
     await _apiClient.post('/events/evaluate');
@@ -29,9 +34,20 @@ class EventRepository {
     return FinancialEventModel.fromJson(res['data']);
   }
 
-  Future<List<ReceivableModel>> getPrioritizedReceivables() async {
-    final res = await _apiClient.get('/receivables/prioritized');
-    final List list = res['data'] ?? [];
-    return list.map((item) => ReceivableModel.fromJson(item)).toList();
+  /// Fetch prioritized receivables from local SQLite engine for the active merchant.
+  /// Fully operational offline.
+  Future<List<ReceivableModel>> getPrioritizedReceivables({String? merchantId}) async {
+    if (merchantId != null && merchantId.isNotEmpty) {
+      final localMaps = await _localEngine.getPrioritizedReceivables(merchantId: merchantId);
+      return localMaps.map((m) => ReceivableModel.fromJson(m)).toList();
+    }
+
+    try {
+      final res = await _apiClient.get('/receivables/prioritized');
+      final List list = res['data'] ?? [];
+      return list.map((item) => ReceivableModel.fromJson(item)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 }

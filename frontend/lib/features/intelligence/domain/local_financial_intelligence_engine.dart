@@ -214,4 +214,106 @@ class LocalFinancialIntelligenceEngine {
       );
     }).toList();
   }
+
+  /// Retrieve and deterministically prioritize receivables strictly from local SQLite payment promises.
+  /// Categorizes into HIGH, MEDIUM, LOW priority based on overdue age, amount outstanding, and promise status.
+  Future<List<Map<String, dynamic>>> getPrioritizedReceivables({
+    required String merchantId,
+  }) async {
+    final driver = _dbService.driver;
+    if (driver == null) return [];
+
+    final now = DateTime.now().toUtc();
+    final nowIso = now.toIso8601String();
+
+    final rows = await driver.query(
+      '''
+      SELECT p.*, c.phone_number as counterparty_phone
+      FROM ${LocalDatabaseSchema.tablePaymentPromises} p
+      LEFT JOIN ${LocalDatabaseSchema.tableFinancialCounterparties} c
+        ON p.counterparty_id = c.id
+      WHERE p.merchant_id = ?
+        AND UPPER(p.direction) = 'EXPECTED_INCOMING'
+        AND UPPER(p.status) NOT IN ('FULFILLED', 'CANCELLED', 'SETTLED')
+      ORDER BY p.due_date ASC
+      ''',
+      [merchantId],
+    );
+
+    final List<Map<String, dynamic>> results = [];
+
+    for (final r in rows) {
+      final promiseId = r['id'] as String;
+      final cpName = r['counterparty_name'] as String? ?? 'Counterparty';
+      final cpId = r['counterparty_id'] as String?;
+      final amountPaise = r['amount_minor_units'] as int? ?? 0;
+      final currency = r['currency'] as String? ?? 'INR';
+      final dueDateStr = r['due_date'] as String? ?? nowIso;
+      final status = (r['status'] as String? ?? 'OPEN').toUpperCase();
+
+      final dueDate = DateTime.tryParse(dueDateStr) ?? now;
+      final diff = now.difference(dueDate);
+      final daysOverdue = diff.inDays;
+
+      String state = 'PENDING';
+      String priority = 'LOW';
+      final List<String> reasonCodes = [];
+
+      if (dueDate.isBefore(now)) {
+        state = 'OVERDUE';
+        if (daysOverdue > 14) {
+          priority = 'HIGH';
+          reasonCodes.add('Severely overdue (> 14 days overdue: ${daysOverdue}d)');
+        } else if (daysOverdue > 3) {
+          priority = 'HIGH';
+          reasonCodes.add('Overdue by ${daysOverdue} days');
+        } else {
+          priority = 'MEDIUM';
+          reasonCodes.add('Recently overdue by ${daysOverdue} days');
+        }
+      } else {
+        final daysUntilDue = dueDate.difference(now).inDays;
+        if (daysUntilDue <= 3) {
+          state = 'DUE_SOON';
+          priority = 'MEDIUM';
+          reasonCodes.add('Due within 3 days ($daysUntilDue days remaining)');
+        } else {
+          state = 'PENDING';
+          priority = 'LOW';
+          reasonCodes.add('Scheduled upcoming receivable');
+        }
+      }
+
+      // Large outstanding amount escalation (> ₹10,000 = 1,000,000 paise)
+      if (amountPaise >= 1000000) {
+        if (priority == 'MEDIUM') {
+          priority = 'HIGH';
+        }
+        reasonCodes.add('High value receivable (≥ ₹10,000)');
+      }
+
+      results.add({
+        'receivable_id': promiseId,
+        'counterparty_id': cpId,
+        'counterparty_name': cpName,
+        'amount': (amountPaise / 100.0).toStringAsFixed(2),
+        'currency': currency,
+        'due_at': dueDate.toIso8601String(),
+        'state': state,
+        'priority': priority,
+        'reason_codes': reasonCodes,
+        'source_payment_promise_id': promiseId,
+      });
+    }
+
+    // Sort: HIGH first, then MEDIUM, then LOW
+    final order = {'HIGH': 0, 'MEDIUM': 1, 'LOW': 2};
+    results.sort((a, b) {
+      final cmp = (order[a['priority']] ?? 2).compareTo(order[b['priority']] ?? 2);
+      if (cmp != 0) return cmp;
+      return (a['due_at'] as String).compareTo(b['due_at'] as String);
+    });
+
+    return results;
+  }
 }

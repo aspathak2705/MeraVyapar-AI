@@ -280,7 +280,37 @@ class _AppRouterState extends ConsumerState<AppRouter> {
   Widget _buildCurrentScreen(String merchantId) {
     switch (_currentRoute) {
       case '/intelligence':
-        return UnifiedFinancialIntelligenceScreen(onBack: _popRoute);
+        return UnifiedFinancialIntelligenceScreen(
+          onBack: _popRoute,
+          onNavigate: _navigateTo,
+        );
+
+      case '/receivables':
+        final eventRepo = ref.read(eventRepositoryProvider);
+        return FutureBuilder(
+          future: eventRepo.getPrioritizedReceivables(merchantId: merchantId),
+          builder: (context, snapshot) {
+            final items = snapshot.data ?? [];
+            return ReceivablesScreen(
+              receivables: items,
+              onBack: _popRoute,
+              onReceivableTap: (item) => _navigateTo('/receivables/detail', {'receivable': item}),
+            );
+          },
+        );
+
+      case '/receivables/detail':
+        final item = _routeArgs['receivable'];
+        return ReceivableDetailScreen(
+          receivable: item,
+          onBack: _popRoute,
+          onReviewFollowUp: () {
+            _navigateTo('/actions/draft', {'promise_id': item.sourcePaymentPromiseId});
+          },
+          onCreateReminderDraft: () {
+            _navigateTo('/actions/draft', {'promise_id': item.sourcePaymentPromiseId});
+          },
+        );
 
       case '/transactions':
         final txRepo = ref.read(localCanonicalTransactionRepositoryProvider);
@@ -362,6 +392,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           actionRepository: localActionRepo,
           promiseId: _routeArgs['promise_id'] ?? '',
           authToken: merchantId,
+          onBack: _popRoute,
         );
 
       case '/actions/detail':

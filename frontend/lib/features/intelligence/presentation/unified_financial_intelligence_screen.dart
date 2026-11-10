@@ -41,8 +41,9 @@ final cashFlowForecastProvider = FutureProvider.autoDispose<CashFlowForecastResu
 /// Comprehensive Financial Intelligence Dashboard Screen
 class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
   final VoidCallback? onBack;
+  final void Function(String route, [Map<String, dynamic>? args])? onNavigate;
 
-  const UnifiedFinancialIntelligenceScreen({super.key, this.onBack});
+  const UnifiedFinancialIntelligenceScreen({super.key, this.onBack, this.onNavigate});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -95,7 +96,7 @@ class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
                       child: Text('Position Calculation Error: $err', style: const TextStyle(color: Colors.red)),
                     ),
                   ),
-                  data: (metrics) => _buildPositionCard(metrics),
+                  data: (metrics) => _buildPositionCard(context, metrics),
                 ),
                 const SizedBox(height: 20),
 
@@ -131,7 +132,7 @@ class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPositionCard(FinancialPositionMetrics metrics) {
+  Widget _buildPositionCard(BuildContext context, FinancialPositionMetrics metrics) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -202,6 +203,23 @@ class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
                 ),
               ],
             ),
+            if (metrics.totalReceivablesPaise > 0 || metrics.totalOverdueReceivablesPaise > 0) ...[
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.arrow_forward, size: 16),
+                label: Text(
+                  metrics.overduePromiseCount > 0
+                      ? 'Review ${metrics.overduePromiseCount} Overdue Receivables'
+                      : 'Review Prioritized Receivables',
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF166534),
+                  minimumSize: const Size.fromHeight(40),
+                ),
+                onPressed: () => onNavigate?.call('/receivables'),
+              ),
+            ],
           ],
         ),
       ),

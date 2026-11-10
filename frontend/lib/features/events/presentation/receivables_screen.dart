@@ -4,11 +4,13 @@ import '../domain/receivable_model.dart';
 class ReceivablesScreen extends StatelessWidget {
   final List<ReceivableModel> receivables;
   final Function(ReceivableModel item) onReceivableTap;
+  final VoidCallback? onBack;
 
   const ReceivablesScreen({
     super.key,
     required this.receivables,
     required this.onReceivableTap,
+    this.onBack,
   });
 
   String _formatDate(DateTime dt) {
@@ -24,6 +26,13 @@ class ReceivablesScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Prioritized Receivables'),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: onBack,
+              )
+            : null,
       ),
       body: SafeArea(
         child: receivables.isEmpty

@@ -4,11 +4,15 @@ import '../domain/receivable_model.dart';
 class ReceivableDetailScreen extends StatelessWidget {
   final ReceivableModel receivable;
   final VoidCallback onReviewFollowUp;
+  final VoidCallback? onCreateReminderDraft;
+  final VoidCallback? onBack;
 
   const ReceivableDetailScreen({
     super.key,
     required this.receivable,
     required this.onReviewFollowUp,
+    this.onCreateReminderDraft,
+    this.onBack,
   });
 
   String _formatDate(DateTime dt) {
@@ -22,6 +26,13 @@ class ReceivableDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Receivable Detail'),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: onBack,
+              )
+            : null,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -73,9 +84,24 @@ class ReceivableDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              ElevatedButton.icon(
+              if (onCreateReminderDraft != null) ...[
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.send_outlined),
+                  label: const Text('Create Payment Reminder Draft'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF047857),
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                  onPressed: onCreateReminderDraft,
+                ),
+                const SizedBox(height: 12),
+              ],
+              OutlinedButton.icon(
                 icon: const Icon(Icons.rate_review),
                 label: const Text('Review Follow-Up Context'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(48),
+                ),
                 onPressed: onReviewFollowUp,
               ),
             ],

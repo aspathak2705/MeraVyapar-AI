@@ -6,12 +6,14 @@ class ReminderDraftScreen extends StatefulWidget {
   final LocalActionRepository actionRepository;
   final String promiseId;
   final String authToken;
+  final VoidCallback? onBack;
 
   const ReminderDraftScreen({
     Key? key,
     required this.actionRepository,
     required this.promiseId,
     required this.authToken,
+    this.onBack,
   }) : super(key: key);
 
   @override
@@ -111,6 +113,13 @@ class _ReminderDraftScreenState extends State<ReminderDraftScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Payment Reminder Draft'),
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: widget.onBack,
+              )
+            : null,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
