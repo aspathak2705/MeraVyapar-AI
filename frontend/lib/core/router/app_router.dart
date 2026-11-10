@@ -47,7 +47,8 @@ import '../../features/intelligence/presentation/unified_financial_intelligence_
 import '../../core/database/local_database_service.dart';
 
 // --- Local Repository Providers ---
-final localAuthRepositoryProvider = Provider((ref) => LocalAuthRepository());
+// Re-export single canonical localAuthRepositoryProvider from local_auth_repository.dart
+// (Do not declare a second localAuthRepositoryProvider instance here)
 final localCanonicalTransactionRepositoryProvider = Provider((ref) => LocalCanonicalTransactionRepository());
 final localMemoryRepositoryProvider = Provider((ref) => LocalMemoryRepository());
 final localActionRepositoryProvider = Provider((ref) => LocalActionRepository());
@@ -416,9 +417,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                 await memRepo.createPaymentPromise(
                   merchantId: merchantId,
                   counterpartyName: pData['counterparty_name'] ?? 'Unknown',
-                  amount: pData['amount'] ?? '0',
-                  direction: pData['direction'] ?? 'EXPECTED_INCOMING',
-                  dueDate: pData['due_date'] ?? DateTime.now().toUtc().toIso8601String(),
+                  amount: pData['amount'] ?? pData['promised_amount'] ?? '0',
+                  direction: pData['direction'] ?? pData['promise_direction'] ?? 'EXPECTED_INCOMING',
+                  dueDate: pData['due_date'] ?? pData['due_at'] ?? DateTime.now().toUtc().toIso8601String(),
+                  counterpartyId: pData['counterparty_id'],
+                  notes: pData['notes'] ?? pData['description'],
                 );
                 setState(() {});
               },
