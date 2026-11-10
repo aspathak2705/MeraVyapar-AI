@@ -33,7 +33,7 @@ class GnaniSTTAdapter:
         base_url: Optional[str] = None,
         timeout_seconds: Optional[float] = None,
     ):
-        self.api_key = api_key or settings.GNANI_API_KEY
+        self.api_key = api_key if api_key is not None else settings.GNANI_API_KEY
         self.base_url = (base_url or settings.GNANI_API_BASE_URL).rstrip("/")
         self.timeout_seconds = timeout_seconds or settings.GNANI_TIMEOUT_SECONDS
 
