@@ -1,0 +1,53 @@
+services:
+  - type: web
+    name: meravyapar-ai-gateway
+    env: python
+    region: singapore
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.gateway_main:app --host 0.0.0.0 --port $PORT --workers 2 --timeout-keep-alive 30
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PROJECT_NAME
+        value: "MeraVyapar AI Stateless Gateway"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: API_V1_STR
+        value: /api/v1
+      - key: EXTERNAL_PROVIDER_MODE
+        value: production
+      - key: ENABLE_DEMO_ENDPOINTS
+        value: "false"
+      - key: ALLOW_INSECURE_INTERNAL_INGEST
+        value: "false"
+      - key: GNANI_API_BASE_URL
+        value: https://api.vachana.ai
+      - key: GNANI_STT_MODEL
+        value: prisma-v2.5
+      - key: GNANI_TTS_MODEL
+        value: timbre-v2.5
+      - key: GNANI_DEFAULT_VOICE
+        value: Nalini
+      - key: GNANI_DEFAULT_LANGUAGE
+        value: hi-IN
+      - key: GNANI_TIMEOUT_SECONDS
+        value: "10.0"
+      - key: SERPAPI_BASE_URL
+        value: https://serpapi.com/search
+      - key: SERPAPI_CACHE_TTL_SECONDS
+        value: "86400"
+      - key: SERPAPI_TIMEOUT_SECONDS
+        value: "10.0"
+      - key: OPENROUTER_BASE_URL
+        value: https://openrouter.ai/api/v1
+      - key: FINANCIAL_INTELLIGENCE_MODEL
+        value: "nvidia/nemotron-3-super-120b-a12b:free"
+      - key: NEMOTRON_REASONING_ENABLED
+        value: "true"
+      # Required Secrets to be configured via Render Dashboard Environment:
+      # - GNANI_API_KEY
+      # - SERPAPI_API_KEY
+      # - OPENROUTER_API_KEY
+      # - INTERNAL_INGEST_API_KEY
