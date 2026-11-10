@@ -5,6 +5,7 @@ import '../../../core/theme/app_icons.dart';
 import 'voice_interaction_controller.dart';
 import 'voice_confirmation_card.dart';
 import 'wake_word_controller.dart';
+import '../services/wake_word_detector_service.dart';
 
 class VoiceAssistantSheet extends ConsumerWidget {
   final StateNotifierProvider<VoiceInteractionController, VoiceInteractionState>? controllerProvider;

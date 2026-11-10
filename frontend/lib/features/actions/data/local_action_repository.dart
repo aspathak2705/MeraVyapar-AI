@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:uuid/uuid.dart';
-import '../../core/database/local_database_service.dart';
-import '../../core/database/local_database_schema.dart';
+import '../../../../core/database/local_database_service.dart';
+import '../../../../core/database/local_database_schema.dart';
 import '../domain/communication_action_model.dart';
 import '../domain/communication_audit_event_model.dart';
 

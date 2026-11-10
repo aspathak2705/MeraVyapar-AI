@@ -3,10 +3,12 @@ import '../domain/canonical_transaction_model.dart';
 
 class CanonicalTransactionDetailScreen extends StatelessWidget {
   final CanonicalTransactionModel transaction;
+  final VoidCallback? onBack;
 
   const CanonicalTransactionDetailScreen({
     super.key,
     required this.transaction,
+    this.onBack,
   });
 
   @override

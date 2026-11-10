@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/theme_mode_provider.dart';
 import '../../../core/presentation/fintech_widgets.dart';
+import '../../intelligence/domain/local_financial_intelligence_engine.dart';
 import '../../intelligence/presentation/unified_financial_intelligence_screen.dart';
 
 class HomeShellScreen extends ConsumerWidget {

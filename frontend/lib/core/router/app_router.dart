@@ -484,7 +484,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
               builder: (ctx) => VoiceAssistantSheet(
-                controllerProvider: voiceControllerProvider,
+                autoDisposeControllerProvider: voiceControllerProvider,
                 wakeWordProvider: wakeWordControllerProvider,
                 onNavigateToRoute: _navigateTo,
               ),

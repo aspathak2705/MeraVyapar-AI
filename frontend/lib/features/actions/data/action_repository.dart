@@ -10,13 +10,20 @@ class ActionRepository {
   ActionRepository({required this.baseUrl, http.Client? client})
       : client = client ?? http.Client();
 
+  String get _cleanBaseUrl {
+    if (baseUrl.endsWith('/api/v1')) {
+      return baseUrl.substring(0, baseUrl.length - 7);
+    }
+    return baseUrl;
+  }
+
   Future<CommunicationAction> draftPaymentReminder({
     required String promiseId,
     required String channel,
     required String authToken,
   }) async {
     final response = await client.post(
-      Uri.parse('$baseUrl/api/v1/actions/draft-reminder'),
+      Uri.parse('$_cleanBaseUrl/api/v1/actions/draft-reminder'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
@@ -38,7 +45,7 @@ class ActionRepository {
     required String authToken,
     String? statusFilter,
   }) async {
-    String url = '$baseUrl/api/v1/actions';
+    String url = '$_cleanBaseUrl/api/v1/actions';
     if (statusFilter != null && statusFilter.isNotEmpty) {
       url += '?status=$statusFilter';
     }
@@ -64,7 +71,7 @@ class ActionRepository {
     required String authToken,
   }) async {
     final response = await client.patch(
-      Uri.parse('$baseUrl/api/v1/actions/$actionId'),
+      Uri.parse('$_cleanBaseUrl/api/v1/actions/$actionId'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $authToken',
@@ -86,7 +93,7 @@ class ActionRepository {
     required String authToken,
   }) async {
     final response = await client.post(
-      Uri.parse('$baseUrl/api/v1/actions/$actionId/confirm'),
+      Uri.parse('$_cleanBaseUrl/api/v1/actions/$actionId/confirm'),
       headers: {
         'Authorization': 'Bearer $authToken',
       },

@@ -1,6 +1,6 @@
 import 'package:uuid/uuid.dart';
-import '../../core/database/local_database_service.dart';
-import '../../core/database/local_database_schema.dart';
+import '../../../../core/database/local_database_service.dart';
+import '../../../../core/database/local_database_schema.dart';
 import '../domain/counterparty_model.dart';
 import '../domain/payment_promise_model.dart';
 
@@ -26,15 +26,21 @@ class LocalMemoryRepository {
       [merchantId],
     );
 
-    return rows.map((row) {
+    return rows.map<CounterpartyModel>((row) {
+      final now = DateTime.now();
+      final createdAt = DateTime.tryParse(row['created_at']?.toString() ?? '') ?? now;
+      final updatedAt = DateTime.tryParse(row['updated_at']?.toString() ?? '') ?? now;
+      final name = (row['name'] ?? row['display_name'] ?? 'Unknown').toString();
       return CounterpartyModel(
         id: row['id'] as String,
         merchantId: row['merchant_id'] as String,
-        name: row['name'] as String,
-        phoneNumber: row['phone_number'] as String?,
-        category: row['category'] as String? ?? 'CUSTOMER',
-        createdAt: row['created_at'] as String,
-        updatedAt: row['updated_at'] as String,
+        displayName: name,
+        normalizedName: name.trim().toLowerCase(),
+        relationshipType: row['category'] as String? ?? 'CUSTOMER',
+        status: 'ACTIVE',
+        createdAt: createdAt,
+        updatedAt: updatedAt,
+        aliases: const [],
       );
     }).toList();
   }
@@ -61,22 +67,28 @@ class LocalMemoryRepository {
 
     final rows = await driver.query(sql, params);
 
-    return rows.map((row) {
-      final minor = row['amount_minor_units'] as int;
+    return rows.map<PaymentPromiseModel>((row) {
+      final minor = row['amount_minor_units'] as int? ?? 0;
+      final now = DateTime.now();
+      final createdAt = DateTime.tryParse(row['created_at']?.toString() ?? '') ?? now;
+      final dueAt = DateTime.tryParse(row['due_date']?.toString() ?? '') ?? now;
+      final fulfilledAt = row['fulfilled_at'] != null ? DateTime.tryParse(row['fulfilled_at'].toString()) : null;
       return PaymentPromiseModel(
         id: row['id'] as String,
         merchantId: row['merchant_id'] as String,
         counterpartyId: row['counterparty_id'] as String?,
-        counterpartyName: row['counterparty_name'] as String,
-        amount: (minor / 100.0).toStringAsFixed(2),
+        description: row['notes'] as String? ?? 'Payment Promise',
+        promisedAmount: (minor / 100.0).toStringAsFixed(2),
         currency: row['currency'] as String? ?? 'INR',
-        direction: row['direction'] as String,
-        status: row['status'] as String,
-        source: row['source'] as String,
-        dueDate: row['due_date'] as String,
-        createdAt: row['created_at'] as String,
-        fulfilledAt: row['fulfilled_at'] as String?,
-        notes: row['notes'] as String?,
+        promiseDirection: row['direction'] as String? ?? 'EXPECTED_INCOMING',
+        dueAt: dueAt,
+        status: row['status'] as String? ?? 'OPEN',
+        source: row['source'] as String? ?? 'MERCHANT_DECLARED',
+        sourceReference: null,
+        fulfilledAt: fulfilledAt,
+        createdAt: createdAt,
+        updatedAt: createdAt,
+        events: const [],
       );
     }).toList();
   }
@@ -125,19 +137,24 @@ class LocalMemoryRepository {
       ],
     );
 
+    final now = DateTime.now();
+    final dueAt = DateTime.tryParse(dueDate) ?? now;
     return PaymentPromiseModel(
       id: promiseId,
       merchantId: merchantId,
       counterpartyId: counterpartyId,
-      counterpartyName: counterpartyName,
-      amount: (amountMinor / 100.0).toStringAsFixed(2),
+      description: notes ?? 'Payment Promise',
+      promisedAmount: (amountMinor / 100.0).toStringAsFixed(2),
       currency: 'INR',
-      direction: direction,
+      promiseDirection: direction,
+      dueAt: dueAt,
       status: 'OPEN',
       source: 'MERCHANT_DECLARED',
-      dueDate: dueDate,
-      createdAt: nowIso,
-      notes: notes,
+      sourceReference: null,
+      fulfilledAt: null,
+      createdAt: now,
+      updatedAt: now,
+      events: const [],
     );
   }
 

@@ -11,8 +11,16 @@ class VoiceRepository {
     http.Client? client,
   }) : client = client ?? http.Client();
 
+  String get _cleanBaseUrl {
+    // If baseUrl already ends with /api/v1, strip it so endpoints with /api/v1 prefix don't duplicate
+    if (baseUrl.endsWith('/api/v1')) {
+      return baseUrl.substring(0, baseUrl.length - 7);
+    }
+    return baseUrl;
+  }
+
   Future<VoiceStatusModel> getVoiceStatus() async {
-    final uri = Uri.parse('$baseUrl/api/v1/voice/status');
+    final uri = Uri.parse('$_cleanBaseUrl/api/v1/voice/status');
     final response = await client.get(
       uri,
       headers: {'Accept': 'application/json'},
@@ -32,7 +40,7 @@ class VoiceRepository {
     String? languageCode,
     bool synthesizeAudio = true,
   }) async {
-    final uri = Uri.parse('$baseUrl/api/v1/voice/interact');
+    final uri = Uri.parse('$_cleanBaseUrl/api/v1/voice/interact');
     final request = http.MultipartRequest('POST', uri);
 
     request.headers['Authorization'] = 'Bearer $authToken';
@@ -77,7 +85,7 @@ class VoiceRepository {
     String voice = 'Nalini',
     double speed = 1.0,
   }) async {
-    final uri = Uri.parse('$baseUrl/api/v1/voice/synthesize');
+    final uri = Uri.parse('$_cleanBaseUrl/api/v1/voice/synthesize');
     final response = await client.post(
       uri,
       headers: {

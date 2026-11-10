@@ -1,6 +1,6 @@
 import 'package:uuid/uuid.dart';
-import '../../core/database/local_database_service.dart';
-import '../../core/database/local_database_schema.dart';
+import '../../../../core/database/local_database_service.dart';
+import '../../../../core/database/local_database_schema.dart';
 import '../domain/canonical_transaction_model.dart';
 
 class LocalCanonicalTransactionRepository {

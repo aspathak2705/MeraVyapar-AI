@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
-import '../../core/database/local_database_service.dart';
-import '../../core/database/local_database_schema.dart';
+import '../local_database_service.dart';
+import '../local_database_schema.dart';
 
 class MigrationResult {
   final bool success;

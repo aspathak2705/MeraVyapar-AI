@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
+
+final localAuthRepositoryProvider = Provider((ref) => LocalAuthRepository());
 
 enum LocalAuthStatus {
   uninitialized, // No merchant profile or PIN set up
