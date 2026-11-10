@@ -5,12 +5,14 @@ class RelevantMarketSignalsScreen extends StatelessWidget {
   final List<MerchantMarketRelevanceModel> signals;
   final Function(MerchantMarketRelevanceModel signal) onSignalTap;
   final VoidCallback onRefresh;
+  final VoidCallback? onBack;
 
   const RelevantMarketSignalsScreen({
     super.key,
     required this.signals,
     required this.onSignalTap,
     required this.onRefresh,
+    this.onBack,
   });
 
   @override
@@ -18,6 +20,13 @@ class RelevantMarketSignalsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('External Market Signals'),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: onBack,
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

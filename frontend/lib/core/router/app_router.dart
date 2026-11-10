@@ -378,6 +378,27 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           },
         );
 
+      case '/market':
+        final marketRepo = ref.read(marketIntelligenceRepositoryProvider);
+        return FutureBuilder(
+          future: marketRepo.getRelevantSignals(),
+          builder: (context, snapshot) {
+            final signals = snapshot.data ?? [];
+            return RelevantMarketSignalsScreen(
+              signals: signals,
+              onRefresh: () => setState(() {}),
+              onBack: _popRoute,
+              onSignalTap: (sig) => _navigateTo('/market/detail', {'signal': sig}),
+            );
+          },
+        );
+
+      case '/market/detail':
+        return MarketSignalDetailScreen(
+          signal: _routeArgs['signal'],
+          onBack: _popRoute,
+        );
+
       case '/actions':
         final localActionRepo = ref.read(localActionRepositoryProvider);
         return ActionCenterScreen(

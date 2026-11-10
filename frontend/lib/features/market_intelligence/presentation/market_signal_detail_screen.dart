@@ -3,10 +3,12 @@ import '../domain/merchant_market_relevance_model.dart';
 
 class MarketSignalDetailScreen extends StatelessWidget {
   final MerchantMarketRelevanceModel signal;
+  final VoidCallback? onBack;
 
   const MarketSignalDetailScreen({
     super.key,
     required this.signal,
+    this.onBack,
   });
 
   String _formatDate(DateTime dt) {
@@ -20,6 +22,13 @@ class MarketSignalDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Market Signal Detail'),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: onBack,
+              )
+            : null,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
