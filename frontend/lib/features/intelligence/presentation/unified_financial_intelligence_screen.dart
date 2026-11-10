@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../domain/local_financial_intelligence_engine.dart';
 import '../domain/local_cashflow_forecasting_engine.dart';
 import '../domain/local_fig_service.dart';
@@ -53,17 +55,17 @@ class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Financial & Business Intelligence'),
+        title: const Text('Financial Intelligence'),
         leading: onBack != null
             ? IconButton(
-                icon: const Icon(Icons.arrow_back),
+                icon: const Icon(AppIcons.arrowBack),
                 tooltip: 'Back',
                 onPressed: onBack,
               )
             : null,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
+            icon: const Icon(AppIcons.refresh),
             tooltip: 'Refresh Intelligence',
             onPressed: () {
               ref.invalidate(financialPositionMetricsProvider);

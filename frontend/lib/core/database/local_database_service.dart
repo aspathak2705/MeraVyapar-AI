@@ -50,6 +50,9 @@ class LocalDatabaseService {
 
     if (_activeDriver != null) {
       await _activeDriver!.open(_databaseFilePath!);
+      // Enable WAL mode and foreign key constraints for production SQLite integrity
+      await _activeDriver!.execute('PRAGMA journal_mode = WAL;');
+      await _activeDriver!.execute('PRAGMA foreign_keys = ON;');
       for (final sql in LocalDatabaseSchema.createStatementsV3) {
         await _activeDriver!.execute(sql);
       }

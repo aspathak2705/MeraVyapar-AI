@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/env.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_icons.dart';
 import '../presentation/configuration_required_screen.dart';
 import '../../features/auth/data/local_auth_repository.dart';
 import '../../features/transactions/data/local_canonical_transaction_repository.dart';
@@ -196,75 +198,113 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     }
 
     if (_authStatus == LocalAuthStatus.uninitialized) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
       return Scaffold(
-        appBar: AppBar(title: const Text('Setup Local Merchant Profile')),
-        body: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.storefront, size: 64, color: Colors.blue),
-              const SizedBox(height: 16),
-              const Text('MeraVyapar AI Local-First', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              const Text('All financial records remain private on your device.', textAlign: TextAlign.center),
-              const SizedBox(height: 24),
-              TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Business Name', border: OutlineInputBorder()),
+        appBar: AppBar(title: const Text('Setup Merchant Profile')),
+        body: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.darkLavenderSurface : AppColors.lightLavender,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        AppIcons.business,
+                        size: 40,
+                        color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('MeraVyapar AI', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    const Text('100% Private, On-Device Financial Intelligence', textAlign: TextAlign.center, style: TextStyle(fontSize: 13)),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(labelText: 'Business Name', hintText: 'e.g. Ramesh Kirana Store'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _pinController,
+                      obscureText: true,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Set 4-6 Digit Security PIN', hintText: '••••'),
+                    ),
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: 12),
+                      Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                    ],
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _handleRegister,
+                      child: const Text('Create Private Merchant Profile'),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _pinController,
-                obscureText: true,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Set 4-6 Digit Security PIN', border: OutlineInputBorder()),
-              ),
-              if (_errorMessage != null) ...[
-                const SizedBox(height: 12),
-                Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
-              ],
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _handleRegister,
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-                child: const Text('Create Private Merchant Profile'),
-              ),
-            ],
+            ),
           ),
         ),
       );
     }
 
     if (_authStatus == LocalAuthStatus.locked) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
       return Scaffold(
-        appBar: AppBar(title: const Text('Unlock MeraVyapar AI')),
-        body: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.lock_outline, size: 64, color: Colors.blue),
-              const SizedBox(height: 16),
-              const Text('Enter Security PIN', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: _pinController,
-                obscureText: true,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Security PIN', border: OutlineInputBorder()),
+        appBar: AppBar(title: const Text('Unlock MeraVyapar')),
+        body: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.darkLavenderSurface : AppColors.lightLavender,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        AppIcons.lock,
+                        size: 40,
+                        color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text('Enter Security PIN', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    const Text('Your financial records remain encrypted on this phone.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13)),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: _pinController,
+                      obscureText: true,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(labelText: 'Security PIN', hintText: '••••'),
+                    ),
+                    if (_errorMessage != null) ...[
+                      const SizedBox(height: 12),
+                      Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                    ],
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _handleUnlock,
+                      child: const Text('Unlock Device Ledger'),
+                    ),
+                  ],
+                ),
               ),
-              if (_errorMessage != null) ...[
-                const SizedBox(height: 12),
-                Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
-              ],
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _handleUnlock,
-                style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
-                child: const Text('Unlock Device Ledger'),
-              ),
-            ],
+            ),
           ),
         ),
       );

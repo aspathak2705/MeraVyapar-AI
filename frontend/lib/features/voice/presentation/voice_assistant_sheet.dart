@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import 'voice_interaction_controller.dart';
 import 'voice_confirmation_card.dart';
 
 class VoiceAssistantSheet extends ConsumerWidget {
   final StateNotifierProvider<VoiceInteractionController, VoiceInteractionState>? controllerProvider;
   final AutoDisposeStateNotifierProvider<VoiceInteractionController, VoiceInteractionState>? autoDisposeControllerProvider;
+  final void Function(String route)? onNavigateToRoute;
 
   const VoiceAssistantSheet({
     super.key,
     this.controllerProvider,
     this.autoDisposeControllerProvider,
+    this.onNavigateToRoute,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final state = autoDisposeControllerProvider != null
         ? ref.watch(autoDisposeControllerProvider!)
         : ref.watch(controllerProvider!);
@@ -24,9 +29,9 @@ class VoiceAssistantSheet extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkCard : AppColors.lightBackground,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: SafeArea(
         child: Column(
@@ -42,18 +47,22 @@ class VoiceAssistantSheet extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFEFF6FF),
+                        color: isDark ? AppColors.darkLavenderSurface : AppColors.lightLavender,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Icons.mic, color: Color(0xFF2563EB)),
+                      child: Icon(
+                        AppIcons.voice,
+                        color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'Voice Assistant',
+                    Text(
+                      'Voice Autopilot',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF0F172A),
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
                       ),
                     ),
                   ],

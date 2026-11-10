@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../domain/canonical_transaction_model.dart';
 
 class CanonicalTransactionsScreen extends StatelessWidget {
@@ -6,6 +8,7 @@ class CanonicalTransactionsScreen extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onRunReconciliation;
   final Function(CanonicalTransactionModel tx) onTransactionTap;
+  final VoidCallback? onBack;
 
   const CanonicalTransactionsScreen({
     super.key,
@@ -13,16 +16,26 @@ class CanonicalTransactionsScreen extends StatelessWidget {
     this.isLoading = false,
     required this.onRunReconciliation,
     required this.onTransactionTap,
+    this.onBack,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reconciled Transactions'),
+        title: const Text('Passbook & Transactions'),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(AppIcons.arrowBack),
+                tooltip: 'Back',
+                onPressed: onBack,
+              )
+            : null,
         actions: [
           IconButton(
-            icon: const Icon(Icons.sync),
+            icon: const Icon(AppIcons.refresh),
             tooltip: 'Run Reconciliation Pass',
             onPressed: onRunReconciliation,
           ),
@@ -34,98 +47,132 @@ class CanonicalTransactionsScreen extends StatelessWidget {
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.compare_arrows, size: 48, color: Color(0xFF94A3B8)),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'No reconciled transactions yet.',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF334155)),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: isDark ? AppColors.darkLavenderSurface : AppColors.lightLavender,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                AppIcons.transactions,
+                                size: 40,
+                                color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'No Canonical Transactions Yet',
+                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Add financial evidence or reconcile captured receipts to build your private canonical ledger.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 13, height: 1.4),
+                            ),
+                            const SizedBox(height: 24),
+                            ElevatedButton.icon(
+                              icon: const Icon(AppIcons.refresh),
+                              label: const Text('Run Reconciliation Pass'),
+                              onPressed: onRunReconciliation,
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Add financial activity or run reconciliation to connect evidence into canonical financial records.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Color(0xFF64748B)),
-                        ),
-                        const SizedBox(height: 24),
-                        ElevatedButton.icon(
-                          icon: const Icon(Icons.play_arrow),
-                          label: const Text('Run Reconciliation Pass'),
-                          onPressed: onRunReconciliation,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 )
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: transactions.length,
-                  separatorBuilder: (_, __) => const Divider(),
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final tx = transactions[index];
-                    final isMoneyIn = tx.transactionType == 'MONEY_IN';
+                    final isCredit = tx.transactionType == 'MONEY_IN' || tx.transactionType == 'CREDIT';
                     final status = tx.reconciliationStatus;
 
-                    Color statusColor = const Color(0xFF64748B);
+                    Color statusColor = isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted;
                     String statusText = 'Unresolved';
                     if (status == 'RECONCILED') {
-                      statusColor = const Color(0xFF166534);
+                      statusColor = isDark ? AppColors.darkSuccess : AppColors.success;
                       statusText = '✓ Reconciled';
                     } else if (status == 'REQUIRES_REVIEW') {
-                      statusColor = const Color(0xFFD97706);
+                      statusColor = isDark ? AppColors.darkWarning : AppColors.warning;
                       statusText = 'Needs Review';
                     }
 
-                    return ListTile(
-                      onTap: () => onTransactionTap(tx),
-                      leading: CircleAvatar(
-                        backgroundColor: isMoneyIn ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
-                        child: Icon(
-                          isMoneyIn ? Icons.arrow_downward : Icons.arrow_upward,
-                          color: isMoneyIn ? const Color(0xFF166534) : const Color(0xFF991B1B),
-                        ),
-                      ),
-                      title: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              tx.counterpartyName ?? tx.description ?? 'Canonical Transaction',
-                              style: const TextStyle(fontWeight: FontWeight.w600),
-                            ),
+                    return Card(
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        onTap: () => onTransactionTap(tx),
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: isCredit
+                                ? (isDark ? AppColors.darkSuccessBg : AppColors.successLight)
+                                : (isDark ? AppColors.darkErrorBg : AppColors.errorLight),
+                            shape: BoxShape.circle,
                           ),
-                          if (tx.isSimulated || tx.sourceProvider == 'SIMULATED_RAZORPAY') ...[
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.shade100,
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: Colors.orange.shade300),
-                              ),
+                          child: Icon(
+                            isCredit ? AppIcons.inflow : AppIcons.outflow,
+                            color: isCredit
+                                ? (isDark ? AppColors.darkSuccess : AppColors.success)
+                                : (isDark ? AppColors.darkError : AppColors.error),
+                            size: 20,
+                          ),
+                        ),
+                        title: Row(
+                          children: [
+                            Expanded(
                               child: Text(
-                                'DEMO EVENT',
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.orange.shade900),
+                                tx.counterpartyName ?? tx.description ?? 'Canonical Transaction',
+                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                               ),
                             ),
-                          ],
-                        ],
-                      ),
-                      subtitle: Text(
-                        'Method: ${tx.paymentMode} • Linked Evidence: ${tx.candidateLinks.length}\nStatus: $statusText',
-                        style: TextStyle(fontSize: 12, color: statusColor),
-                      ),
-                      trailing: tx.amount != null
-                          ? Text(
-                              '${isMoneyIn ? "+" : "-"} ₹${tx.amount}',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: isMoneyIn ? const Color(0xFF166534) : const Color(0xFF991B1B),
+                            if (tx.isSimulated || tx.sourceProvider == 'SIMULATED_RAZORPAY') ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'DEMO',
+                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.orange),
+                                ),
                               ),
-                            )
-                          : null,
+                            ],
+                          ],
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            'Method: ${tx.paymentMode} • Status: $statusText',
+                            style: TextStyle(fontSize: 12, color: statusColor),
+                          ),
+                        ),
+                        trailing: tx.amount != null
+                            ? Text(
+                                '${isCredit ? "+" : "-"} ₹${tx.amount}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                  letterSpacing: -0.3,
+                                  color: isCredit
+                                      ? (isDark ? AppColors.darkSuccess : AppColors.success)
+                                      : (isDark ? AppColors.darkError : AppColors.error),
+                                ),
+                              )
+                            : null,
+                      ),
                     );
                   },
                 ),
