@@ -1,7 +1,7 @@
 import 'package:uuid/uuid.dart';
-import '../../core/database/local_database_service.dart';
-import '../../core/database/local_database_schema.dart';
-import '../../core/database/migration/migration_verification_service.dart';
+import '../../../core/database/local_database_service.dart';
+import '../../../core/database/local_database_schema.dart';
+import '../../../core/database/migration/migration_verification_service.dart';
 import '../../evidence/domain/transaction_candidate_model.dart';
 import '../../transactions/domain/canonical_transaction_model.dart';
 

@@ -4,6 +4,8 @@ import 'app_colors.dart';
 class AppTheme {
   AppTheme._();
 
+  static ThemeData get theme => lightTheme;
+
   static ThemeData get lightTheme {
     final colorScheme = ColorScheme(
       brightness: Brightness.light,

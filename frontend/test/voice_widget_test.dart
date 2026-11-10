@@ -9,20 +9,21 @@ import 'package:frontend/features/voice/services/audio_playback_service.dart';
 import 'package:frontend/features/voice/presentation/voice_interaction_controller.dart';
 import 'package:frontend/features/voice/presentation/voice_assistant_sheet.dart';
 import 'package:frontend/features/voice/presentation/voice_confirmation_card.dart';
-import 'package:frontend/features/actions/data/action_repository.dart';
+import 'package:frontend/features/actions/data/local_action_repository.dart';
+import 'package:frontend/core/database/local_database_service.dart';
 
 void main() {
   late StateNotifierProvider<VoiceInteractionController, VoiceInteractionState> testControllerProvider;
   late VoiceRepository voiceRepo;
   late SimulatedAudioRecordingService recordingSvc;
   late SimulatedAudioPlaybackService playbackSvc;
-  late ActionRepository actionRepo;
+  late LocalActionRepository actionRepo;
 
   setUp(() {
     voiceRepo = VoiceRepository(baseUrl: 'http://localhost:8000');
     recordingSvc = SimulatedAudioRecordingService();
     playbackSvc = SimulatedAudioPlaybackService();
-    actionRepo = ActionRepository(baseUrl: 'http://localhost:8000');
+    actionRepo = LocalActionRepository(dbService: LocalDatabaseService.instance);
 
     testControllerProvider = StateNotifierProvider<VoiceInteractionController, VoiceInteractionState>((ref) {
       return VoiceInteractionController(

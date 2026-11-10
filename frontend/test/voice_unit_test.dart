@@ -6,7 +6,8 @@ import 'package:frontend/features/voice/data/voice_repository.dart';
 import 'package:frontend/features/voice/services/audio_recording_service.dart';
 import 'package:frontend/features/voice/services/audio_playback_service.dart';
 import 'package:frontend/features/voice/presentation/voice_interaction_controller.dart';
-import 'package:frontend/features/actions/data/action_repository.dart';
+import 'package:frontend/features/actions/data/local_action_repository.dart';
+import 'package:frontend/core/database/local_database_service.dart';
 import 'package:frontend/features/actions/domain/communication_action_model.dart';
 
 void main() {
@@ -94,7 +95,7 @@ void main() {
       final voiceRepo = VoiceRepository(baseUrl: 'http://localhost:8000', client: mockVoiceClient);
       final recordingSvc = SimulatedAudioRecordingService();
       final playbackSvc = SimulatedAudioPlaybackService();
-      final actionRepo = ActionRepository(baseUrl: 'http://localhost:8000');
+      final actionRepo = LocalActionRepository(dbService: LocalDatabaseService.instance);
 
       final controller = VoiceInteractionController(
         voiceRepository: voiceRepo,
@@ -148,7 +149,7 @@ void main() {
       final voiceRepo = VoiceRepository(baseUrl: 'http://localhost:8000', client: mockVoiceClient);
       final recordingSvc = SimulatedAudioRecordingService();
       final playbackSvc = SimulatedAudioPlaybackService();
-      final actionRepo = ActionRepository(baseUrl: 'http://localhost:8000', client: mockActionClient);
+      final actionRepo = LocalActionRepository(dbService: LocalDatabaseService.instance);
 
       final controller = VoiceInteractionController(
         voiceRepository: voiceRepo,
@@ -179,7 +180,7 @@ void main() {
       final voiceRepo = VoiceRepository(baseUrl: 'http://localhost:8000');
       final recordingSvc = SimulatedAudioRecordingService(permissionGranted: false);
       final playbackSvc = SimulatedAudioPlaybackService();
-      final actionRepo = ActionRepository(baseUrl: 'http://localhost:8000');
+      final actionRepo = LocalActionRepository(dbService: LocalDatabaseService.instance);
 
       final controller = VoiceInteractionController(
         voiceRepository: voiceRepo,
@@ -251,7 +252,7 @@ void main() {
       final voiceRepo = VoiceRepository(baseUrl: 'http://localhost:8000');
       final recordingSvc = SimulatedAudioRecordingService();
       final playbackSvc = SimulatedAudioPlaybackService();
-      final actionRepo = ActionRepository(baseUrl: 'http://localhost:8000');
+      final actionRepo = LocalActionRepository(dbService: LocalDatabaseService.instance);
 
       final controller = VoiceInteractionController(
         voiceRepository: voiceRepo,
