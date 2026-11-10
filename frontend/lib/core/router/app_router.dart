@@ -35,6 +35,7 @@ import '../../features/events/presentation/receivable_detail_screen.dart';
 import '../../features/intelligence/presentation/merchant_assistant_screen.dart';
 import '../../features/market_intelligence/presentation/relevant_market_signals_screen.dart';
 import '../../features/market_intelligence/presentation/market_signal_detail_screen.dart';
+import '../../features/actions/data/local_action_repository.dart';
 import '../../features/actions/presentation/action_center_screen.dart';
 import '../../features/actions/presentation/action_detail_screen.dart';
 import '../../features/actions/presentation/reminder_draft_screen.dart';
@@ -45,6 +46,7 @@ import '../../core/database/local_database_service.dart';
 final localAuthRepositoryProvider = Provider((ref) => LocalAuthRepository());
 final localCanonicalTransactionRepositoryProvider = Provider((ref) => LocalCanonicalTransactionRepository());
 final localMemoryRepositoryProvider = Provider((ref) => LocalMemoryRepository());
+final localActionRepositoryProvider = Provider((ref) => LocalActionRepository());
 
 // --- Gateway / Unmigrated Providers ---
 final evidenceRepositoryProvider = Provider((ref) => EvidenceRepository());
@@ -344,6 +346,30 @@ class _AppRouterState extends ConsumerState<AppRouter> {
               },
             );
           },
+        );
+
+      case '/actions':
+        final localActionRepo = ref.read(localActionRepositoryProvider);
+        return ActionCenterScreen(
+          actionRepository: localActionRepo,
+          authToken: merchantId,
+          onBack: _popRoute,
+        );
+
+      case '/actions/draft':
+        final localActionRepo = ref.read(localActionRepositoryProvider);
+        return ReminderDraftScreen(
+          actionRepository: localActionRepo,
+          promiseId: _routeArgs['promise_id'] ?? '',
+          authToken: merchantId,
+        );
+
+      case '/actions/detail':
+        final localActionRepo = ref.read(localActionRepositoryProvider);
+        return ActionDetailScreen(
+          actionRepository: localActionRepo,
+          actionId: _routeArgs['action_id'] ?? '',
+          authToken: merchantId,
         );
 
       default:

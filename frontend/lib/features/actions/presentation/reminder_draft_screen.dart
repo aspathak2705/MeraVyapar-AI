@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../domain/communication_action_model.dart';
-import '../data/action_repository.dart';
+import '../data/local_action_repository.dart';
 
 class ReminderDraftScreen extends StatefulWidget {
-  final ActionRepository actionRepository;
+  final LocalActionRepository actionRepository;
   final String promiseId;
   final String authToken;
 
@@ -37,7 +37,7 @@ class _ReminderDraftScreenState extends State<ReminderDraftScreen> {
       final action = await widget.actionRepository.draftPaymentReminder(
         promiseId: widget.promiseId,
         channel: _channel,
-        authToken: widget.authToken,
+        merchantId: widget.authToken,
       );
       setState(() {
         _action = action;
@@ -62,7 +62,7 @@ class _ReminderDraftScreenState extends State<ReminderDraftScreen> {
       final updated = await widget.actionRepository.updateDraft(
         actionId: _action!.id,
         finalContent: _contentController.text,
-        authToken: widget.authToken,
+        merchantId: widget.authToken,
       );
       setState(() {
         _action = updated;
@@ -88,7 +88,7 @@ class _ReminderDraftScreenState extends State<ReminderDraftScreen> {
     try {
       final confirmed = await widget.actionRepository.confirmAction(
         actionId: _action!.id,
-        authToken: widget.authToken,
+        merchantId: widget.authToken,
       );
       setState(() {
         _action = confirmed;

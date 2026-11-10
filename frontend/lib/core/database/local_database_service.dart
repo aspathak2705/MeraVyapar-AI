@@ -50,7 +50,7 @@ class LocalDatabaseService {
 
     if (_activeDriver != null) {
       await _activeDriver!.open(_databaseFilePath!);
-      for (final sql in LocalDatabaseSchema.createStatementsV2) {
+      for (final sql in LocalDatabaseSchema.createStatementsV3) {
         await _activeDriver!.execute(sql);
       }
     }

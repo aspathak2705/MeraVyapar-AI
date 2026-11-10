@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import '../domain/communication_action_model.dart';
-import '../data/action_repository.dart';
+import '../data/local_action_repository.dart';
 import 'action_detail_screen.dart';
 
 class ActionCenterScreen extends StatefulWidget {
-  final ActionRepository actionRepository;
+  final LocalActionRepository actionRepository;
   final String authToken;
+  final VoidCallback? onBack;
 
   const ActionCenterScreen({
     Key? key,
     required this.actionRepository,
     required this.authToken,
+    this.onBack,
   }) : super(key: key);
 
   @override
@@ -28,7 +30,7 @@ class _ActionCenterScreenState extends State<ActionCenterScreen> {
 
   void _refreshActions() {
     setState(() {
-      _actionsFuture = widget.actionRepository.fetchActions(authToken: widget.authToken);
+      _actionsFuture = widget.actionRepository.fetchActions(merchantId: widget.authToken);
     });
   }
 
@@ -37,6 +39,13 @@ class _ActionCenterScreenState extends State<ActionCenterScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Merchant Action Center'),
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: widget.onBack,
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

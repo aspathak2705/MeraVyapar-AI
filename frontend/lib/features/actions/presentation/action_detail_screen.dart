@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../domain/communication_action_model.dart';
 import '../domain/communication_audit_event_model.dart';
-import '../data/action_repository.dart';
+import '../data/local_action_repository.dart';
 
 class ActionDetailScreen extends StatefulWidget {
-  final ActionRepository actionRepository;
+  final LocalActionRepository actionRepository;
   final String actionId;
   final String authToken;
 
@@ -32,12 +32,13 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
 
   void _loadData() {
     setState(() {
-      _actionFuture = widget.actionRepository.fetchActions(authToken: widget.authToken).then(
-            (list) => list.firstWhere((a) => a.id == widget.actionId),
-          );
+      _actionFuture = widget.actionRepository.getActionById(
+        actionId: widget.actionId,
+        merchantId: widget.authToken,
+      ).then((a) => a ?? (throw Exception('Action not found: ${widget.actionId}')));
       _auditFuture = widget.actionRepository.fetchAuditTrail(
         actionId: widget.actionId,
-        authToken: widget.authToken,
+        merchantId: widget.authToken,
       );
     });
   }
@@ -47,7 +48,7 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
     try {
       await widget.actionRepository.confirmAction(
         actionId: widget.actionId,
-        authToken: widget.authToken,
+        merchantId: widget.authToken,
       );
       _loadData();
     } catch (e) {
@@ -60,9 +61,9 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
   Future<void> _dispatchAction() async {
     setState(() => _isProcessing = true);
     try {
-      await widget.actionRepository.dispatchAction(
+      await widget.actionRepository.recordExternalHandoff(
         actionId: widget.actionId,
-        authToken: widget.authToken,
+        merchantId: widget.authToken,
       );
       _loadData();
     } catch (e) {
@@ -77,7 +78,7 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
     try {
       await widget.actionRepository.cancelAction(
         actionId: widget.actionId,
-        authToken: widget.authToken,
+        merchantId: widget.authToken,
       );
       _loadData();
     } catch (e) {
