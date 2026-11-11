@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'drivers/sqflite_database_driver.dart';
 import 'local_database_schema.dart';
 
 /// Abstract interface for local database operations to allow deterministic test mocks
@@ -46,16 +47,14 @@ class LocalDatabaseService {
     if (_isInitialized) return;
 
     _databaseFilePath = await getDatabasePath();
-    _activeDriver = customDriver;
+    _activeDriver = customDriver ?? SqfliteDatabaseDriver();
 
-    if (_activeDriver != null) {
-      await _activeDriver!.open(_databaseFilePath!);
-      // Enable WAL mode and foreign key constraints for production SQLite integrity
-      await _activeDriver!.execute('PRAGMA journal_mode = WAL;');
-      await _activeDriver!.execute('PRAGMA foreign_keys = ON;');
-      for (final sql in LocalDatabaseSchema.createStatementsV3) {
-        await _activeDriver!.execute(sql);
-      }
+    await _activeDriver!.open(_databaseFilePath!);
+    // Enable WAL mode and foreign key constraints for production SQLite integrity
+    await _activeDriver!.execute('PRAGMA journal_mode = WAL;');
+    await _activeDriver!.execute('PRAGMA foreign_keys = ON;');
+    for (final sql in LocalDatabaseSchema.createStatementsV3) {
+      await _activeDriver!.execute(sql);
     }
 
     _isInitialized = true;

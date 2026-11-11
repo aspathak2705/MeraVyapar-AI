@@ -1,4 +1,3 @@
-import 'dart:math';
 import '../../../core/database/local_database_service.dart';
 import '../../../core/database/local_database_schema.dart';
 
@@ -249,13 +248,13 @@ class LocalFinancialIntelligenceEngine {
       final amountPaise = r['amount_minor_units'] as int? ?? 0;
       final currency = r['currency'] as String? ?? 'INR';
       final dueDateStr = r['due_date'] as String? ?? nowIso;
-      final status = (r['status'] as String? ?? 'OPEN').toUpperCase();
+      final promiseStatus = (r['status'] as String? ?? 'OPEN').toUpperCase();
 
       final dueDate = DateTime.tryParse(dueDateStr) ?? now;
       final diff = now.difference(dueDate);
       final daysOverdue = diff.inDays;
 
-      String state = 'PENDING';
+      String state = promiseStatus == 'OVERDUE' ? 'OVERDUE' : 'PENDING';
       String priority = 'LOW';
       final List<String> reasonCodes = [];
 
