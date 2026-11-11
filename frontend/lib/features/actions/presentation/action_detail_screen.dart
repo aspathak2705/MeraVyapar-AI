@@ -184,7 +184,7 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
                           onPressed: _isProcessing ? null : _dispatchAction,
-                          child: const Text('Dispatch Message'),
+                          child: const Text('Share Draft (User Handoff)'),
                         ),
                       ),
                     if (canCancel) ...[
