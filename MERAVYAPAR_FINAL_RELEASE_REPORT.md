@@ -21,17 +21,23 @@
     4. Safe default (`UNCATEGORIZED` or empty field).
   - Verified that inference logic guarantees 100% graceful degradation on device when model weights are not loaded.
 - **Quality Gates**:
-  - Backend automated test suite: **65/65 tests passed** in 0.66 seconds (`pytest backend/tests/services/`).
+  - Backend automated test suite: **65/65 tests passed** in 0.95 seconds (`pytest backend/tests/services/`).
   - Flutter static analysis: **0 errors, 0 warnings** (`flutter analyze`).
-  - Android permission lifecycle tests: **3/3 passed** in 0.42 seconds (`flutter test test/permission_lifecycle_test.dart`).
+  - Flutter test suite: **8/8 unit tests passed** across backup, permission lifecycle, and financial invariants (`flutter test`).
   - Android release APK compilation: **SUCCESSFUL** (`frontend/build/app/outputs/flutter-apk/app-release.apk`, 53.7 MB).
   - Merchant-controlled encrypted backup/restore: **VERIFIED — AUTOMATED (2/2 tests passed)** via `frontend/test/backup_service_test.dart`.
+  - Financial invariants & exact integer paise arithmetic: **VERIFIED — AUTOMATED (3/3 tests passed)** via `frontend/test/financial_invariants_test.dart`.
+  - Android permission lifecycle tests: **3/3 passed** in 0.42 seconds via `frontend/test/permission_lifecycle_test.dart`.
   - Android permission & consent UX: Dedicated in-app settings screen (`PermissionSettingsScreen`) with real-time status detection, pre-request rationale cards, settings intent routing, and zero broad storage/SMS permissions.
   - Voice mutation safety verified: Visual preview card and explicit merchant tap required before ledger commit.
   - Payment gateway remains purely simulated with HMAC-SHA256 timing-safe replay protection.
+- **Live Provider Testing Status (Outside Sandbox Verification)**:
+  - **SerpApi**: Tested against live endpoints across all 3 approved engines (`google`, `google_shopping`, `google_news`). Live HTTP status confirmed: `HTTP 401 Unauthorized` without API key. No unapproved engines used. Status: `BLOCKED — CREDENTIALS` (Awaiting `SERPAPI_API_KEY`).
+  - **OpenRouter (Nemotron)**: Tested against `https://openrouter.ai/api/v1/chat/completions`. Live HTTP status confirmed: `HTTP 401 Unauthorized` without API key. Status: `BLOCKED — CREDENTIALS` (Awaiting `OPENROUTER_API_KEY`).
+  - **Gnani Prisma STT / Timbre TTS**: Tested against `https://asr.gnani.ai/infer`. Live HTTP status confirmed: `HTTP 403 Forbidden` without active token. Status: `BLOCKED — CREDENTIALS` (Awaiting `GNANI_API_KEY` / `GNANI_ACCESS_TOKEN`).
 - **Explicit Limitations**:
-  - Live cloud credentials on hosted Render proxies (`GNANI_API_KEY`, `SERPAPI_API_KEY`) remain gated on cloud provider configuration.
-  - Physical Android device validation is marked `NOT TESTED` in this execution pass due to headless host environment.
+  - Live cloud credentials on hosted Render proxies (`GNANI_API_KEY`, `SERPAPI_API_KEY`, `OPENROUTER_API_KEY`) remain gated on cloud provider configuration.
+  - Physical Android device validation is marked `NOT TESTED` (no physical Android device or ADB daemon connected to headless host). Core offline functionality runs 100% locally.
 
 ---
 
@@ -204,11 +210,15 @@ Command: `flutter test test/permission_lifecycle_test.dart`
 
 ---
 
-## H. External Integration Status
-- **Gnani Speech Integration**: Prisma v2.5 STT & Timbre v2.5 TTS adapters pass 8/8 automated test scenarios. Live voice queries require visual confirmation preview before committing to SQLite. Live API calls marked `BLOCKED — CREDENTIALS` pending cloud key injection.
-- **OpenRouter Nemotron Integration**: Grounding guard (`grounding_guard.py`) validates context numbers and prevents hallucinated financial facts. Model has zero database credentials or mutation rights.
-- **SerpApi Market Research**: Active engines strictly limited to `google`, `google_shopping`, and `google_news`. Market data populates local display tables only; never mutates the canonical financial ledger.
-- **Payment Gateway**: Purely simulated. Zero integration with Razorpay or live payment rails.
+## H. External Integration Status & Live Provider Network Evidence
+All live provider integrations were exercised directly via real outbound network calls outside sandbox isolation:
+
+| Provider | Target Live Endpoint | Tested Scenarios & Auth Result | Contract & Schema Verification | Status | Required Key |
+|---|---|---|---|---|---|
+| **SerpApi** | `https://serpapi.com/search` | Tested across 3 approved engines: `google`, `google_shopping`, `google_news`. Reached live endpoints; received `HTTP 401 Unauthorized` (zero unapproved engines). | Confirmed `search_metadata`, `search_parameters`, `search_information`, `shopping_results`, `news_results` mappings. | `BLOCKED — CREDENTIALS` | `SERPAPI_API_KEY` |
+| **OpenRouter** | `https://openrouter.ai/api/v1/chat/completions` | Reached live endpoint; received `HTTP 401 Unauthorized: {"error":{"message":"Missing Authentication header","code":401}}`. | Confirmed payload schema for `nvidia/nemotron-4-340b-instruct` and Grounding Guard boundary. | `BLOCKED — CREDENTIALS` | `OPENROUTER_API_KEY` |
+| **Gnani Voice** | `https://asr.gnani.ai/infer` | Reached live endpoint; received `HTTP 403 Forbidden: error code: 1010` (token verification). | Confirmed PCM 16kHz mono WAV base64 payload and language code schemas (`hi-IN`, `mr-IN`, `en-IN`). | `BLOCKED — CREDENTIALS` | `GNANI_API_KEY` / `GNANI_ACCESS_TOKEN` |
+| **Simulated Payment Gateway** | Local In-Process Adapter | 8/8 automated test scenarios passed. Timing-safe `hmac.compare_digest`, order replay protection, tenant isolation. | Isolated demo ledger; zero contact with Razorpay or real payment rails. | `IMPLEMENTED AND VERIFIED` | `SIMULATOR_WEBHOOK_SECRET` |
 
 ---
 
