@@ -96,6 +96,12 @@ class HomeShellScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          // Permissions / Privacy Settings Button
+          IconButton(
+            icon: const Icon(Icons.security_rounded, size: 20),
+            tooltip: 'Device Permissions & Privacy',
+            onPressed: () => onNavigateToRoute?.call('/settings/permissions'),
+          ),
           // Theme Toggle Button
           IconButton(
             icon: Icon(
@@ -263,7 +269,6 @@ class HomeShellScreen extends ConsumerWidget {
           ],
         ),
         data: (metrics) {
-          final isPositive = metrics.netCashMovementPaise >= 0;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

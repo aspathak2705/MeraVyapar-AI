@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+import '../../capture/data/device_evidence_capture.dart';
 
 abstract class AudioRecordingService {
   Future<bool> hasPermission();
@@ -78,21 +79,32 @@ class SimulatedAudioRecordingService implements AudioRecordingService {
 class DeviceAudioRecordingService implements AudioRecordingService {
   static const int maxAudioBytes = 10 * 1024 * 1024; // 10 MB limit matching backend boundary
   final Future<Directory> Function()? tempDirProvider;
+  final DeviceEvidenceCapture? deviceEvidenceCapture;
   bool _isRecording = false;
   File? _currentRecordingFile;
 
-  DeviceAudioRecordingService({this.tempDirProvider});
+  DeviceAudioRecordingService({
+    this.tempDirProvider,
+    DeviceEvidenceCapture? deviceEvidenceCapture,
+  }) : deviceEvidenceCapture = deviceEvidenceCapture ?? AndroidDeviceEvidenceCapture();
 
   @override
   bool get isRecording => _isRecording;
 
   @override
   Future<bool> hasPermission() async {
+    if (deviceEvidenceCapture != null && deviceEvidenceCapture!.isPlatformSupported) {
+      return await deviceEvidenceCapture!.checkPermission('RECORD_AUDIO');
+    }
     return true;
   }
 
   @override
   Future<bool> requestPermission() async {
+    if (deviceEvidenceCapture != null && deviceEvidenceCapture!.isPlatformSupported) {
+      final status = await deviceEvidenceCapture!.requestFeaturePermission('RECORD_AUDIO');
+      return status == PermissionLifecycleStatus.granted;
+    }
     return true;
   }
 

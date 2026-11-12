@@ -10,6 +10,7 @@ import '../../actions/domain/communication_action_model.dart';
 enum VoiceInteractionStatus {
   idle,
   requestingPermission,
+  permissionRationale,
   recording,
   processing,
   speaking,
@@ -98,20 +99,28 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
     state = state.copyWith(selectedLanguage: languageCode);
   }
 
-  Future<void> startRecording() async {
+  Future<void> startRecording({bool proceedDirectly = false}) async {
     try {
+      final hasPermission = await recordingService.hasPermission();
+      if (!hasPermission && !proceedDirectly) {
+        state = state.copyWith(
+          status: VoiceInteractionStatus.permissionRationale,
+          errorMessage: null,
+        );
+        return;
+      }
+
       state = state.copyWith(
         status: VoiceInteractionStatus.requestingPermission,
         errorMessage: null,
       );
 
-      final hasPermission = await recordingService.hasPermission();
       if (!hasPermission) {
         final granted = await recordingService.requestPermission();
         if (!granted) {
           state = state.copyWith(
             status: VoiceInteractionStatus.error,
-            errorMessage: 'Microphone permission is required for voice assistant.',
+            errorMessage: 'Microphone permission is required for voice assistant. You can enable it in Android App Settings.',
           );
           return;
         }

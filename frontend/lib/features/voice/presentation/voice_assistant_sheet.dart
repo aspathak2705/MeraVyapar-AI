@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../capture/data/device_evidence_capture.dart';
 import 'voice_interaction_controller.dart';
 import 'voice_confirmation_card.dart';
 import 'wake_word_controller.dart';
@@ -145,6 +146,45 @@ class VoiceAssistantSheet extends ConsumerWidget {
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
             child: Text('Requesting microphone permission...', style: TextStyle(color: Color(0xFF64748B))),
+          ),
+        );
+
+      case VoiceInteractionStatus.permissionRationale:
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFFEFF6FF),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFBFDBFE)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: const [
+                  Icon(Icons.mic, color: Color(0xFF1D4ED8), size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Microphone Access Consent',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E3A8A)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'MeraVyapar AI needs microphone access strictly when you tap speak to recognize Hindi, Marathi, or English commands for recording credit entries and receivables queries. Audio is not recorded continuously or in the background.',
+                style: TextStyle(fontSize: 13, color: Color(0xFF1E40AF), height: 1.4),
+              ),
+              const SizedBox(height: 12),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF2563EB),
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () => controller.startRecording(proceedDirectly: true),
+                child: const Text('Allow & Start Speaking'),
+              ),
+            ],
           ),
         );
 
@@ -297,6 +337,7 @@ class VoiceAssistantSheet extends ConsumerWidget {
         );
 
       case VoiceInteractionStatus.error:
+        final isMicDenied = (state.errorMessage ?? '').contains('Microphone permission');
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -313,6 +354,17 @@ class VoiceAssistantSheet extends ConsumerWidget {
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 14, color: Color(0xFF991B1B)),
               ),
+              if (isMicDenied) ...[
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  icon: const Icon(Icons.settings, size: 16),
+                  label: const Text('Open Android App Settings'),
+                  onPressed: () {
+                    final capture = AndroidDeviceEvidenceCapture();
+                    capture.openAppSettings();
+                  },
+                ),
+              ],
             ],
           ),
         );

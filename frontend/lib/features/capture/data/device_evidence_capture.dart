@@ -1,10 +1,21 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+enum PermissionLifecycleStatus {
+  granted,
+  denied,
+  permanentlyDenied,
+  notRequested,
+  unsupported,
+}
+
 abstract class DeviceEvidenceCapture {
   bool get isPlatformSupported;
   Future<bool> checkPermission(String feature);
-  Future<bool> requestPermission(String feature);
+  Future<PermissionLifecycleStatus> requestFeaturePermission(String feature);
+  Future<Map<String, PermissionLifecycleStatus>> getDetailedPermissionStatus();
+  Future<bool> openAppSettings();
+  Future<bool> openNotificationListenerSettings();
   void setNotificationHandler(Future<void> Function(Map<String, dynamic> data) handler);
 }
 
@@ -47,13 +58,81 @@ class AndroidDeviceEvidenceCapture implements DeviceEvidenceCapture {
   }
 
   @override
-  Future<bool> requestPermission(String feature) async {
+  Future<PermissionLifecycleStatus> requestFeaturePermission(String feature) async {
+    if (!isPlatformSupported) return PermissionLifecycleStatus.unsupported;
+    try {
+      final dynamic result = await _channel.invokeMethod('requestPermission', {'feature': feature});
+      if (result == true || result == 'GRANTED') {
+        return PermissionLifecycleStatus.granted;
+      } else if (result == 'PERMANENTLY_DENIED') {
+        return PermissionLifecycleStatus.permanentlyDenied;
+      } else {
+        return PermissionLifecycleStatus.denied;
+      }
+    } on MissingPluginException {
+      return PermissionLifecycleStatus.unsupported;
+    } catch (_) {
+      return PermissionLifecycleStatus.denied;
+    }
+  }
+
+  @override
+  Future<Map<String, PermissionLifecycleStatus>> getDetailedPermissionStatus() async {
+    if (!isPlatformSupported) {
+      return {
+        'RECORD_AUDIO': PermissionLifecycleStatus.unsupported,
+        'NOTIFICATION_LISTENER': PermissionLifecycleStatus.unsupported,
+        'POST_NOTIFICATIONS': PermissionLifecycleStatus.unsupported,
+        'INTERNET': PermissionLifecycleStatus.unsupported,
+      };
+    }
+
+    try {
+      final dynamic raw = await _channel.invokeMethod('getDetailedPermissionStatus');
+      if (raw is Map) {
+        final Map<String, PermissionLifecycleStatus> result = {};
+        raw.forEach((key, value) {
+          final k = key.toString();
+          final v = value.toString();
+          if (v == 'GRANTED' || v == 'CONNECTED') {
+            result[k] = PermissionLifecycleStatus.granted;
+          } else if (v == 'PERMANENTLY_DENIED') {
+            result[k] = PermissionLifecycleStatus.permanentlyDenied;
+          } else if (v == 'NOT_REQUESTED') {
+            result[k] = PermissionLifecycleStatus.notRequested;
+          } else {
+            result[k] = PermissionLifecycleStatus.denied;
+          }
+        });
+        return result;
+      }
+    } catch (_) {}
+
+    return {
+      'RECORD_AUDIO': PermissionLifecycleStatus.notRequested,
+      'NOTIFICATION_LISTENER': PermissionLifecycleStatus.denied,
+      'POST_NOTIFICATIONS': PermissionLifecycleStatus.notRequested,
+      'INTERNET': PermissionLifecycleStatus.denied,
+    };
+  }
+
+  @override
+  Future<bool> openAppSettings() async {
     if (!isPlatformSupported) return false;
     try {
-      final bool result = await _channel.invokeMethod('requestPermission', {'feature': feature});
-      return result;
-    } on MissingPluginException {
+      final bool? res = await _channel.invokeMethod<bool>('openAppSettings');
+      return res ?? false;
+    } catch (_) {
       return false;
+    }
+  }
+
+  @override
+  Future<bool> openNotificationListenerSettings() async {
+    if (!isPlatformSupported) return false;
+    try {
+      final bool? res = await _channel.invokeMethod<bool>('openNotificationListenerSettings');
+      return res ?? false;
     } catch (_) {
       return false;
     }
