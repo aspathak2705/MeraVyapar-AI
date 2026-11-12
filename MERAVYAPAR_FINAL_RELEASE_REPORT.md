@@ -23,6 +23,8 @@
 - **Quality Gates**:
   - Backend automated test suite: **65/65 tests passed** in 0.92 seconds.
   - Flutter static analysis: **0 errors, 0 warnings** (`flutter analyze --fatal-warnings`).
+  - Android release APK compilation: **SUCCESSFUL** (`frontend/build/app/outputs/flutter-apk/app-release.apk`, 53.7 MB).
+  - Merchant-controlled encrypted backup/restore: **VERIFIED — AUTOMATED (2/2 tests passed)** via `frontend/test/backup_service_test.dart`.
   - Voice mutation safety verified: Visual preview card and explicit merchant tap required before ledger commit.
   - Payment gateway remains purely simulated with HMAC-SHA256 timing-safe replay protection.
 - **Explicit Limitations**:
@@ -59,6 +61,8 @@
 | Voice Assistant | `VoiceAssistantSheet` | Gnani Prisma STT / Timbre TTS proxy | VERIFIED — AUTOMATED (Adapter) |
 | Market Intelligence | `RelevantMarketSignalsScreen` | SerpApi proxy (`google`, `shopping`, `news`) | VERIFIED — AUTOMATED (Adapter) |
 | Simulated Payment Sandbox | `SimulatedPaymentGatewayAdapter` | Local Sandbox Order Ledger + HMAC verification | VERIFIED — AUTOMATED (8/8) |
+| Encrypted Backup & Restore | `EncryptedLocalBackupService` | Merchant Passphrase + PBKDF2-HMAC-SHA256 + EtM | VERIFIED — AUTOMATED (2/2) |
+| Android Release Packaging | Gradle 8.3 / AGP 8.3.2 | Flutter release toolchain (`app-release.apk`) | VERIFIED — BUILD (53.7 MB) |
 
 ---
 
@@ -150,7 +154,25 @@ Command: `flutter analyze --fatal-warnings`
 - **Errors**: 0 [VERIFIED — AUTOMATED]
 - **Warnings**: 0 [VERIFIED — AUTOMATED]
 - **Actionable Issues**: 0
-- **Cosmetic Infos**: 47 (Flutter 3.x framework deprecation notices recommending `withValues` over `withOpacity`).
+- **Cosmetic Infos**: 49 (Flutter framework deprecation notices recommending `withValues` over `withOpacity`).
+
+### 3. Android Release APK Build
+Command: `flutter build apk --release`
+- **Status**: **SUCCESSFUL** [VERIFIED — BUILD]
+- **Output Artifact**: `frontend/build/app/outputs/flutter-apk/app-release.apk`
+- **Size**: **53.7 MB** (56,334,886 bytes)
+- **Compilation Time**: 141.2 seconds
+- **Gradle Configuration**: `org.gradle.jvmargs=-Xmx2048m -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError` in `frontend/android/gradle.properties` resolved host JVM heap constraints.
+- **Security Audit of APK Assets**: Verified zero cloud secrets, database files, or private merchant records packaged into binary.
+
+### 4. Merchant-Controlled Encrypted Backup & Restore Unit Tests
+Command: `flutter test test/backup_service_test.dart`
+- **Status**: **2/2 PASSED** [VERIFIED — AUTOMATED] in 0.58 seconds.
+- **Test 1**: `EncryptedLocalBackupService - creates encrypted backup with manifest and authenticates integrity` [PASSED]
+  - Verified PBKDF2-HMAC-SHA256 key derivation (60,000 iterations), separate 256-bit AES encryption & HMAC authentication keys, Encrypt-then-MAC (EtM) envelope verification, and SHA-256 database checksum verification.
+- **Test 2**: `EncryptedLocalBackupService - rejects corrupt or tampered backup file` [PASSED]
+  - Verified that byte tampering or invalid passphrases immediately throw `BackupVerificationException` prior to any disk mutation or restore.
+  - Verified atomic recovery rollback journaling (`restore_journal.json`).
 
 ---
 
@@ -176,11 +198,23 @@ Command: `flutter analyze --fatal-warnings`
 
 ---
 
-## J. Remaining Genuine Blockers
-1. **Cloud Environment Key Injection**:
-   - `GNANI_API_KEY`, `SERPAPI_API_KEY`, and `OPENROUTER_API_KEY` must be provisioned in Render dashboard environment variables for live internet voice and market searches.
-2. **Merchant Device Backup Retention**:
-   - As SQLite is the canonical source of truth, device loss will result in data loss unless the merchant manually exports an encrypted backup.
+## J. Render Cloud Environment Configuration Guide & Blockers
+To enable live proxy responses from Gnani, SerpApi, and OpenRouter when deploying the backend on Render, configure the following environment variables in the Render Service Dashboard:
+
+| Environment Variable | Provider / Purpose | Default / Fallback Mode |
+|---|---|---|
+| `GNANI_API_KEY` | Gnani Prisma v2.5 STT & Timbre v2.5 TTS voice synthesis | Returns mock/adapter response if missing (`BLOCKED — CREDENTIALS`) |
+| `GNANI_ACCESS_TOKEN` | Gnani API Authentication Token | Optional depending on Gnani workspace tier |
+| `SERPAPI_API_KEY` | Real-time market prices & news via Google, Shopping, News | Returns empty signals with explicit credential notice |
+| `OPENROUTER_API_KEY` | Grounded Nemotron LLM reasoning | Guarded fallback to local rule-based response |
+| `FASTAPI_ENV` | Environment marker (`development` / `staging` / `production`) | Simulator blocked in `production` (`ProductionSimulatorDisabledError`) |
+| `SIMULATOR_WEBHOOK_SECRET` | HMAC secret for simulated payment signature generation | Required for simulated sandbox webhook dispatch |
+
+### Remaining Operational Notes:
+1. **Merchant Device Backup Retention**:
+   - As SQLite is the canonical source of truth, device loss will result in data loss unless the merchant exports an encrypted backup via `EncryptedLocalBackupService` to local SD/USB or device storage.
+2. **Physical Device Installation**:
+   - Release APK (`app-release.apk`) is built and ready for sideloading via `adb install frontend/build/app/outputs/flutter-apk/app-release.apk`.
 
 ---
 
