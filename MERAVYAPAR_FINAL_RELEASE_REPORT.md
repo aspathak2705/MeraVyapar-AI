@@ -31,12 +31,22 @@
   - Android permission & consent UX: Dedicated in-app settings screen (`PermissionSettingsScreen`) with real-time status detection, pre-request rationale cards, settings intent routing, and zero broad storage/SMS permissions.
   - Voice mutation safety verified: Visual preview card and explicit merchant tap required before ledger commit.
   - Payment gateway remains purely simulated with HMAC-SHA256 timing-safe replay protection.
-- **Live Provider Testing Status (Outside Sandbox Verification)**:
-  - **SerpApi**: Tested against live endpoints across all 3 approved engines (`google`, `google_shopping`, `google_news`). Live HTTP status confirmed: `HTTP 401 Unauthorized` without API key. No unapproved engines used. Status: `BLOCKED — CREDENTIALS` (Awaiting `SERPAPI_API_KEY`).
-  - **OpenRouter (Nemotron)**: Tested against `https://openrouter.ai/api/v1/chat/completions`. Live HTTP status confirmed: `HTTP 401 Unauthorized` without API key. Status: `BLOCKED — CREDENTIALS` (Awaiting `OPENROUTER_API_KEY`).
-  - **Gnani Prisma STT / Timbre TTS**: Tested against `https://asr.gnani.ai/infer`. Live HTTP status confirmed: `HTTP 403 Forbidden` without active token. Status: `BLOCKED — CREDENTIALS` (Awaiting `GNANI_API_KEY` / `GNANI_ACCESS_TOKEN`).
+- **Live Provider Testing Status (Authenticated Live Verification)**:
+  - **Gnani Speech Stack (STT + TTS)**: **AUTHENTICATED & VERIFIED — LIVE**.
+    - **Gnani TTS (Timbre v2.5)**: `https://api.vachana.ai/api/v1/tts/inference` returned **HTTP 200 OK** with 66,604 bytes audio synthesized for Hindi merchant prompt (`Nalini` voice).
+    - **Gnani STT (Prisma v2.5)**: `https://api.vachana.ai/stt/v3` returned **HTTP 200 OK** with accurate Hindi transcription (`रमेश जी से ₹5,000 लेने हैं।`).
+    - **End-to-End Voice Journey**: Voice speech → STT transcription → `VoiceActionRouter` extraction → parsed counterparty, integer paise amount, and confirmation requirement verified.
+  - **SerpApi Market Research**: **AUTHENTICATED & VERIFIED — LIVE**.
+    - All 3 approved engines executed with real live queries outside sandbox:
+      1. `google`: **HTTP 200 OK** (9 normalized items, e.g., Mandi onion prices).
+      2. `google_shopping`: **HTTP 200 OK** (40 normalized items, e.g., wholesale fabric with rupee prices).
+      3. `google_news`: **HTTP 200 OK** (23 normalized items, e.g., RBI MSME lending reports).
+    - Zero unapproved engines called.
+  - **OpenRouter (Nemotron)**: **BLOCKED — CREDENTIAL REJECTED BY PROVIDER**.
+    - Request to `https://openrouter.ai/api/v1/chat/completions` and auth check `https://openrouter.ai/api/v1/auth/key` returned `HTTP 401 Unauthorized: {"error":{"message":"User not found.","code":401}}`. The key in `.env` is formatted (`sk-or-v1-...`), but rejected by OpenRouter as an invalid or deleted user account. Fallback rule-based financial reasoning functions deterministically on-device without cloud LLM.
 - **Explicit Limitations**:
-  - Live cloud credentials on hosted Render proxies (`GNANI_API_KEY`, `SERPAPI_API_KEY`, `OPENROUTER_API_KEY`) remain gated on cloud provider configuration.
+  - OpenRouter account credential requires refresh in `.env` (`OPENROUTER_API_KEY`).
+  - Render deployment requires setting `GNANI_API_KEY` and `SERPAPI_API_KEY` on Render Dashboard to mirror verified local environment.
   - Physical Android device validation is marked `NOT TESTED` (no physical Android device or ADB daemon connected to headless host). Core offline functionality runs 100% locally.
 
 ---
@@ -210,15 +220,35 @@ Command: `flutter test test/permission_lifecycle_test.dart`
 
 ---
 
-## H. External Integration Status & Live Provider Network Evidence
+## H. External Integration Status & Authenticated Live Provider Evidence
 All live provider integrations were exercised directly via real outbound network calls outside sandbox isolation:
 
-| Provider | Target Live Endpoint | Tested Scenarios & Auth Result | Contract & Schema Verification | Status | Required Key |
+| Provider / Operation | Environment | HTTP Status | Provider-Level Status | Functional Validation | Result |
 |---|---|---|---|---|---|
-| **SerpApi** | `https://serpapi.com/search` | Tested across 3 approved engines: `google`, `google_shopping`, `google_news`. Reached live endpoints; received `HTTP 401 Unauthorized` (zero unapproved engines). | Confirmed `search_metadata`, `search_parameters`, `search_information`, `shopping_results`, `news_results` mappings. | `BLOCKED — CREDENTIALS` | `SERPAPI_API_KEY` |
-| **OpenRouter** | `https://openrouter.ai/api/v1/chat/completions` | Reached live endpoint; received `HTTP 401 Unauthorized: {"error":{"message":"Missing Authentication header","code":401}}`. | Confirmed payload schema for `nvidia/nemotron-4-340b-instruct` and Grounding Guard boundary. | `BLOCKED — CREDENTIALS` | `OPENROUTER_API_KEY` |
-| **Gnani Voice** | `https://asr.gnani.ai/infer` | Reached live endpoint; received `HTTP 403 Forbidden: error code: 1010` (token verification). | Confirmed PCM 16kHz mono WAV base64 payload and language code schemas (`hi-IN`, `mr-IN`, `en-IN`). | `BLOCKED — CREDENTIALS` | `GNANI_API_KEY` / `GNANI_ACCESS_TOKEN` |
-| **Simulated Payment Gateway** | Local In-Process Adapter | 8/8 automated test scenarios passed. Timing-safe `hmac.compare_digest`, order replay protection, tenant isolation. | Isolated demo ledger; zero contact with Razorpay or real payment rails. | `IMPLEMENTED AND VERIFIED` | `SIMULATOR_WEBHOOK_SECRET` |
+| **SerpApi Google** | Local (`backend` + `.env`) | **HTTP 200** | `OK` | Returned 9 items for wholesale onion query with title, snippet, source URL | **PASS** |
+| **SerpApi Shopping** | Local (`backend` + `.env`) | **HTTP 200** | `OK` | Returned 40 items for cotton fabric wholesale with rupee pricing (`₹250`) | **PASS** |
+| **SerpApi News** | Local (`backend` + `.env`) | **HTTP 200** | `OK` | Returned 23 items for RBI MSME lending with publication date & source | **PASS** |
+| **Gnani STT (Prisma v2.5)** | Local (`backend` + `.env`) | **HTTP 200** | `OK` | Transcribed speech bytes accurately: *"रमेश जी से ₹5,000 लेने हैं।"* | **PASS** |
+| **Gnani TTS (Timbre v2.5)** | Local (`backend` + `.env`) | **HTTP 200** | `OK` | Synthesized Hindi sentence into 66,604 bytes linear PCM WAV (`Nalini` voice) | **PASS** |
+| **OpenRouter Nemotron** | Local (`backend` + `.env`) | **HTTP 401** | `User not found` | Key rejected by OpenRouter auth API; deterministic fallback operational | **BLOCKED — CREDENTIALS** |
+| **Simulated Payment Gateway** | Local In-Process Adapter | **In-Process** | `VERIFIED` | 8/8 adversarial security tests pass; timing-safe HMAC, replay blocked | **PASS** |
+
+### Live Integration Diagnostic Findings:
+1. **SerpApi**:
+   - `SERPAPI_API_KEY` loaded from `.env`.
+   - All 3 approved engines (`google`, `shopping`, `news`) tested and confirmed working with normalized data structures (`ExternalEvidenceItem`).
+   - Unapproved engines (Trends, Maps, Finance) remain locked and uninvoked.
+2. **Gnani AI Speech Stack**:
+   - `GNANI_API_KEY` loaded from `.env`.
+   - Base URL confirmed: `https://api.vachana.ai`.
+   - STT endpoint `POST /stt/v3` with header `X-API-Key-ID` authenticated and transcribed Hindi audio in under 2 seconds.
+   - TTS endpoint `POST /api/v1/tts/inference` authenticated and synthesized audio bytes successfully.
+   - Full round-trip voice journey tested: Speech synthesis -> STT recognition -> `VoiceActionRouter` intent classification -> preview extraction.
+3. **OpenRouter (Nemotron)**:
+   - `OPENROUTER_API_KEY` is present in `.env` and correctly loaded by Pydantic settings.
+   - OpenRouter returned `HTTP 401: {"error":{"message":"User not found.","code":401}}` on both `/chat/completions` and `/auth/key`.
+   - Diagnosis: The key was either generated under an account that has been deleted/disabled or was truncated/copied incorrectly.
+   - Remediation: Replace `OPENROUTER_API_KEY` in `.env` with an active key from openrouter.ai. Core app remains fully functional using local rule-based intelligence.
 
 ---
 
