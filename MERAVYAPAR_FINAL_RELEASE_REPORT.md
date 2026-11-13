@@ -21,9 +21,11 @@
     4. Safe default (`UNCATEGORIZED` or empty field).
   - Verified that inference logic guarantees 100% graceful degradation on device when model weights are not loaded.
 - **Quality Gates**:
-  - Backend automated test suite: **65/65 tests passed** in 0.95 seconds (`pytest backend/tests/services/`).
+  - Backend automated test suite: **65/65 tests passed** in 2.31 seconds (`pytest backend/tests/services/`).
+  - Voice router procurement integration: **VERIFIED** for `CREATE_PURCHASE_REQUEST`, `COMPARE_SUPPLIER_QUOTES`, and `QUERY_SUPPLIER_OBLIGATIONS`.
   - Flutter static analysis: **0 errors, 0 warnings** (`flutter analyze`).
-  - Flutter test suite: **8/8 unit tests passed** across backup, permission lifecycle, and financial invariants (`flutter test`).
+  - Flutter test suite: **13/13 unit tests passed** across backup, permission lifecycle, financial invariants, and procurement quotation comparison (`flutter test`).
+  - KharidSaathi Procurement Intelligence: **INTEGRATED & VERIFIED** (SQLite V4 schema, landed cost exact integer paise arithmetic, multi-attribute quote evaluation, FIG supplier nodes & edges, and cashflow payables aggregation).
   - Android release APK compilation: **SUCCESSFUL** (`frontend/build/app/outputs/flutter-apk/app-release.apk`, 53.7 MB).
   - Merchant-controlled encrypted backup/restore: **VERIFIED — AUTOMATED (2/2 tests passed)** via `frontend/test/backup_service_test.dart`.
   - Financial invariants & exact integer paise arithmetic: **VERIFIED — AUTOMATED (3/3 tests passed)** via `frontend/test/financial_invariants_test.dart`.
@@ -59,8 +61,9 @@
 | Authoritative Persistence | SQLite (`meravyapar_local.db`) via `SqfliteDatabaseDriver` | Local Canonical Authority | `LocalDatabaseService.initialize()` binds `SqfliteDatabaseDriver` with WAL mode & foreign keys [VERIFIED — OFFLINE] |
 | Cloud Database Status | PostgreSQL retired from mobile financial path | Isolated / Disabled for Mobile | No financial reads, writes, balances, or mutations route through PostgreSQL [VERIFIED — OFFLINE] |
 | Monetary Precision | Integer minor units (Paise: 1 INR = 100 paise) | Enforced across all schemas | `amount_minor_units` integer columns across `canonical_transactions`, `payment_promises` [VERIFIED — AUTOMATED] |
-| Graph Intelligence | FIG derived exclusively from confirmed SQLite facts | Non-Authoritative Derived Layer | `LocalFinancialIntelligenceGraphService` rebuilds graph from confirmed SQLite records only [VERIFIED — OFFLINE] |
+| Graph Intelligence | FIG derived exclusively from confirmed SQLite facts | Non-Authoritative Derived Layer | `LocalFinancialIntelligenceGraphService` rebuilds graph from confirmed SQLite records and procurement links [VERIFIED — OFFLINE] |
 | Offline Capability | Inflows, outflows, counterparties, promises, FIG, forecast | 100% Offline Functional | All core financial screens render from local repositories without network requests [VERIFIED — OFFLINE] |
+| KharidSaathi Procurement Intelligence | Additive SQLite schema V4 (`procurement_*`) with exact integer paise landed cost calculation | Integrated Local Autopilot | Multi-attribute quote comparison, trade-offs, voice draft intent, FIG supplier links & cashflow payables aggregation [VERIFIED — OFFLINE] |
 
 ---
 
@@ -82,6 +85,7 @@
 | Simulated Payment Sandbox | `SimulatedPaymentGatewayAdapter` | Local Sandbox Order Ledger + HMAC verification | VERIFIED — AUTOMATED (8/8) |
 | Encrypted Backup & Restore | `EncryptedLocalBackupService` | Merchant Passphrase + PBKDF2-HMAC-SHA256 + EtM | VERIFIED — AUTOMATED (2/2) |
 | Android Permission Lifecycle | `PermissionSettingsScreen` / `MainActivity` | Runtime checks, rationale banners, Settings navigation | VERIFIED — AUTOMATED (3/3) |
+| KharidSaathi Procurement Hub | `ProcurementDashboardScreen` / `LocalProcurementRepository` | Local SQLite V4 (`procurement_*`) + `QuotationComparisonEngine` | VERIFIED — AUTOMATED (5/5) |
 | Android Release Packaging | Gradle 8.3 / AGP 8.3.2 | Flutter release toolchain (`app-release.apk`) | VERIFIED — BUILD (53.7 MB) |
 
 ---

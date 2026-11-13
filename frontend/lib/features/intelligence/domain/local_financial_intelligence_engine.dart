@@ -141,6 +141,22 @@ class LocalFinancialIntelligenceEngine {
       }
     }
 
+    // 2b. Add Outgoing Supplier Obligations from Procurement (V4 integration)
+    try {
+      final obligationRows = await driver.query(
+        '''
+        SELECT outstanding_minor_units, status
+        FROM ${LocalDatabaseSchema.tableSupplierObligations}
+        WHERE merchant_id = ? AND status != 'FULFILLED'
+        ''',
+        [merchantId],
+      );
+      for (final ob in obligationRows) {
+        final outstandingPaise = ob['outstanding_minor_units'] as int? ?? 0;
+        totalPayables += outstandingPaise;
+      }
+    } catch (_) {}
+
     // 3. Counterparty count
     final cpRows = await driver.query(
       '''

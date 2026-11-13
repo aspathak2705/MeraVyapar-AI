@@ -3,7 +3,7 @@
 /// Preserves financial precision using integer minor units (paise: 1 INR = 100 paise)
 /// and ISO-8601 UTC timestamp strings.
 class LocalDatabaseSchema {
-  static const int version = 3;
+  static const int version = 4;
   static const String databaseFileName = 'meravyapar_local.db';
 
   // Table Names
@@ -17,6 +17,13 @@ class LocalDatabaseSchema {
   static const String tableCommunicationDrafts = 'communication_drafts';
   static const String tableAuditLog = 'local_audit_log';
   static const String tableMigrationMetadata = 'migration_metadata';
+
+  // Procurement & Supplier Intelligence Tables (Additive V4)
+  static const String tableSuppliers = 'procurement_suppliers';
+  static const String tablePurchaseRequests = 'procurement_purchase_requests';
+  static const String tableSupplierQuotations = 'procurement_supplier_quotations';
+  static const String tablePurchaseOrders = 'procurement_purchase_orders';
+  static const String tableSupplierObligations = 'procurement_supplier_obligations';
 
   // SQL DDL statements for version 3
   static const List<String> createStatementsV3 = [
@@ -201,6 +208,127 @@ class LocalDatabaseSchema {
       migrated_at TEXT NOT NULL,
       checksum TEXT NOT NULL
     );
+    ''',
+    // -------------------------------------------------------------
+    // Additive Procurement DDL (V4)
+    // -------------------------------------------------------------
+    '''
+    CREATE TABLE IF NOT EXISTS $tableSuppliers (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      name TEXT NOT NULL,
+      contact_person TEXT,
+      phone_number TEXT,
+      email TEXT,
+      category TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE INDEX IF NOT EXISTS idx_procurement_suppliers_merchant
+    ON $tableSuppliers(merchant_id, name);
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS $tablePurchaseRequests (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      item_name TEXT NOT NULL,
+      quantity REAL NOT NULL,
+      unit TEXT NOT NULL,
+      grade_spec TEXT,
+      dimensions TEXT,
+      delivery_timeline TEXT,
+      status TEXT NOT NULL DEFAULT 'OPEN',
+      notes TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE INDEX IF NOT EXISTS idx_procurement_pr_merchant
+    ON $tablePurchaseRequests(merchant_id, status);
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS $tableSupplierQuotations (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      purchase_request_id TEXT,
+      supplier_id TEXT NOT NULL,
+      supplier_name TEXT NOT NULL,
+      item_name TEXT NOT NULL,
+      specification TEXT,
+      quantity REAL NOT NULL,
+      unit TEXT NOT NULL,
+      unit_price_minor_units INTEGER NOT NULL,
+      gst_rate_percent REAL NOT NULL DEFAULT 18.0,
+      freight_minor_units INTEGER NOT NULL DEFAULT 0,
+      other_charges_minor_units INTEGER NOT NULL DEFAULT 0,
+      total_landed_cost_minor_units INTEGER NOT NULL,
+      delivery_days INTEGER NOT NULL DEFAULT 7,
+      payment_terms TEXT NOT NULL DEFAULT 'CREDIT_30_DAYS',
+      valid_until TEXT,
+      is_accepted INTEGER NOT NULL DEFAULT 0,
+      notes TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT,
+      FOREIGN KEY (purchase_request_id) REFERENCES $tablePurchaseRequests(id) ON DELETE SET NULL,
+      FOREIGN KEY (supplier_id) REFERENCES $tableSuppliers(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE INDEX IF NOT EXISTS idx_procurement_quotes_pr
+    ON $tableSupplierQuotations(purchase_request_id, total_landed_cost_minor_units);
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS $tablePurchaseOrders (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      purchase_request_id TEXT,
+      quotation_id TEXT NOT NULL,
+      supplier_id TEXT NOT NULL,
+      supplier_name TEXT NOT NULL,
+      item_name TEXT NOT NULL,
+      quantity REAL NOT NULL,
+      unit TEXT NOT NULL,
+      total_amount_minor_units INTEGER NOT NULL,
+      status TEXT NOT NULL DEFAULT 'CONFIRMED',
+      delivery_status TEXT NOT NULL DEFAULT 'PENDING',
+      quality_status TEXT NOT NULL DEFAULT 'PENDING',
+      created_at TEXT NOT NULL,
+      delivered_at TEXT,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT,
+      FOREIGN KEY (purchase_request_id) REFERENCES $tablePurchaseRequests(id) ON DELETE SET NULL,
+      FOREIGN KEY (quotation_id) REFERENCES $tableSupplierQuotations(id) ON DELETE RESTRICT,
+      FOREIGN KEY (supplier_id) REFERENCES $tableSuppliers(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS $tableSupplierObligations (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      purchase_order_id TEXT NOT NULL,
+      supplier_id TEXT NOT NULL,
+      supplier_name TEXT NOT NULL,
+      total_obligation_minor_units INTEGER NOT NULL,
+      settled_minor_units INTEGER NOT NULL DEFAULT 0,
+      outstanding_minor_units INTEGER NOT NULL,
+      due_date TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'PENDING',
+      created_at TEXT NOT NULL,
+      settled_at TEXT,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT,
+      FOREIGN KEY (purchase_order_id) REFERENCES $tablePurchaseOrders(id) ON DELETE RESTRICT,
+      FOREIGN KEY (supplier_id) REFERENCES $tableSuppliers(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE INDEX IF NOT EXISTS idx_supplier_obligations_merchant
+    ON $tableSupplierObligations(merchant_id, status, due_date);
     '''
   ];
 }

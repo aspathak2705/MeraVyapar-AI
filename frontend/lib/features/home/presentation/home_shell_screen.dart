@@ -402,6 +402,11 @@ class HomeShellScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 MerchantActionTile(
+                  label: 'KharidSaathi\nProcurement',
+                  icon: Icons.shopping_cart_checkout_rounded,
+                  onTap: () => onNavigateToRoute?.call('/procurement'),
+                ),
+                MerchantActionTile(
                   label: 'Payment\nPromises',
                   icon: AppIcons.promise,
                   onTap: () => (onOpenPromises ?? () => onNavigateToRoute?.call('/promises'))(),
@@ -416,12 +421,21 @@ class HomeShellScreen extends ConsumerWidget {
                   icon: AppIcons.market,
                   onTap: () => (onOpenMarketSignals ?? () => onNavigateToRoute?.call('/market'))(),
                 ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
                 MerchantActionTile(
                   label: 'AI Voice\nAutopilot',
                   icon: AppIcons.voice,
                   color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
                   onTap: () => onOpenVoiceAssistant?.call(),
                 ),
+                const SizedBox(width: 68),
+                const SizedBox(width: 68),
+                const SizedBox(width: 68),
               ],
             ),
           ],

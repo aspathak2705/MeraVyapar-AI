@@ -1,7 +1,7 @@
 import '../../../core/database/local_database_service.dart';
 import '../../../core/database/local_database_schema.dart';
 
-enum FigNodeType { merchant, counterparty, transaction, paymentPromise, financialEvent, evidence }
+enum FigNodeType { merchant, counterparty, transaction, paymentPromise, financialEvent, evidence, supplier, purchaseRequest, supplierQuotation, supplierObligation }
 
 class FigNode {
   final String id;
@@ -188,6 +188,51 @@ class LocalFinancialIntelligenceGraphService {
         ));
       }
     }
+
+    // 5. Procurement Entities (Suppliers & Outgoing Obligations)
+    try {
+      final supplierRows = await driver.query(
+        'SELECT id, name, category FROM ${LocalDatabaseSchema.tableSuppliers} WHERE merchant_id = ?',
+        [merchantId],
+      );
+      for (final s in supplierRows) {
+        final sId = s['id'] as String;
+        nodes.add(FigNode(
+          id: sId,
+          type: FigNodeType.supplier,
+          label: 'Supplier: ${s['name']}',
+          attributes: {'category': s['category']},
+        ));
+        edges.add(FigEdge(
+          sourceId: merchantId,
+          targetId: sId,
+          relationshipType: 'PROCURES_FROM',
+          metadata: {'supplier_name': s['name']},
+        ));
+      }
+
+      final obligationRows = await driver.query(
+        'SELECT id, supplier_id, total_obligation_minor_units, outstanding_minor_units, status FROM ${LocalDatabaseSchema.tableSupplierObligations} WHERE merchant_id = ?',
+        [merchantId],
+      );
+      for (final ob in obligationRows) {
+        final obId = ob['id'] as String;
+        final sId = ob['supplier_id'] as String;
+        final outPaise = ob['outstanding_minor_units'] as int? ?? 0;
+        nodes.add(FigNode(
+          id: obId,
+          type: FigNodeType.supplierObligation,
+          label: 'Obligation ₹${(outPaise / 100.0).toStringAsFixed(2)}',
+          attributes: {'status': ob['status'], 'outstanding_paise': outPaise},
+        ));
+        edges.add(FigEdge(
+          sourceId: sId,
+          targetId: obId,
+          relationshipType: 'HOLDS_OBLIGATION',
+          metadata: {'status': ob['status']},
+        ));
+      }
+    } catch (_) {}
 
     return FigGraphSnapshot(
       nodes: nodes,

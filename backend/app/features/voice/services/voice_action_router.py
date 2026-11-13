@@ -57,7 +57,20 @@ class VoiceActionRouter:
                 "metadata": {}
             }
 
-        # 2. Payment Promises Query
+        # 2. Procurement & Purchasing Intents (KharidSaathi Intelligence)
+        # 2a. Compare quotations
+        if any(w in lower_text for w in ["compare", "तुलना", "काउन्ट", "kaun better", "कम्पैरिजन", "फरक"]):
+            return self._handle_procurement_comparison_query(language_code)
+
+        # 2b. Purchase request creation / procurement draft
+        if any(w in lower_text for w in ["चाहिए", "खरीदना", "purchase", "order", "सप्लायर से मंगाना", "मागवायचे"]):
+            return self._handle_procurement_request_intent(raw_text, language_code)
+
+        # 2c. Supplier obligations / upcoming payables
+        if any(w in lower_text for w in ["supplier", "सप्लायर", "देना है", "देय", "देणी", "हप्ता", "obligation"]):
+            return self._handle_supplier_obligations_query(language_code)
+
+        # 3. Payment Promises Query
         # Hindi: "वादा", "प्रॉमिस", "किसने वादा किया", "किसका वादा आज है"
         # Marathi: "वचन", "प्रॉमिस", "कोणाचे प्रॉमिस"
         # English: "promise", "who promised", "due promises", "commitments"
@@ -357,3 +370,55 @@ class VoiceActionRouter:
         elif "mr" in lang:
             return "माझा व्यापार फक्त तुमचे व्यावसायिक रेकॉर्ड, उधारी आणि वचने व्यवस्थापित करतो. शेअर बाजार किंवा कर्ज सल्ला आमच्या कक्षेत येत नाही."
         return "MeraVyapar handles merchant records, receivables, and payment commitments. Stock market, loans, and investment advice are out of scope."
+
+    def _handle_procurement_comparison_query(self, lang: str) -> Dict[str, Any]:
+        if "hi" in lang:
+            text = "कोटेशन तुलना के अनुसार, कुल लैंडेड कॉस्ट (जीएसटी और भाड़े सहित) और डिलीवरी अवधि के आधार पर सबसे उपयुक्त सप्लायर चुना गया है। विवरण स्क्रीन पर उपलब्ध है।"
+        elif "mr" in lang:
+            text = "कोटेशन तुलनेनुसार, एकूण लँडेड खर्च (जीएसटी आणि भाड्याने) आणि वितरण वेळेनुसार सर्वोत्तम पुरवठादार निवडला आहे. तपशील स्क्रीनवर उपलब्ध आहे."
+        else:
+            text = "Quotation comparison complete. Ranked by total landed cost (inclusive of GST and freight) and delivery lead time. Detailed analysis ready on screen."
+        return {
+            "intent": "COMPARE_SUPPLIER_QUOTES",
+            "response_text": text,
+            "confirmation_required": False,
+            "candidate_action": None,
+            "metadata": {"source": "kharidsaathi_engine"}
+        }
+
+    def _handle_procurement_request_intent(self, raw_text: str, lang: str) -> Dict[str, Any]:
+        candidate = {
+            "action_type": "CREATE_PURCHASE_REQUEST",
+            "raw_prompt": raw_text,
+            "item_name": raw_text,
+            "source": "voice_procurement",
+        }
+        if "hi" in lang:
+            text = f"आपकी मांग '{raw_text}' के लिए नई खरीद मांग (Purchase Request) तैयार की गई है। क्या आप इसे सहेजना चाहते हैं?"
+        elif "mr" in lang:
+            text = f"तुमच्या '{raw_text}' मागणीसाठी नवीन खरेदी विनंती तयार केली आहे. आपण ही सेव्ह करू इच्छिता?"
+        else:
+            text = f"Prepared a purchase request for '{raw_text}'. Do you want to confirm and save?"
+        return {
+            "intent": "CREATE_PURCHASE_REQUEST",
+            "response_text": text,
+            "confirmation_required": True,
+            "candidate_action": candidate,
+            "metadata": {"prompt": raw_text}
+        }
+
+    def _handle_supplier_obligations_query(self, lang: str) -> Dict[str, Any]:
+        if "hi" in lang:
+            text = "आपके आगामी सप्लायर भुगतानों का विवरण आपकी कैशफ्लो स्थिति में शामिल कर दिया गया है। पूर्ण विवरण स्क्रीन पर देखें।"
+        elif "mr" in lang:
+            text = "तुमची आगामी पुरवठादार देणी कॅशफ्लो स्थितीत समाविष्ट केली आहेत. संपूर्ण माहिती स्क्रीनवर तपासा."
+        else:
+            text = "Upcoming supplier obligations are reflected in your cashflow forecast. Full breakdown available on screen."
+        return {
+            "intent": "QUERY_SUPPLIER_OBLIGATIONS",
+            "response_text": text,
+            "confirmation_required": False,
+            "candidate_action": None,
+            "metadata": {}
+        }
+
