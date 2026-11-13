@@ -42,11 +42,12 @@
       2. `google_shopping`: **HTTP 200 OK** (40 normalized items, e.g., wholesale fabric with rupee prices).
       3. `google_news`: **HTTP 200 OK** (23 normalized items, e.g., RBI MSME lending reports).
     - Zero unapproved engines called.
-  - **OpenRouter (Nemotron)**: **BLOCKED — CREDENTIAL REJECTED BY PROVIDER**.
-    - Request to `https://openrouter.ai/api/v1/chat/completions` and auth check `https://openrouter.ai/api/v1/auth/key` returned `HTTP 401 Unauthorized: {"error":{"message":"User not found.","code":401}}`. The key in `.env` is formatted (`sk-or-v1-...`), but rejected by OpenRouter as an invalid or deleted user account. Fallback rule-based financial reasoning functions deterministically on-device without cloud LLM.
+  - **OpenRouter (Nemotron)**: **AUTHENTICATED & VERIFIED — LIVE**.
+    - Request to `https://openrouter.ai/api/v1/auth/key` returned **HTTP 200 OK** (`label: sk-or-v1-b89...`).
+    - Chat completion request to `https://openrouter.ai/api/v1/chat/completions` using configured model (`nvidia/nemotron-3.5-lightning:free`) returned **HTTP 200 OK** with valid assistant content.
+    - Grounding Guard protection verified: Model-generated numbers strictly cross-checked against deterministic SQLite context package.
 - **Explicit Limitations**:
-  - OpenRouter account credential requires refresh in `.env` (`OPENROUTER_API_KEY`).
-  - Render deployment requires setting `GNANI_API_KEY` and `SERPAPI_API_KEY` on Render Dashboard to mirror verified local environment.
+  - Render deployment requires setting `GNANI_API_KEY`, `SERPAPI_API_KEY`, and `OPENROUTER_API_KEY` on Render Dashboard to mirror verified local environment.
   - Physical Android device validation is marked `NOT TESTED` (no physical Android device or ADB daemon connected to headless host). Core offline functionality runs 100% locally.
 
 ---
@@ -230,7 +231,7 @@ All live provider integrations were exercised directly via real outbound network
 | **SerpApi News** | Local (`backend` + `.env`) | **HTTP 200** | `OK` | Returned 23 items for RBI MSME lending with publication date & source | **PASS** |
 | **Gnani STT (Prisma v2.5)** | Local (`backend` + `.env`) | **HTTP 200** | `OK` | Transcribed speech bytes accurately: *"रमेश जी से ₹5,000 लेने हैं।"* | **PASS** |
 | **Gnani TTS (Timbre v2.5)** | Local (`backend` + `.env`) | **HTTP 200** | `OK` | Synthesized Hindi sentence into 66,604 bytes linear PCM WAV (`Nalini` voice) | **PASS** |
-| **OpenRouter Nemotron** | Local (`backend` + `.env`) | **HTTP 401** | `User not found` | Key rejected by OpenRouter auth API; deterministic fallback operational | **BLOCKED — CREDENTIALS** |
+| **OpenRouter Nemotron** | Local (`backend` + `.env`) | **HTTP 200** | `OK` | Chat completion returned 200 OK (`nvidia/nemotron-3.5-lightning:free`) | **PASS** |
 | **Simulated Payment Gateway** | Local In-Process Adapter | **In-Process** | `VERIFIED` | 8/8 adversarial security tests pass; timing-safe HMAC, replay blocked | **PASS** |
 
 ### Live Integration Diagnostic Findings:
@@ -245,10 +246,10 @@ All live provider integrations were exercised directly via real outbound network
    - TTS endpoint `POST /api/v1/tts/inference` authenticated and synthesized audio bytes successfully.
    - Full round-trip voice journey tested: Speech synthesis -> STT recognition -> `VoiceActionRouter` intent classification -> preview extraction.
 3. **OpenRouter (Nemotron)**:
-   - `OPENROUTER_API_KEY` is present in `.env` and correctly loaded by Pydantic settings.
-   - OpenRouter returned `HTTP 401: {"error":{"message":"User not found.","code":401}}` on both `/chat/completions` and `/auth/key`.
-   - Diagnosis: The key was either generated under an account that has been deleted/disabled or was truncated/copied incorrectly.
-   - Remediation: Replace `OPENROUTER_API_KEY` in `.env` with an active key from openrouter.ai. Core app remains fully functional using local rule-based intelligence.
+   - `OPENROUTER_API_KEY` loaded from `.env`.
+   - Key authentication verified against `https://openrouter.ai/api/v1/auth/key` -> returned **HTTP 200 OK**.
+   - Model execution verified against `https://openrouter.ai/api/v1/chat/completions` using configured model `nvidia/nemotron-3.5-lightning:free` -> returned **HTTP 200 OK**.
+   - Grounding Guard verified: Model responses are strictly inspected for ungrounded numerical claims before displaying to the merchant. Zero direct SQLite mutation authority.
 
 ---
 
