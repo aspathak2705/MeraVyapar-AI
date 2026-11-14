@@ -16,7 +16,8 @@ enum MarketSignalsState {
 class RelevantMarketSignalsScreen extends StatefulWidget {
   final List<MerchantMarketRelevanceModel> initialSignals;
   final Function(MerchantMarketRelevanceModel signal) onSignalTap;
-  final Future<List<MerchantMarketRelevanceModel>> Function({String? query}) onFetchSignals;
+  final Future<List<MerchantMarketRelevanceModel>> Function({String? query})
+      onFetchSignals;
   final MerchantBusinessProfile? merchantProfile;
   final VoidCallback? onBack;
 
@@ -30,10 +31,12 @@ class RelevantMarketSignalsScreen extends StatefulWidget {
   });
 
   @override
-  State<RelevantMarketSignalsScreen> createState() => _RelevantMarketSignalsScreenState();
+  State<RelevantMarketSignalsScreen> createState() =>
+      _RelevantMarketSignalsScreenState();
 }
 
-class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScreen> {
+class _RelevantMarketSignalsScreenState
+    extends State<RelevantMarketSignalsScreen> {
   late TextEditingController _searchController;
   List<MerchantMarketRelevanceModel> _signals = [];
   MarketSignalsState _state = MarketSignalsState.initial;
@@ -69,14 +72,17 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
     // Priority 1: Main procurement commodities
     if (profile.mainProcurementCategories.isNotEmpty &&
         profile.mainProcurementCategories != 'Grains, Spices, Packaged Goods') {
-      queryParts.add(profile.mainProcurementCategories.split(',').take(2).join(' '));
+      queryParts
+          .add(profile.mainProcurementCategories.split(',').take(2).join(' '));
     } else {
       queryParts.add('wholesale grocery commodities');
     }
 
     // Priority 2: Category or business model
     if (profile.businessCategory.isNotEmpty) {
-      queryParts.add(profile.businessCategory.contains('Kirana') ? 'kirana retail' : profile.businessCategory);
+      queryParts.add(profile.businessCategory.contains('Kirana')
+          ? 'kirana retail'
+          : profile.businessCategory);
     }
 
     // Priority 3: Geography
@@ -105,20 +111,29 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
     });
 
     try {
-      final results = await widget.onFetchSignals(query: trimmed.isNotEmpty ? trimmed : null);
+      final results = await widget.onFetchSignals(
+          query: trimmed.isNotEmpty ? trimmed : null);
       if (mounted) {
         setState(() {
           _signals = results;
-          _state = results.isEmpty ? MarketSignalsState.empty : MarketSignalsState.loaded;
+          _state = results.isEmpty
+              ? MarketSignalsState.empty
+              : MarketSignalsState.loaded;
         });
       }
     } catch (e) {
       if (mounted) {
         final errStr = e.toString().toLowerCase();
         MarketSignalsState errState = MarketSignalsState.error;
-        if (errStr.contains('socket') || errStr.contains('network') || errStr.contains('connection')) {
+        if (errStr.contains('socket') ||
+            errStr.contains('network') ||
+            errStr.contains('connection') ||
+            errStr.contains('unavailable') ||
+            errStr.contains('timed out')) {
           errState = MarketSignalsState.networkError;
-        } else if (errStr.contains('serpapi') || errStr.contains('not configured') || errStr.contains('key missing')) {
+        } else if (errStr.contains('serpapi') ||
+            errStr.contains('not configured') ||
+            errStr.contains('key missing')) {
           errState = MarketSignalsState.providerNotConfigured;
         }
 
@@ -146,7 +161,9 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh Signals',
-            onPressed: () => _search(_activeQuery.isNotEmpty ? _activeQuery : _buildProfileDerivedQuery()),
+            onPressed: () => _search(_activeQuery.isNotEmpty
+                ? _activeQuery
+                : _buildProfileDerivedQuery()),
           ),
         ],
       ),
@@ -159,11 +176,15 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
               child: TextField(
                 controller: _searchController,
                 textInputAction: TextInputAction.search,
+                onChanged: (_) => setState(() {}),
                 onSubmitted: (val) => _search(val),
                 decoration: InputDecoration(
-                  hintText: 'Search markets, commodities, suppliers or trends...',
-                  hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.primaryPurple),
+                  hintText:
+                      'Search markets, commodities, suppliers or trends...',
+                  hintStyle:
+                      const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                  prefixIcon:
+                      const Icon(Icons.search, color: AppColors.primaryPurple),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear, size: 18),
@@ -175,7 +196,8 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
                       : null,
                   filled: true,
                   fillColor: const Color(0xFFF8FAFC),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
@@ -186,7 +208,8 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.primaryPurple, width: 1.5),
+                    borderSide: const BorderSide(
+                        color: AppColors.primaryPurple, width: 1.5),
                   ),
                 ),
               ),
@@ -195,15 +218,20 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
             // Active Query / Profile Banner
             if (widget.merchantProfile != null)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: Row(
                   children: [
-                    const Icon(Icons.storefront, size: 14, color: Color(0xFF64748B)),
+                    const Icon(Icons.storefront,
+                        size: 14, color: Color(0xFF64748B)),
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         'Profile context: ${widget.merchantProfile!.businessCategory} • ${widget.merchantProfile!.city}, ${widget.merchantProfile!.state}',
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                        style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF64748B),
+                            fontWeight: FontWeight.w500),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -227,13 +255,14 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
   Widget _buildBodyContent() {
     switch (_state) {
       case MarketSignalsState.loading:
-        return Center(
+        return const Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Retrieving market signals via SerpApi...', style: TextStyle(color: Color(0xFF64748B), fontSize: 13)),
+              Text('Retrieving market signals via SerpApi...',
+                  style: TextStyle(color: Color(0xFF64748B), fontSize: 13)),
             ],
           ),
         );
@@ -249,13 +278,17 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
                 const SizedBox(height: 16),
                 const Text(
                   'Market Provider Key Missing',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                  style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F172A)),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'SERPAPI_API_KEY is not configured on the backend gateway. Set the provider credentials to enable live market intelligence.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFF64748B), fontSize: 13, height: 1.4),
+                  style: TextStyle(
+                      color: Color(0xFF64748B), fontSize: 13, height: 1.4),
                 ),
                 const SizedBox(height: 20),
                 OutlinedButton.icon(
@@ -279,13 +312,17 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
                 const SizedBox(height: 16),
                 const Text(
                   'Network Unavailable',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                  style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F172A)),
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'Unable to reach market intelligence server. Check internet connection and backend status.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFF64748B), fontSize: 13, height: 1.4),
+                  style: TextStyle(
+                      color: Color(0xFF64748B), fontSize: 13, height: 1.4),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
@@ -305,11 +342,15 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.travel_explore, size: 56, color: Color(0xFF64748B)),
+                const Icon(Icons.travel_explore,
+                    size: 56, color: Color(0xFF64748B)),
                 const SizedBox(height: 16),
                 const Text(
                   'No Relevant Market Signals Found',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                  style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F172A)),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -317,7 +358,8 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
                       ? 'No verified results returned for query "$_activeQuery". Try searching specific commodities (e.g. "Wheat prices", "Turmeric market", "FMCG wholesale").'
                       : 'No external market events currently match your declared business profile.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, height: 1.4),
+                  style: const TextStyle(
+                      color: Color(0xFF64748B), fontSize: 13, height: 1.4),
                 ),
                 const SizedBox(height: 20),
                 OutlinedButton.icon(
@@ -337,17 +379,23 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.error_outline, size: 56, color: Colors.redAccent),
+                const Icon(Icons.error_outline,
+                    size: 56, color: Colors.redAccent),
                 const SizedBox(height: 16),
                 const Text(
                   'Market Research Request Failed',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                  style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF0F172A)),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  _errorMessage ?? 'An error occurred while retrieving external market intelligence.',
+                  _errorMessage ??
+                      'An error occurred while retrieving external market intelligence.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, height: 1.4),
+                  style: const TextStyle(
+                      color: Color(0xFF64748B), fontSize: 13, height: 1.4),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
@@ -371,9 +419,12 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
             final ev = item.marketEvent;
             final src = ev?.source;
 
-            String relevanceReason = item.explanation ?? 'Relevant to procurement costs and inventory planning.';
-            if (widget.merchantProfile != null && widget.merchantProfile!.mainProcurementCategories.isNotEmpty) {
-              relevanceReason = 'Relevant because your business purchases ${widget.merchantProfile!.mainProcurementCategories.toLowerCase()}.';
+            String relevanceReason = item.explanation ??
+                'Relevant to procurement costs and inventory planning.';
+            if (widget.merchantProfile != null &&
+                widget.merchantProfile!.mainProcurementCategories.isNotEmpty) {
+              relevanceReason =
+                  'Relevant because your business purchases ${widget.merchantProfile!.mainProcurementCategories.toLowerCase()}.';
             }
 
             return Card(
@@ -399,7 +450,8 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
                               color: const Color(0xFFE0F2FE),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(Icons.public, color: Color(0xFF0284C7), size: 20),
+                            child: const Icon(Icons.public,
+                                color: Color(0xFF0284C7), size: 20),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -408,37 +460,52 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
                               children: [
                                 Text(
                                   ev?.title ?? 'External Market Signal',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14),
                                 ),
                                 if (src != null) ...[
                                   const SizedBox(height: 4),
                                   Text(
                                     '${src.sourceName} • ${src.providerName}',
-                                    style: const TextStyle(fontSize: 11, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+                                    style: const TextStyle(
+                                        fontSize: 11,
+                                        color: Color(0xFF64748B),
+                                        fontWeight: FontWeight.w500),
                                   ),
                                 ],
                               ],
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: const Color(0xFFE0F2FE),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              item.relevanceStatus == 'POTENTIALLY_RELEVANT' ? 'POTENTIALLY RELEVANT' : 'MORE CONTEXT',
-                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF0369A1)),
+                              item.relevanceStatus == 'POTENTIALLY_RELEVANT'
+                                  ? 'POTENTIALLY RELEVANT'
+                                  : 'MORE CONTEXT',
+                              style: const TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF0369A1)),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        ev?.summary ?? 'Market signal observed from external sources.',
+                        ev?.summary ??
+                            'Market signal observed from external sources.',
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 13, color: Color(0xFF334155), height: 1.4),
+                        style: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF334155),
+                            height: 1.4),
                       ),
                       const SizedBox(height: 10),
                       Container(
@@ -449,12 +516,16 @@ class _RelevantMarketSignalsScreenState extends State<RelevantMarketSignalsScree
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.info_outline, size: 14, color: AppColors.primaryPurple),
+                            const Icon(Icons.info_outline,
+                                size: 14, color: AppColors.primaryPurple),
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 relevanceReason,
-                                style: const TextStyle(fontSize: 11, color: Color(0xFF475569), fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color(0xFF475569),
+                                    fontWeight: FontWeight.w500),
                               ),
                             ),
                           ],

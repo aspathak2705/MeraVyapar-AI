@@ -45,27 +45,39 @@ import '../../features/transactions/domain/statement_import_service.dart';
 import '../../features/capture/data/device_evidence_capture.dart';
 import '../../features/capture/domain/local_evidence_capture_service.dart';
 import '../../core/database/local_database_service.dart';
+import '../../core/money/money.dart';
 
 // --- Local Repository Providers ---
 // Re-export single canonical localAuthRepositoryProvider from local_auth_repository.dart
 // (Do not declare a second localAuthRepositoryProvider instance here)
-final localCanonicalTransactionRepositoryProvider = Provider((ref) => LocalCanonicalTransactionRepository());
-final localMemoryRepositoryProvider = Provider((ref) => LocalMemoryRepository());
-final localActionRepositoryProvider = Provider((ref) => LocalActionRepository());
-final localEvidenceCaptureServiceProvider = Provider((ref) => LocalEvidenceCaptureService());
+final localCanonicalTransactionRepositoryProvider =
+    Provider((ref) => LocalCanonicalTransactionRepository());
+final localMemoryRepositoryProvider =
+    Provider((ref) => LocalMemoryRepository());
+final localActionRepositoryProvider =
+    Provider((ref) => LocalActionRepository());
+final localEvidenceCaptureServiceProvider =
+    Provider((ref) => LocalEvidenceCaptureService());
 
 // --- Gateway / Unmigrated Providers ---
 final evidenceRepositoryProvider = Provider((ref) => EvidenceRepository());
 final captureRepositoryProvider = Provider((ref) => CaptureRepository());
 final eventRepositoryProvider = Provider((ref) => EventRepository());
-final intelligenceRepositoryProvider = Provider((ref) => IntelligenceRepository());
-final marketIntelligenceRepositoryProvider = Provider((ref) => MarketIntelligenceRepository());
-final voiceRepositoryProvider = Provider((ref) => VoiceRepository(baseUrl: Env.apiBaseUrl));
-final actionRepositoryProvider = Provider((ref) => ActionRepository(baseUrl: Env.apiBaseUrl));
-final audioRecordingServiceProvider = Provider<AudioRecordingService>((ref) => DeviceAudioRecordingService());
-final audioPlaybackServiceProvider = Provider<AudioPlaybackService>((ref) => DeviceAudioPlaybackService());
+final intelligenceRepositoryProvider =
+    Provider((ref) => IntelligenceRepository());
+final marketIntelligenceRepositoryProvider =
+    Provider((ref) => MarketIntelligenceRepository());
+final voiceRepositoryProvider =
+    Provider((ref) => VoiceRepository(baseUrl: Env.apiBaseUrl));
+final actionRepositoryProvider =
+    Provider((ref) => ActionRepository(baseUrl: Env.apiBaseUrl));
+final audioRecordingServiceProvider =
+    Provider<AudioRecordingService>((ref) => DeviceAudioRecordingService());
+final audioPlaybackServiceProvider =
+    Provider<AudioPlaybackService>((ref) => DeviceAudioPlaybackService());
 
-final voiceControllerProvider = StateNotifierProvider.autoDispose<VoiceInteractionController, VoiceInteractionState>((ref) {
+final voiceControllerProvider = StateNotifierProvider.autoDispose<
+    VoiceInteractionController, VoiceInteractionState>((ref) {
   final authRepo = ref.watch(localAuthRepositoryProvider);
   final token = authRepo.activeMerchantId ?? '';
   return VoiceInteractionController(
@@ -77,9 +89,11 @@ final voiceControllerProvider = StateNotifierProvider.autoDispose<VoiceInteracti
   );
 });
 
-final wakeWordEngineProvider = Provider<WakeWordDetectorEngine>((ref) => LocalAcousticWakeWordEngine());
+final wakeWordEngineProvider =
+    Provider<WakeWordDetectorEngine>((ref) => LocalAcousticWakeWordEngine());
 
-final wakeWordControllerProvider = StateNotifierProvider<WakeWordController, WakeWordStateData>((ref) {
+final wakeWordControllerProvider =
+    StateNotifierProvider<WakeWordController, WakeWordStateData>((ref) {
   return WakeWordController(
     detectorEngine: ref.watch(wakeWordEngineProvider),
     recordingService: ref.watch(audioRecordingServiceProvider),
@@ -132,8 +146,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
       if (fullText.isEmpty) return;
 
       final captureService = ref.read(localEvidenceCaptureServiceProvider);
-      final timestamp = data['timestamp'] as int? ?? DateTime.now().millisecondsSinceEpoch;
-      final sha256Hash = sha256.convert(utf8.encode('$packageName|$timestamp|$fullText')).toString();
+      final timestamp =
+          data['timestamp'] as int? ?? DateTime.now().millisecondsSinceEpoch;
+      final sha256Hash = sha256
+          .convert(utf8.encode('$packageName|$timestamp|$fullText'))
+          .toString();
 
       await captureService.ingestEvidenceAndExtract(
         merchantId: activeMerchantId,
@@ -156,7 +173,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
     capture.setQuickEntryHandler((data) async {
       final requestId = data['requestId'] as String? ?? '';
-      if (requestId.isNotEmpty && processedQuickEntryRequests.contains(requestId)) {
+      if (requestId.isNotEmpty &&
+          processedQuickEntryRequests.contains(requestId)) {
         return; // Idempotency: prevent double entry from repeated intent
       }
       if (requestId.isNotEmpty) {
@@ -178,21 +196,30 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         if (storedMerchantId != null) {
           activeMerchantId = storedMerchantId;
         } else {
-          await capture.notifyQuickEntryFailure('Unlock MeraVyapar app first to record entries');
+          await capture.notifyQuickEntryFailure(
+              'Unlock MeraVyapar app first to record entries');
           return;
         }
       }
 
       // Extract amount and parse description
-      final amtMatch = RegExp(r'(?:Rs\.?|INR|₹)?\s*([\d,]+(?:\.\d{1,2})?)').firstMatch(text);
+      final amtMatch =
+          RegExp(r'(?:Rs\.?|INR|₹)?\s*([\d,]+(?:\.\d{1,2})?)').firstMatch(text);
       if (amtMatch == null) {
-        await capture.notifyQuickEntryFailure('No valid amount found in "$text"');
+        await capture
+            .notifyQuickEntryFailure('No valid amount found in "$text"');
         return;
       }
 
       final amtStr = amtMatch.group(1)!.replaceAll(',', '');
-      final parsed = double.tryParse(amtStr);
-      if (parsed == null || parsed <= 0) {
+      int amountMinor;
+      try {
+        amountMinor = Money.parseInrToPaise(amtStr);
+      } on FormatException {
+        await capture.notifyQuickEntryFailure('Invalid amount: $amtStr');
+        return;
+      }
+      if (amountMinor <= 0) {
         await capture.notifyQuickEntryFailure('Invalid amount: $amtStr');
         return;
       }
@@ -200,15 +227,21 @@ class _AppRouterState extends ConsumerState<AppRouter> {
       // Determine transaction direction
       String txType = defaultType;
       final lower = text.toLowerCase();
-      if (lower.contains('expense') || lower.contains('paid') || lower.contains('debit')) {
+      if (lower.contains('expense') ||
+          lower.contains('paid') ||
+          lower.contains('debit')) {
         txType = 'DEBIT';
-      } else if (lower.contains('income') || lower.contains('received') || lower.contains('credit')) {
+      } else if (lower.contains('income') ||
+          lower.contains('received') ||
+          lower.contains('credit')) {
         txType = 'CREDIT';
       }
 
       // Extract counterparty if present
       String? counterparty;
-      final cpMatch = RegExp(r'(?:from|to|by)\s+([A-Za-z0-9\s]{2,25})', caseSensitive: false).firstMatch(text);
+      final cpMatch = RegExp(r'(?:from|to|by)\s+([A-Za-z0-9\s]{2,25})',
+              caseSensitive: false)
+          .firstMatch(text);
       if (cpMatch != null) {
         counterparty = cpMatch.group(1)?.trim();
       }
@@ -217,11 +250,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         final txRepo = ref.read(localCanonicalTransactionRepositoryProvider);
         final idempotencyKey = requestId.isNotEmpty
             ? 'quick_entry_$requestId'
-            : 'quick_${DateTime.now().millisecondsSinceEpoch}_${(parsed * 100).round()}';
+            : 'quick_${DateTime.now().millisecondsSinceEpoch}_$amountMinor';
 
         final tx = await txRepo.createTransaction(
           merchantId: activeMerchantId,
-          amount: (parsed).toStringAsFixed(2),
+          amount: Money.formatPaise(amountMinor),
           transactionType: txType,
           paymentMode: 'CASH',
           counterpartyName: counterparty,
@@ -237,7 +270,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           setState(() {});
         }
       } catch (e) {
-        await capture.notifyQuickEntryFailure('Database error: ${e.toString()}');
+        await capture
+            .notifyQuickEntryFailure('Database error: ${e.toString()}');
       }
     });
   }
@@ -256,7 +290,9 @@ class _AppRouterState extends ConsumerState<AppRouter> {
       final authRepo = ref.read(localAuthRepositoryProvider);
       final hasMerchant = await authRepo.hasLocalMerchant();
       setState(() {
-        _authStatus = hasMerchant ? LocalAuthStatus.locked : LocalAuthStatus.uninitialized;
+        _authStatus = hasMerchant
+            ? LocalAuthStatus.locked
+            : LocalAuthStatus.uninitialized;
         _isLoading = false;
       });
     } catch (e) {
@@ -271,7 +307,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     final name = _nameController.text.trim();
     final pin = _pinController.text.trim();
     if (name.isEmpty || pin.length < 4) {
-      setState(() => _errorMessage = 'Please enter name and at least 4-digit PIN');
+      setState(
+          () => _errorMessage = 'Please enter name and at least 4-digit PIN');
       return;
     }
     setState(() => _isLoading = true);
@@ -369,34 +406,48 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkLavenderSurface : AppColors.lightLavender,
+                        color: isDark
+                            ? AppColors.darkLavenderSurface
+                            : AppColors.lightLavender,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         AppIcons.business,
                         size: 40,
-                        color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+                        color: isDark
+                            ? AppColors.darkPrimaryPurple
+                            : AppColors.primaryPurple,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text('MeraVyapar AI', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                    const Text('MeraVyapar AI',
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 6),
-                    const Text('100% Private, On-Device Financial Intelligence', textAlign: TextAlign.center, style: TextStyle(fontSize: 13)),
+                    const Text('100% Private, On-Device Financial Intelligence',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 13)),
                     const SizedBox(height: 24),
                     TextField(
                       controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Business Name', hintText: 'e.g. Ramesh Kirana Store'),
+                      decoration: const InputDecoration(
+                          labelText: 'Business Name',
+                          hintText: 'e.g. Ramesh Kirana Store'),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: _pinController,
                       obscureText: true,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Set 4-6 Digit Security PIN', hintText: '••••'),
+                      decoration: const InputDecoration(
+                          labelText: 'Set 4-6 Digit Security PIN',
+                          hintText: '••••'),
                     ),
                     if (_errorMessage != null) ...[
                       const SizedBox(height: 12),
-                      Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                      Text(_errorMessage!,
+                          style:
+                              const TextStyle(color: Colors.red, fontSize: 13)),
                     ],
                     const SizedBox(height: 24),
                     ElevatedButton(
@@ -428,29 +479,41 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.darkLavenderSurface : AppColors.lightLavender,
+                        color: isDark
+                            ? AppColors.darkLavenderSurface
+                            : AppColors.lightLavender,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         AppIcons.lock,
                         size: 40,
-                        color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+                        color: isDark
+                            ? AppColors.darkPrimaryPurple
+                            : AppColors.primaryPurple,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text('Enter Security PIN', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text('Enter Security PIN',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 6),
-                    const Text('Your financial records remain encrypted on this phone.', textAlign: TextAlign.center, style: TextStyle(fontSize: 13)),
+                    const Text(
+                        'Your financial records remain encrypted on this phone.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 13)),
                     const SizedBox(height: 24),
                     TextField(
                       controller: _pinController,
                       obscureText: true,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Security PIN', hintText: '••••'),
+                      decoration: const InputDecoration(
+                          labelText: 'Security PIN', hintText: '••••'),
                     ),
                     if (_errorMessage != null) ...[
                       const SizedBox(height: 12),
-                      Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                      Text(_errorMessage!,
+                          style:
+                              const TextStyle(color: Colors.red, fontSize: 13)),
                     ],
                     const SizedBox(height: 24),
                     ElevatedButton(
@@ -497,7 +560,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
             return ReceivablesScreen(
               receivables: items,
               onBack: _popRoute,
-              onReceivableTap: (item) => _navigateTo('/receivables/detail', {'receivable': item}),
+              onReceivableTap: (item) =>
+                  _navigateTo('/receivables/detail', {'receivable': item}),
             );
           },
         );
@@ -508,10 +572,12 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           receivable: item,
           onBack: _popRoute,
           onReviewFollowUp: () {
-            _navigateTo('/actions/draft', {'promise_id': item.sourcePaymentPromiseId});
+            _navigateTo(
+                '/actions/draft', {'promise_id': item.sourcePaymentPromiseId});
           },
           onCreateReminderDraft: () {
-            _navigateTo('/actions/draft', {'promise_id': item.sourcePaymentPromiseId});
+            _navigateTo(
+                '/actions/draft', {'promise_id': item.sourcePaymentPromiseId});
           },
         );
 
@@ -525,10 +591,13 @@ class _AppRouterState extends ConsumerState<AppRouter> {
               transactions: txs,
               isLoading: snapshot.connectionState == ConnectionState.waiting,
               onRunReconciliation: () {},
-              onTransactionTap: (tx) => _navigateTo('/transactions/detail', {'tx': tx}),
+              onTransactionTap: (tx) =>
+                  _navigateTo('/transactions/detail', {'tx': tx}),
               onBack: _popRoute,
-              onAddTransaction: () => _showManualEntryDialog(context, merchantId, txRepo),
-              onImportStatement: () => _showStatementImportDialog(context, merchantId, txRepo),
+              onAddTransaction: () =>
+                  _showManualEntryDialog(context, merchantId, txRepo),
+              onImportStatement: () =>
+                  _showStatementImportDialog(context, merchantId, txRepo),
             );
           },
         );
@@ -547,7 +616,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
             final cps = snapshot.data ?? [];
             return FinancialRelationshipsScreen(
               counterparties: cps,
-              onCounterpartyTap: (cp) => _navigateTo('/relationships/detail', {'cp': cp}),
+              onCounterpartyTap: (cp) =>
+                  _navigateTo('/relationships/detail', {'cp': cp}),
             );
           },
         );
@@ -571,15 +641,20 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   merchantId: merchantId,
                   counterpartyName: pData['counterparty_name'] ?? 'Unknown',
                   amount: pData['amount'] ?? pData['promised_amount'] ?? '0',
-                  direction: pData['direction'] ?? pData['promise_direction'] ?? 'EXPECTED_INCOMING',
-                  dueDate: pData['due_date'] ?? pData['due_at'] ?? DateTime.now().toUtc().toIso8601String(),
+                  direction: pData['direction'] ??
+                      pData['promise_direction'] ??
+                      'EXPECTED_INCOMING',
+                  dueDate: pData['due_date'] ??
+                      pData['due_at'] ??
+                      DateTime.now().toUtc().toIso8601String(),
                   counterpartyId: pData['counterparty_id'],
                   notes: pData['notes'] ?? pData['description'],
                 );
                 setState(() {});
               },
               onFulfillPromise: (promiseId) async {
-                await memRepo.fulfillPromise(merchantId: merchantId, promiseId: promiseId);
+                await memRepo.fulfillPromise(
+                    merchantId: merchantId, promiseId: promiseId);
                 setState(() {});
               },
             );
@@ -593,21 +668,19 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         final fallbackName = authRepo.currentSession?.displayName;
 
         return FutureBuilder(
-          future: Future.wait([
-            profileRepo.getProfile(merchantId: merchantId, fallbackName: fallbackName),
-            marketRepo.getRelevantSignals(),
-          ]),
+          future: profileRepo.getProfile(
+              merchantId: merchantId, fallbackName: fallbackName),
           builder: (context, snapshot) {
-            final data = snapshot.data;
-            final profile = data != null ? data[0] as MerchantBusinessProfile : null;
-            final signals = data != null ? (data[1] as List).cast<MerchantMarketRelevanceModel>() : <MerchantMarketRelevanceModel>[];
+            final profile = snapshot.data as MerchantBusinessProfile?;
 
             return RelevantMarketSignalsScreen(
-              initialSignals: signals,
+              initialSignals: const [],
               merchantProfile: profile,
-              onFetchSignals: ({String? query}) => marketRepo.getRelevantSignals(query: query),
+              onFetchSignals: ({String? query}) =>
+                  marketRepo.getRelevantSignals(query: query),
               onBack: _popRoute,
-              onSignalTap: (sig) => _navigateTo('/market/detail', {'signal': sig}),
+              onSignalTap: (sig) =>
+                  _navigateTo('/market/detail', {'signal': sig}),
             );
           },
         );
@@ -662,9 +735,16 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
       default:
         return HomeShellScreen(
-          onAddPaymentReceived: () => _showManualEntryDialog(context, merchantId, ref.read(localCanonicalTransactionRepositoryProvider), defaultType: 'CREDIT'),
-          onAddExpense: () => _showManualEntryDialog(context, merchantId, ref.read(localCanonicalTransactionRepositoryProvider), defaultType: 'DEBIT'),
-          onImportStatement: () => _showStatementImportDialog(context, merchantId, ref.read(localCanonicalTransactionRepositoryProvider)),
+          onAddPaymentReceived: () => _showManualEntryDialog(context,
+              merchantId, ref.read(localCanonicalTransactionRepositoryProvider),
+              defaultType: 'CREDIT'),
+          onAddExpense: () => _showManualEntryDialog(context, merchantId,
+              ref.read(localCanonicalTransactionRepositoryProvider),
+              defaultType: 'DEBIT'),
+          onImportStatement: () => _showStatementImportDialog(
+              context,
+              merchantId,
+              ref.read(localCanonicalTransactionRepositoryProvider)),
           onOpenVoiceAssistant: () {
             showModalBottomSheet(
               context: context,
@@ -716,7 +796,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                 const SizedBox(height: 16),
                 TextField(
                   controller: amtCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   decoration: const InputDecoration(
                     labelText: 'Amount (₹)',
                     hintText: 'e.g. 500.00',
@@ -738,7 +819,9 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   items: const [
                     DropdownMenuItem(value: 'CASH', child: Text('Cash')),
                     DropdownMenuItem(value: 'UPI', child: Text('UPI / QR')),
-                    DropdownMenuItem(value: 'BANK_TRANSFER', child: Text('Bank Transfer / NEFT')),
+                    DropdownMenuItem(
+                        value: 'BANK_TRANSFER',
+                        child: Text('Bank Transfer / NEFT')),
                     DropdownMenuItem(value: 'CHEQUE', child: Text('Cheque')),
                   ],
                   onChanged: (val) {
@@ -764,8 +847,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
             FilledButton(
               onPressed: () async {
                 final amtText = amtCtrl.text.trim();
-                final parsedAmt = double.tryParse(amtText);
-                if (parsedAmt == null || parsedAmt <= 0) return;
+                try {
+                  if (Money.parseInrToPaise(amtText) <= 0) return;
+                } on FormatException {
+                  return;
+                }
 
                 final navigator = Navigator.of(context);
                 await txRepo.createTransaction(
@@ -773,8 +859,12 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   amount: amtText,
                   transactionType: txType,
                   paymentMode: paymentMode,
-                  counterpartyName: partyCtrl.text.trim().isEmpty ? null : partyCtrl.text.trim(),
-                  description: descCtrl.text.trim().isEmpty ? null : descCtrl.text.trim(),
+                  counterpartyName: partyCtrl.text.trim().isEmpty
+                      ? null
+                      : partyCtrl.text.trim(),
+                  description: descCtrl.text.trim().isEmpty
+                      ? null
+                      : descCtrl.text.trim(),
                   sourceType: 'MANUAL',
                 );
 
@@ -799,7 +889,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     final statementService = StatementImportService(txRepo: txRepo);
     final captureService = AndroidDeviceEvidenceCapture();
     final rawTextCtrl = TextEditingController();
-    String docName = 'Statement_${DateTime.now().toIso8601String().substring(0, 10)}.csv';
+    String docName =
+        'Statement_${DateTime.now().toIso8601String().substring(0, 10)}.csv';
     List<ExtractedStatementRecord> extractedRecords = [];
     bool isPreviewMode = false;
     bool isProcessing = false;
@@ -813,11 +904,16 @@ class _AppRouterState extends ConsumerState<AppRouter> {
       totalDebitPaise = 0;
       for (final rec in extractedRecords) {
         if (!rec.isSelected) continue;
-        final paise = (double.tryParse(rec.amount) ?? 0.0 * 100).round();
+        final int paise;
+        try {
+          paise = Money.parseInrToPaise(rec.amount);
+        } on FormatException {
+          continue;
+        }
         if (rec.type == 'CREDIT') {
-          totalCreditPaise += (double.parse(rec.amount) * 100).round();
+          totalCreditPaise += paise;
         } else {
-          totalDebitPaise += (double.parse(rec.amount) * 100).round();
+          totalDebitPaise += paise;
         }
       }
     }
@@ -828,11 +924,14 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         builder: (dialogCtx, setDialogState) => AlertDialog(
           title: Row(
             children: [
-              const Icon(Icons.file_upload_outlined, color: AppColors.primaryPurple),
+              const Icon(Icons.file_upload_outlined,
+                  color: AppColors.primaryPurple),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  isPreviewMode ? 'Review Extracted Statement' : 'Import Financial Statement',
+                  isPreviewMode
+                      ? 'Review Extracted Statement'
+                      : 'Import Financial Statement',
                   style: const TextStyle(fontSize: 18),
                 ),
               ),
@@ -857,7 +956,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                               });
 
                               try {
-                                final fileData = await captureService.pickDocument();
+                                final fileData =
+                                    await captureService.pickDocument();
                                 if (fileData == null) {
                                   setDialogState(() {
                                     isProcessing = false;
@@ -865,18 +965,23 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                                   return;
                                 }
 
-                                final pickedName = fileData['fileName'] as String? ?? 'Imported_Statement';
-                                final bytes = fileData['bytes'] as List<dynamic>?;
+                                final pickedName =
+                                    fileData['fileName'] as String? ??
+                                        'Imported_Statement';
+                                final bytes =
+                                    fileData['bytes'] as List<dynamic>?;
                                 if (bytes == null || bytes.isEmpty) {
                                   setDialogState(() {
                                     isProcessing = false;
-                                    statusMessage = 'Could not read document contents';
+                                    statusMessage =
+                                        'Could not read document contents';
                                   });
                                   return;
                                 }
 
                                 docName = pickedName;
-                                final parseResult = statementService.parseDocumentBytes(
+                                final parseResult =
+                                    statementService.parseDocumentBytes(
                                   bytes.cast<int>(),
                                   pickedName,
                                 );
@@ -884,12 +989,15 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                                 if (parseResult.records.isEmpty) {
                                   setDialogState(() {
                                     isProcessing = false;
-                                    statusMessage = parseResult.diagnosticMessage ?? 'No transactions found in file';
+                                    statusMessage =
+                                        parseResult.diagnosticMessage ??
+                                            'No transactions found in file';
                                   });
                                   return;
                                 }
 
-                                final evaluated = await statementService.detectDuplicates(
+                                final evaluated =
+                                    await statementService.detectDuplicates(
                                   merchantId: merchantId,
                                   candidates: parseResult.records,
                                 );
@@ -903,7 +1011,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                               } catch (e) {
                                 setDialogState(() {
                                   isProcessing = false;
-                                  statusMessage = 'Import error: ${e.toString()}';
+                                  statusMessage =
+                                      'Import error: ${e.toString()}';
                                 });
                               }
                             },
@@ -913,7 +1022,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                         decoration: BoxDecoration(
                           color: const Color(0xFFF3E8FF),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFC084FC), width: 1.5),
+                          border: Border.all(
+                              color: const Color(0xFFC084FC), width: 1.5),
                         ),
                         child: Row(
                           children: [
@@ -923,7 +1033,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                                 color: Color(0xFF7E22CE),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.file_present_rounded, color: Colors.white, size: 28),
+                              child: const Icon(Icons.file_present_rounded,
+                                  color: Colors.white, size: 28),
                             ),
                             const SizedBox(width: 14),
                             Expanded(
@@ -932,12 +1043,16 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                                 children: const [
                                   Text(
                                     'Choose PDF or CSV File',
-                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF581C87)),
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF581C87)),
                                   ),
                                   SizedBox(height: 3),
                                   Text(
                                     'Tap to select native bank statement from device storage (Storage Access Framework)',
-                                    style: TextStyle(fontSize: 11, color: Color(0xFF7E22CE)),
+                                    style: TextStyle(
+                                        fontSize: 11, color: Color(0xFF7E22CE)),
                                   ),
                                 ],
                               ),
@@ -958,7 +1073,10 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                         ),
                         child: Text(
                           statusMessage!,
-                          style: const TextStyle(fontSize: 12, color: Color(0xFFB91C1C), fontWeight: FontWeight.w600),
+                          style: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFFB91C1C),
+                              fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -975,14 +1093,19 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                       child: Row(
                         children: [
                           Icon(
-                            showManualPaste ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                            showManualPaste
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
                             size: 18,
                             color: const Color(0xFF64748B),
                           ),
                           const SizedBox(width: 6),
                           const Text(
                             'Or paste statement text manually',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF64748B)),
                           ),
                         ],
                       ),
@@ -995,7 +1118,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                         maxLines: 5,
                         decoration: const InputDecoration(
                           labelText: 'Statement Text / Raw CSV',
-                          hintText: 'Date,Description,Amount,Type\n2026-10-12,UPI/Rahul,1500.00,CREDIT\n2026-10-14,Wholesale Spices,420.00,DEBIT',
+                          hintText:
+                              'Date,Description,Amount,Type\n2026-10-12,UPI/Rahul,1500.00,CREDIT\n2026-10-14,Wholesale Spices,420.00,DEBIT',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -1010,16 +1134,19 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                                   if (content.isEmpty) return;
 
                                   setDialogState(() => isProcessing = true);
-                                  final parsed = statementService.parseStatementContent(content);
+                                  final parsed = statementService
+                                      .parseStatementContent(content);
                                   if (parsed.isEmpty) {
                                     setDialogState(() {
                                       isProcessing = false;
-                                      statusMessage = 'No valid transaction records detected in pasted text';
+                                      statusMessage =
+                                          'No valid transaction records detected in pasted text';
                                     });
                                     return;
                                   }
 
-                                  final evaluated = await statementService.detectDuplicates(
+                                  final evaluated =
+                                      await statementService.detectDuplicates(
                                     merchantId: merchantId,
                                     candidates: parsed,
                                   );
@@ -1031,7 +1158,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                                     isProcessing = false;
                                   });
                                 },
-                          icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+                          icon:
+                              const Icon(Icons.arrow_forward_rounded, size: 16),
                           label: const Text('Parse Text'),
                         ),
                       ),
@@ -1048,11 +1176,14 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Source: $docName', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                          Text('Source: $docName',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 13)),
                           const SizedBox(height: 4),
                           Text(
                             'Detected: ${extractedRecords.length} records | Total Credit: +₹${(totalCreditPaise / 100.0).toStringAsFixed(2)} | Total Debit: -₹${(totalDebitPaise / 100.0).toStringAsFixed(2)}',
-                            style: const TextStyle(fontSize: 11, color: Color(0xFF475569)),
+                            style: const TextStyle(
+                                fontSize: 11, color: Color(0xFF475569)),
                           ),
                         ],
                       ),
@@ -1063,10 +1194,14 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                       return Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         decoration: BoxDecoration(
-                          color: rec.isPossibleDuplicate ? const Color(0xFFFEF2F2) : const Color(0xFFF8FAFC),
+                          color: rec.isPossibleDuplicate
+                              ? const Color(0xFFFEF2F2)
+                              : const Color(0xFFF8FAFC),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: rec.isPossibleDuplicate ? Colors.red.shade200 : const Color(0xFFE2E8F0),
+                            color: rec.isPossibleDuplicate
+                                ? Colors.red.shade200
+                                : const Color(0xFFE2E8F0),
                           ),
                         ),
                         child: CheckboxListTile(
@@ -1084,14 +1219,18 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                                 '${isCredit ? "+" : "-"} ₹${rec.amount}',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  color: isCredit ? AppColors.success : AppColors.error,
+                                  color: isCredit
+                                      ? AppColors.success
+                                      : AppColors.error,
                                 ),
                               ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   rec.counterparty ?? rec.description,
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -1100,11 +1239,15 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Date: ${rec.date} • ${rec.description}', style: const TextStyle(fontSize: 11)),
+                              Text('Date: ${rec.date} • ${rec.description}',
+                                  style: const TextStyle(fontSize: 11)),
                               if (rec.isPossibleDuplicate)
                                 Text(
                                   '⚠ Possible Duplicate: ${rec.duplicateReason}',
-                                  style: TextStyle(fontSize: 11, color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.red.shade700,
+                                      fontWeight: FontWeight.bold),
                                 ),
                             ],
                           ),
@@ -1127,7 +1270,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                     ? null
                     : () async {
                         setDialogState(() => isProcessing = true);
-                        final count = await statementService.persistConfirmedTransactions(
+                        final count =
+                            await statementService.persistConfirmedTransactions(
                           merchantId: merchantId,
                           confirmedRecords: extractedRecords,
                           sourceDocumentName: docName,
@@ -1136,12 +1280,19 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                         if (context.mounted) {
                           Navigator.pop(ctx);
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Successfully imported $count transactions into private ledger')),
+                            SnackBar(
+                                content: Text(
+                                    'Successfully imported $count transactions into private ledger')),
                           );
                           setState(() {});
                         }
                       },
-                child: isProcessing ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Confirm & Save'),
+                child: isProcessing
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Text('Confirm & Save'),
               ),
           ],
         ),

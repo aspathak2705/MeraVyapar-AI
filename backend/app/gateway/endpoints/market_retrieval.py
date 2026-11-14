@@ -51,8 +51,15 @@ def get_relevant_market_signals_stateless(
         result: SerpApiResult = client.search(clean_query, num=10)
         items = result.normalized_items
 
-        records: List[dict] = []
+        records: List[tuple[int, dict]] = []
         now = datetime.now(timezone.utc)
+        # The app sends a query derived from the merchant's local SQLite
+        # profile. Rank normalized provider results against that context without
+        # uploading the merchant's ledger or profile to any cloud database.
+        context_terms = {
+            term.lower() for term in clean_query.split()
+            if len(term) > 2 and term.lower() not in {'india', 'market', 'retail', 'wholesale'}
+        }
 
         for idx, item in enumerate(items[:10]):
             event_id = uuid4()
@@ -74,7 +81,7 @@ def get_relevant_market_signals_stateless(
 
             ev = {
                 "id": str(event_id),
-                "event_type": MarketEventType.PRICE_VARIATION.value,
+                "event_type": MarketEventType.COMMODITY_PRICE_MOVEMENT.value,
                 "title": item.title or "Observed Commodity Market Signal",
                 "summary": item.snippet or item.title or "Market trend reported by external source.",
                 "geography": "IN",
@@ -91,7 +98,7 @@ def get_relevant_market_signals_stateless(
 
             rel = {
                 "id": str(relevance_id),
-                "merchant_id": str(uuid4()),
+                "merchant_id": installation.installation_id,
                 "market_event_id": str(event_id),
                 "relevance_status": MarketRelevanceStatus.POTENTIALLY_RELEVANT.value,
                 "reason_codes": ["COMMODITY_PRICE_MONITORING"],
@@ -102,18 +109,22 @@ def get_relevant_market_signals_stateless(
                 "market_event": ev,
             }
 
-            records.append(rel)
+            searchable = f"{item.title or ''} {item.snippet or ''}".lower()
+            relevance_score = sum(term in searchable for term in context_terms)
+            rel["context_snapshot"]["relevance_score"] = relevance_score
+            records.append((relevance_score, rel))
 
         return APIResponse(
             success=True,
             message="Relevant market signals retrieved via SerpApi",
-            data=records,
+            data=[record for _, record in sorted(records, key=lambda item: item[0], reverse=True)],
         )
 
     except Exception as exc:
         logger.error("Stateless market retrieval failed: %s", str(exc), exc_info=True)
-        return APIResponse(
-            success=True,
-            message=f"Market research completed with empty signal set ({str(exc)})",
-            data=[]
-        )
+        # An upstream failure is not an empty research result. Returning a
+        # non-2xx response lets Android present its retryable network state.
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Market intelligence provider unavailable. Please try again.",
+        ) from exc

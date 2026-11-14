@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/money/money.dart';
 import '../../../../core/database/local_database_service.dart';
 import '../../../../core/database/local_database_schema.dart';
 import '../domain/canonical_transaction_model.dart';
@@ -31,9 +32,8 @@ class LocalCanonicalTransactionRepository {
 
     return rows.map((row) {
       final amountMinor = row['amount_minor_units'] as int?;
-      final amountStr = amountMinor != null
-          ? (amountMinor / 100.0).toStringAsFixed(2)
-          : null;
+      final amountStr =
+          amountMinor != null ? Money.formatPaise(amountMinor) : null;
 
       return CanonicalTransactionModel(
         id: row['id'] as String,
@@ -46,7 +46,8 @@ class LocalCanonicalTransactionRepository {
         transactionReference: row['transaction_reference'] as String?,
         description: row['description'] as String?,
         occurredAt: row['occurred_at'] as String?,
-        reconciliationStatus: row['reconciliation_status'] as String? ?? 'UNRESOLVED',
+        reconciliationStatus:
+            row['reconciliation_status'] as String? ?? 'UNRESOLVED',
         sourceType: row['source_type'] as String?,
         sourceProvider: row['source_provider'] as String?,
         isSimulated: (row['is_simulated'] as int? ?? 0) == 1,
@@ -74,12 +75,15 @@ class LocalCanonicalTransactionRepository {
       throw StateError('Database not initialized');
     }
 
-    // Exact minor unit calculation (paise)
-    final doubleAmount = double.tryParse(amount);
-    if (doubleAmount == null) {
-      throw ArgumentError('Invalid monetary amount format: $amount');
+    final int amountMinor;
+    try {
+      amountMinor = Money.parseInrToPaise(amount);
+    } on FormatException catch (error) {
+      throw ArgumentError(error.message);
     }
-    final int amountMinor = (doubleAmount * 100).round();
+    if (amountMinor <= 0) {
+      throw ArgumentError('Amount must be greater than zero.');
+    }
 
     final txId = const Uuid().v4();
     final nowIso = DateTime.now().toUtc().toIso8601String();
@@ -110,7 +114,8 @@ class LocalCanonicalTransactionRepository {
         return CanonicalTransactionModel(
           id: row['id'] as String,
           merchantId: row['merchant_id'] as String,
-          amount: existingMinor != null ? (existingMinor / 100.0).toStringAsFixed(2) : null,
+          amount:
+              existingMinor != null ? Money.formatPaise(existingMinor) : null,
           currency: row['currency'] as String? ?? 'INR',
           transactionType: row['transaction_type'] as String,
           paymentMode: row['payment_mode'] as String,
@@ -118,7 +123,8 @@ class LocalCanonicalTransactionRepository {
           transactionReference: row['transaction_reference'] as String?,
           description: row['description'] as String?,
           occurredAt: row['occurred_at'] as String?,
-          reconciliationStatus: row['reconciliation_status'] as String? ?? 'UNRESOLVED',
+          reconciliationStatus:
+              row['reconciliation_status'] as String? ?? 'UNRESOLVED',
           sourceType: row['source_type'] as String?,
           sourceProvider: row['source_provider'] as String?,
           isSimulated: false,
@@ -160,7 +166,7 @@ class LocalCanonicalTransactionRepository {
     return CanonicalTransactionModel(
       id: txId,
       merchantId: merchantId,
-      amount: (amountMinor / 100.0).toStringAsFixed(2),
+      amount: Money.formatPaise(amountMinor),
       currency: 'INR',
       transactionType: transactionType,
       paymentMode: paymentMode,
@@ -203,7 +209,8 @@ class LocalCanonicalTransactionRepository {
     final counterparty = row['counterparty_name'] as String?;
 
     // Compute fingerprint
-    final rawFp = '$merchantId|$amountPaise|$direction|${ref ?? ''}|${counterparty?.toLowerCase() ?? ''}';
+    final rawFp =
+        '$merchantId|$amountPaise|$direction|${ref ?? ''}|${counterparty?.toLowerCase() ?? ''}';
     final fp = sha256.convert(utf8.encode(rawFp)).toString();
 
     await driver.transaction((txn) async {

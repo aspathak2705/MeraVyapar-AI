@@ -69,7 +69,8 @@ class VoiceInteractionState {
       committedAction: committedAction ?? this.committedAction,
       audioBase64: audioBase64 ?? this.audioBase64,
       isPlayingAudio: isPlayingAudio ?? this.isPlayingAudio,
-      recordingDurationSeconds: recordingDurationSeconds ?? this.recordingDurationSeconds,
+      recordingDurationSeconds:
+          recordingDurationSeconds ?? this.recordingDurationSeconds,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -120,7 +121,8 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
         if (!granted) {
           state = state.copyWith(
             status: VoiceInteractionStatus.error,
-            errorMessage: 'Microphone permission is required for voice assistant. You can enable it in Android App Settings.',
+            errorMessage:
+                'Microphone permission is required for voice assistant. You can enable it in Android App Settings.',
           );
           return;
         }
@@ -134,7 +136,8 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
           return;
         }
         if (state.status == VoiceInteractionStatus.recording) {
-          state = state.copyWith(recordingDurationSeconds: state.recordingDurationSeconds + 1);
+          state = state.copyWith(
+              recordingDurationSeconds: state.recordingDurationSeconds + 1);
         } else {
           t.cancel();
         }
@@ -154,7 +157,8 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
   Future<void> cancelRecording() async {
     _timer?.cancel();
     await recordingService.cancelRecording();
-    state = state.copyWith(status: VoiceInteractionStatus.idle, recordingDurationSeconds: 0);
+    state = state.copyWith(
+        status: VoiceInteractionStatus.idle, recordingDurationSeconds: 0);
   }
 
   Future<void> stopAndProcessRecording() async {
@@ -174,7 +178,6 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
       final interaction = await voiceRepository.interactWithVoice(
         audioBytes: audioBytes,
         filename: 'voice_query.wav',
-        authToken: authToken,
         languageCode: state.selectedLanguage,
         synthesizeAudio: true,
       );
@@ -182,7 +185,8 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
       if (!mounted) return;
 
       // Check if mutation requires explicit Two-Phase confirmation
-      if (interaction.confirmationRequired && interaction.candidateAction != null) {
+      if (interaction.confirmationRequired &&
+          interaction.candidateAction != null) {
         state = state.copyWith(
           status: VoiceInteractionStatus.awaitingConfirmation,
           transcript: interaction.transcript,
@@ -215,26 +219,26 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
   }
 
   Future<void> playSpokenResponse() async {
-      if (state.audioBase64 != null) {
-        try {
-          if (!mounted) return;
-          state = state.copyWith(isPlayingAudio: true);
-          await playbackService.playBase64Audio(state.audioBase64!);
-        } catch (_) {
-        } finally {
-          if (mounted) {
-            state = state.copyWith(isPlayingAudio: false);
-          }
+    if (state.audioBase64 != null) {
+      try {
+        if (!mounted) return;
+        state = state.copyWith(isPlayingAudio: true);
+        await playbackService.playBase64Audio(state.audioBase64!);
+      } catch (_) {
+      } finally {
+        if (mounted) {
+          state = state.copyWith(isPlayingAudio: false);
         }
       }
     }
+  }
 
-    Future<void> stopPlayback() async {
-      await playbackService.stop();
-      if (mounted) {
-        state = state.copyWith(isPlayingAudio: false);
-      }
+  Future<void> stopPlayback() async {
+    await playbackService.stop();
+    if (mounted) {
+      state = state.copyWith(isPlayingAudio: false);
     }
+  }
 
   /// Two-Phase Mutation Confirmation:
   /// Merchant explicitly taps 'Confirm' on the proposed candidate card.
@@ -263,7 +267,8 @@ class VoiceInteractionController extends StateNotifier<VoiceInteractionState> {
       state = state.copyWith(
         status: VoiceInteractionStatus.confirmationCompleted,
         committedAction: confirmed,
-        responseText: 'Payment reminder has been created and confirmed for ${candidate.counterpartyName}.',
+        responseText:
+            'Payment reminder has been created and confirmed for ${candidate.counterpartyName}.',
       );
     } catch (e) {
       if (!mounted) return;

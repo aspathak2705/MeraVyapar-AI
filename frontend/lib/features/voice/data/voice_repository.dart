@@ -1,15 +1,19 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../../../core/api/gateway_session_service.dart';
 import '../domain/voice_models.dart';
 
 class VoiceRepository {
   final String baseUrl;
   final http.Client client;
+  final GatewaySessionService _gatewaySession;
 
   VoiceRepository({
     required this.baseUrl,
     http.Client? client,
-  }) : client = client ?? http.Client();
+    GatewaySessionService? gatewaySession,
+  })  : client = client ?? http.Client(),
+        _gatewaySession = gatewaySession ?? GatewaySessionService();
 
   String get _cleanBaseUrl {
     // If baseUrl already ends with /api/v1, strip it so endpoints with /api/v1 prefix don't duplicate
@@ -36,14 +40,14 @@ class VoiceRepository {
   Future<VoiceInteractionModel> interactWithVoice({
     required List<int> audioBytes,
     required String filename,
-    required String authToken,
     String? languageCode,
     bool synthesizeAudio = true,
   }) async {
     final uri = Uri.parse('$_cleanBaseUrl/api/v1/voice/interact');
     final request = http.MultipartRequest('POST', uri);
 
-    request.headers['Authorization'] = 'Bearer $authToken';
+    request.headers['Authorization'] =
+        await _gatewaySession.getAuthorizationHeader();
     request.headers['Accept'] = 'application/json';
 
     final multipartFile = http.MultipartFile.fromBytes(
@@ -64,7 +68,8 @@ class VoiceRepository {
     if (response.statusCode == 200) {
       return VoiceInteractionModel.fromJson(jsonDecode(response.body));
     } else if (response.statusCode == 400) {
-      final msg = _parseErrorMessage(response.body, 'Invalid audio recording format.');
+      final msg =
+          _parseErrorMessage(response.body, 'Invalid audio recording format.');
       throw Exception(msg);
     } else if (response.statusCode == 401) {
       throw Exception('Session expired. Please sign in again.');
@@ -73,14 +78,14 @@ class VoiceRepository {
     } else if (response.statusCode == 503) {
       throw Exception('Voice intelligence service is temporarily unavailable.');
     } else {
-      final msg = _parseErrorMessage(response.body, 'Server error during voice processing (${response.statusCode}).');
+      final msg = _parseErrorMessage(response.body,
+          'Server error during voice processing (${response.statusCode}).');
       throw Exception(msg);
     }
   }
 
   Future<List<int>> synthesizeSpeech({
     required String text,
-    required String authToken,
     String languageCode = 'hi-IN',
     String voice = 'Nalini',
     double speed = 1.0,
@@ -89,7 +94,7 @@ class VoiceRepository {
     final response = await client.post(
       uri,
       headers: {
-        'Authorization': 'Bearer $authToken',
+        'Authorization': await _gatewaySession.getAuthorizationHeader(),
         'Content-Type': 'application/json',
       },
       body: jsonEncode({

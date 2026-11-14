@@ -1,4 +1,5 @@
 import 'package:uuid/uuid.dart';
+import '../../../core/money/money.dart';
 import '../../../../core/database/local_database_service.dart';
 import '../../../../core/database/local_database_schema.dart';
 import '../domain/counterparty_model.dart';
@@ -28,8 +29,10 @@ class LocalMemoryRepository {
 
     return rows.map<CounterpartyModel>((row) {
       final now = DateTime.now();
-      final createdAt = DateTime.tryParse(row['created_at']?.toString() ?? '') ?? now;
-      final updatedAt = DateTime.tryParse(row['updated_at']?.toString() ?? '') ?? now;
+      final createdAt =
+          DateTime.tryParse(row['created_at']?.toString() ?? '') ?? now;
+      final updatedAt =
+          DateTime.tryParse(row['updated_at']?.toString() ?? '') ?? now;
       final name = (row['name'] ?? row['display_name'] ?? 'Unknown').toString();
       return CounterpartyModel(
         id: row['id'] as String,
@@ -70,9 +73,12 @@ class LocalMemoryRepository {
     return rows.map<PaymentPromiseModel>((row) {
       final minor = row['amount_minor_units'] as int? ?? 0;
       final now = DateTime.now();
-      final createdAt = DateTime.tryParse(row['created_at']?.toString() ?? '') ?? now;
+      final createdAt =
+          DateTime.tryParse(row['created_at']?.toString() ?? '') ?? now;
       final dueAt = DateTime.tryParse(row['due_date']?.toString() ?? '') ?? now;
-      final fulfilledAt = row['fulfilled_at'] != null ? DateTime.tryParse(row['fulfilled_at'].toString()) : null;
+      final fulfilledAt = row['fulfilled_at'] != null
+          ? DateTime.tryParse(row['fulfilled_at'].toString())
+          : null;
       return PaymentPromiseModel(
         id: row['id'] as String,
         merchantId: row['merchant_id'] as String,
@@ -106,11 +112,15 @@ class LocalMemoryRepository {
     final driver = _dbService.driver;
     if (driver == null) throw StateError('Database not initialized');
 
-    final doubleAmount = double.tryParse(amount);
-    if (doubleAmount == null) {
-      throw ArgumentError('Invalid monetary amount format: $amount');
+    final int amountMinor;
+    try {
+      amountMinor = Money.parseInrToPaise(amount);
+    } on FormatException catch (error) {
+      throw ArgumentError(error.message);
     }
-    final int amountMinor = (doubleAmount * 100).round();
+    if (amountMinor <= 0) {
+      throw ArgumentError('Amount must be greater than zero.');
+    }
     final promiseId = const Uuid().v4();
     final nowIso = DateTime.now().toUtc().toIso8601String();
 

@@ -38,7 +38,7 @@ class ConfigurationRequiredScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'MeraVyapar AI Phase 0 is unconfigured.\nProvide SUPABASE_URL and SUPABASE_ANON_KEY environment variables to enable merchant identity and backend authentication.',
+                  'MeraVyapar AI is local-first. Create a local merchant profile to begin; cloud services are optional and configured on the gateway.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -65,11 +65,18 @@ class ConfigurationRequiredScreen extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 8),
-                      Text('1. Set SUPABASE_URL in environment or .env', style: TextStyle(fontSize: 13, color: Color(0xFF475569))),
+                      Text('1. Create or unlock the local merchant profile',
+                          style: TextStyle(
+                              fontSize: 13, color: Color(0xFF475569))),
                       SizedBox(height: 4),
-                      Text('2. Set SUPABASE_ANON_KEY in environment or .env', style: TextStyle(fontSize: 13, color: Color(0xFF475569))),
+                      Text(
+                          '2. Configure cloud provider credentials only on the gateway',
+                          style: TextStyle(
+                              fontSize: 13, color: Color(0xFF475569))),
                       SizedBox(height: 4),
-                      Text('3. Restart application build', style: TextStyle(fontSize: 13, color: Color(0xFF475569))),
+                      Text('3. Restart application build',
+                          style: TextStyle(
+                              fontSize: 13, color: Color(0xFF475569))),
                     ],
                   ),
                 ),

@@ -111,7 +111,7 @@ class ActionRepository {
     required String authToken,
   }) async {
     final response = await client.post(
-      Uri.parse('$baseUrl/api/v1/actions/$actionId/cancel'),
+      Uri.parse('$_cleanBaseUrl/api/v1/actions/$actionId/cancel'),
       headers: {
         'Authorization': 'Bearer $authToken',
       },
@@ -129,7 +129,7 @@ class ActionRepository {
     required String authToken,
   }) async {
     final response = await client.post(
-      Uri.parse('$baseUrl/api/v1/actions/$actionId/dispatch'),
+      Uri.parse('$_cleanBaseUrl/api/v1/actions/$actionId/dispatch'),
       headers: {
         'Authorization': 'Bearer $authToken',
       },
@@ -147,7 +147,7 @@ class ActionRepository {
     required String authToken,
   }) async {
     final response = await client.get(
-      Uri.parse('$baseUrl/api/v1/actions/$actionId/audit-trail'),
+      Uri.parse('$_cleanBaseUrl/api/v1/actions/$actionId/audit-trail'),
       headers: {
         'Authorization': 'Bearer $authToken',
       },
@@ -155,7 +155,9 @@ class ActionRepository {
 
     if (response.statusCode == 200) {
       final List<dynamic> body = jsonDecode(response.body);
-      return body.map((item) => CommunicationAuditEvent.fromJson(item)).toList();
+      return body
+          .map((item) => CommunicationAuditEvent.fromJson(item))
+          .toList();
     } else {
       throw Exception('Failed to load audit trail');
     }
