@@ -109,6 +109,7 @@ class QuickEntryReceiver : BroadcastReceiver() {
                 .setContentTitle("Mera Vyapar AI — Quick Entry")
                 .setContentText("Pull down to record Income or Expense in seconds")
                 .setOngoing(true)
+                .setOnlyAlertOnce(true)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(openAppPendingIntent)
                 .addAction(incomeAction)
@@ -116,6 +117,77 @@ class QuickEntryReceiver : BroadcastReceiver() {
                 .build()
 
             notificationManager.notify(NOTIFICATION_ID, notification)
+        }
+
+        fun updateQuickEntryStatus(context: Context, statusText: String, isProcessing: Boolean = false) {
+            createNotificationChannel(context)
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            val openAppIntent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+            val openAppPendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                openAppIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0)
+            )
+
+            val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Mera Vyapar AI — Quick Entry")
+                .setContentText(statusText)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setContentIntent(openAppPendingIntent)
+
+            if (isProcessing) {
+                builder.setProgress(0, 0, true)
+            } else {
+                // Restore interactive actions
+                val remoteInputIncome = RemoteInput.Builder(KEY_TEXT_REPLY)
+                    .setLabel("Amount & details (e.g. 1500 from Rahul)")
+                    .build()
+                val incomeIntent = Intent(context, QuickEntryReceiver::class.java).apply {
+                    action = ACTION_SUBMIT_QUICK_ENTRY
+                    putExtra(EXTRA_ENTRY_TYPE, "CREDIT")
+                }
+                val incomePendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    101,
+                    incomeIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0)
+                )
+                val incomeAction = NotificationCompat.Action.Builder(
+                    android.R.drawable.ic_input_add,
+                    "+ Add Income",
+                    incomePendingIntent
+                ).addRemoteInput(remoteInputIncome).build()
+
+                val remoteInputExpense = RemoteInput.Builder(KEY_TEXT_REPLY)
+                    .setLabel("Amount & details (e.g. 450 groceries)")
+                    .build()
+                val expenseIntent = Intent(context, QuickEntryReceiver::class.java).apply {
+                    action = ACTION_SUBMIT_QUICK_ENTRY
+                    putExtra(EXTRA_ENTRY_TYPE, "DEBIT")
+                }
+                val expensePendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    102,
+                    expenseIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0)
+                )
+                val expenseAction = NotificationCompat.Action.Builder(
+                    android.R.drawable.ic_delete,
+                    "- Add Expense",
+                    expensePendingIntent
+                ).addRemoteInput(remoteInputExpense).build()
+
+                builder.addAction(incomeAction).addAction(expenseAction)
+            }
+
+            notificationManager.notify(NOTIFICATION_ID, builder.build())
         }
 
         fun showSuccessConfirmationNotification(context: Context, amountStr: String, type: String) {
@@ -134,7 +206,23 @@ class QuickEntryReceiver : BroadcastReceiver() {
                 .build()
 
             notificationManager.notify(CONFIRMATION_NOTIFICATION_ID, confirmation)
-            // Re-show persistent quick entry shade
+            // Immediately restore persistent quick entry notification without spinner
+            showQuickEntryNotification(context)
+        }
+        fun showFailureNotification(context: Context, reason: String) {
+            createNotificationChannel(context)
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            val failureNotification = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Mera Vyapar AI — Entry Not Saved")
+                .setContentText(reason)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .build()
+
+            notificationManager.notify(CONFIRMATION_NOTIFICATION_ID, failureNotification)
+            // Immediately restore persistent quick entry notification
             showQuickEntryNotification(context)
         }
     }
@@ -149,24 +237,33 @@ class QuickEntryReceiver : BroadcastReceiver() {
             Log.d(TAG, "Quick entry received from notification shade: '$text', type: $entryType")
 
             if (text.isNotEmpty()) {
+                val requestId = java.util.UUID.randomUUID().toString()
                 val payload = mapOf(
+                    "requestId" to requestId,
                     "text" to text,
                     "type" to entryType,
                     "timestamp" to System.currentTimeMillis()
                 )
 
+                // Update notification immediately to dismiss user input and show progress/ack
+                updateQuickEntryStatus(context, "Saving '$text'...", isProcessing = true)
+
                 if (quickEntryCallback != null) {
                     quickEntryCallback?.invoke(payload)
                 } else {
-                    // Launch or signal MainActivity if Flutter engine is detached
+                    // Launch or bring MainActivity to front if detached
                     val launchIntent = Intent(context, MainActivity::class.java).apply {
                         action = ACTION_SUBMIT_QUICK_ENTRY
+                        putExtra("quick_entry_request_id", requestId)
                         putExtra("quick_entry_text", text)
                         putExtra("quick_entry_type", entryType)
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
                     }
                     context.startActivity(launchIntent)
                 }
+            } else {
+                // If user pressed send with empty text, restore clean notification
+                showQuickEntryNotification(context)
             }
         }
     }

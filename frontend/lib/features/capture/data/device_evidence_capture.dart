@@ -20,6 +20,7 @@ abstract class DeviceEvidenceCapture {
   void setQuickEntryHandler(Future<void> Function(Map<String, dynamic> data) handler);
   Future<bool> showQuickEntryNotification();
   Future<bool> notifyQuickEntrySuccess(String amount, String type);
+  Future<bool> notifyQuickEntryFailure(String reason);
   Future<Map<String, dynamic>?> pickDocument();
 }
 
@@ -74,6 +75,19 @@ class AndroidDeviceEvidenceCapture implements DeviceEvidenceCapture {
       final bool? result = await _channel.invokeMethod<bool>('notifyQuickEntrySuccess', {
         'amount': amount,
         'type': type,
+      });
+      return result ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> notifyQuickEntryFailure(String reason) async {
+    if (!isPlatformSupported) return false;
+    try {
+      final bool? result = await _channel.invokeMethod<bool>('notifyQuickEntryFailure', {
+        'reason': reason,
       });
       return result ?? false;
     } catch (_) {

@@ -1,4 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import '../../../core/config/env.dart';
 import '../../capture/data/device_evidence_capture.dart';
 
 class PermissionSettingsScreen extends StatefulWidget {
@@ -165,6 +168,11 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
 
                     // 6. Encrypted Backup File Access
                     _buildBackupAccessTile(),
+
+                    const SizedBox(height: 12),
+
+                    // 7. Backend Connection Status (Production Gateway Diagnostic)
+                    _buildBackendDiagnosticTile(),
 
                     const SizedBox(height: 24),
                     Center(
@@ -447,6 +455,151 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
             const Text(
               'Under Google Play Store Permissions Policy, general financial/expense tracking apps are not eligible for broad READ_SMS or RECEIVE_SMS permissions unless registered as default SMS handler. Passive capture operates strictly via authorized Notification Listener, user-selected Statement Import, and Quick Entry shade.',
               style: TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.35),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBackendDiagnosticTile() {
+    return _BackendDiagnosticCard();
+  }
+}
+
+class _BackendDiagnosticCard extends StatefulWidget {
+  @override
+  State<_BackendDiagnosticCard> createState() => _BackendDiagnosticCardState();
+}
+
+class _BackendDiagnosticCardState extends State<_BackendDiagnosticCard> {
+  bool _isTesting = false;
+  String? _status;
+  Color _statusColor = const Color(0xFF64748B);
+  String? _details;
+
+  Future<void> _testConnection() async {
+    setState(() {
+      _isTesting = true;
+      _status = 'Testing connection...';
+      _statusColor = const Color(0xFFD97706);
+      _details = null;
+    });
+
+    try {
+      final uri = Uri.parse('${Env.apiBaseUrl}/health');
+      final response = await http.get(uri).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        final data = body['data'] as Map<String, dynamic>? ?? {};
+        final service = data['service'] ?? 'meravyapar-api';
+        final status = data['status'] ?? 'healthy';
+        final version = data['version'] ?? '1.0.0';
+
+        setState(() {
+          _isTesting = false;
+          _status = 'CONNECTED (HTTP 200)';
+          _statusColor = const Color(0xFF166534);
+          _details = 'Service: $service | Status: $status | Version: $version\nGateway: ${Env.apiBaseUrl}';
+        });
+      } else {
+        setState(() {
+          _isTesting = false;
+          _status = 'SERVER ERROR (HTTP ${response.statusCode})';
+          _statusColor = const Color(0xFFDC2626);
+          _details = 'Endpoint returned status code ${response.statusCode}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isTesting = false;
+        _status = 'CONNECTION FAILED';
+        _statusColor = const Color(0xFFDC2626);
+        _details = 'Error: ${e.toString()}\nEnsure device has active internet connectivity.';
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFE2E8F0)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.cloud_done_outlined, color: Color(0xFF2563EB), size: 22),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'Production AI Cloud Gateway',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                ),
+                if (_status != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: _statusColor == const Color(0xFF166534)
+                          ? const Color(0xFFDCFCE7)
+                          : const Color(0xFFFEE2E2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _status!,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: _statusColor,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Configured Gateway URL: ${Env.apiBaseUrl}',
+              style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Color(0xFF475569)),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Connects to the deployed Render gateway for optional cloud services (Gnani Speech, SerpApi Market Research, and NVIDIA Nemotron). Core ledger remains 100% private and offline.',
+              style: TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.35),
+            ),
+            if (_details != null) ...[
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Text(
+                  _details!,
+                  style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Color(0xFF334155)),
+                ),
+              ),
+            ],
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                onPressed: _isTesting ? null : _testConnection,
+                icon: _isTesting
+                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.wifi_tethering, size: 16),
+                label: const Text('Test Backend Connection'),
+              ),
             ),
           ],
         ),

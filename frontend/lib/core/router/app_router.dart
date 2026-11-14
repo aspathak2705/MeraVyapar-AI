@@ -152,25 +152,50 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     });
 
     // 2. Quick Entry Shade RemoteInput Listener
+    final Set<String> processedQuickEntryRequests = <String>{};
+
     capture.setQuickEntryHandler((data) async {
-      final authRepo = ref.read(localAuthRepositoryProvider);
-      final activeMerchantId = authRepo.activeMerchantId;
-      if (activeMerchantId == null) {
-        // Merchant not authenticated yet, cannot commit transaction without session
-        return;
+      final requestId = data['requestId'] as String? ?? '';
+      if (requestId.isNotEmpty && processedQuickEntryRequests.contains(requestId)) {
+        return; // Idempotency: prevent double entry from repeated intent
+      }
+      if (requestId.isNotEmpty) {
+        processedQuickEntryRequests.add(requestId);
       }
 
       final text = data['text'] as String? ?? '';
       final defaultType = data['type'] as String? ?? 'CREDIT';
-      if (text.isEmpty) return;
+      if (text.isEmpty) {
+        await capture.notifyQuickEntryFailure('Entry text was empty');
+        return;
+      }
+
+      final authRepo = ref.read(localAuthRepositoryProvider);
+      var activeMerchantId = authRepo.activeMerchantId;
+      if (activeMerchantId == null) {
+        // Fall back to configured local merchant if initialized
+        final storedMerchantId = await authRepo.getStoredMerchantId();
+        if (storedMerchantId != null) {
+          activeMerchantId = storedMerchantId;
+        } else {
+          await capture.notifyQuickEntryFailure('Unlock MeraVyapar app first to record entries');
+          return;
+        }
+      }
 
       // Extract amount and parse description
       final amtMatch = RegExp(r'(?:Rs\.?|INR|₹)?\s*([\d,]+(?:\.\d{1,2})?)').firstMatch(text);
-      if (amtMatch == null) return;
+      if (amtMatch == null) {
+        await capture.notifyQuickEntryFailure('No valid amount found in "$text"');
+        return;
+      }
 
       final amtStr = amtMatch.group(1)!.replaceAll(',', '');
       final parsed = double.tryParse(amtStr);
-      if (parsed == null || parsed <= 0) return;
+      if (parsed == null || parsed <= 0) {
+        await capture.notifyQuickEntryFailure('Invalid amount: $amtStr');
+        return;
+      }
 
       // Determine transaction direction
       String txType = defaultType;
@@ -181,21 +206,38 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         txType = 'CREDIT';
       }
 
-      final txRepo = ref.read(localCanonicalTransactionRepositoryProvider);
-      final tx = await txRepo.createTransaction(
-        merchantId: activeMerchantId,
-        amount: (parsed).toStringAsFixed(2),
-        transactionType: txType,
-        paymentMode: 'CASH',
-        description: 'Quick Entry: $text',
-        sourceType: 'QUICK_ENTRY',
-      );
+      // Extract counterparty if present
+      String? counterparty;
+      final cpMatch = RegExp(r'(?:from|to|by)\s+([A-Za-z0-9\s]{2,25})', caseSensitive: false).firstMatch(text);
+      if (cpMatch != null) {
+        counterparty = cpMatch.group(1)?.trim();
+      }
 
-      // Notify Android native confirmation shade
-      await capture.notifyQuickEntrySuccess(tx.amount ?? amtStr, txType);
+      try {
+        final txRepo = ref.read(localCanonicalTransactionRepositoryProvider);
+        final idempotencyKey = requestId.isNotEmpty
+            ? 'quick_entry_$requestId'
+            : 'quick_${DateTime.now().millisecondsSinceEpoch}_${(parsed * 100).round()}';
 
-      if (mounted) {
-        setState(() {});
+        final tx = await txRepo.createTransaction(
+          merchantId: activeMerchantId,
+          amount: (parsed).toStringAsFixed(2),
+          transactionType: txType,
+          paymentMode: 'CASH',
+          counterpartyName: counterparty,
+          description: 'Quick Entry: $text',
+          sourceType: 'QUICK_ENTRY',
+          idempotencyKey: idempotencyKey,
+        );
+
+        // Notify Android native confirmation shade to clear spinner and confirm
+        await capture.notifyQuickEntrySuccess(tx.amount ?? amtStr, txType);
+
+        if (mounted) {
+          setState(() {});
+        }
+      } catch (e) {
+        await capture.notifyQuickEntryFailure('Database error: ${e.toString()}');
       }
     });
   }

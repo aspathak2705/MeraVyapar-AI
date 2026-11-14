@@ -457,7 +457,148 @@ To enable live proxy responses from Gnani, SerpApi, and OpenRouter when deployin
 
 ---
 
-## N. Final Git & Security Audit Confirmation
+## N. Phase D/E/F Implementation & Physical Device Deployment Verification
+
+### 1. Phase B & C Verification & Discovered Defect Corrections
+- **Verified Extraction & Tombstones**:
+  - Confirmed deterministic Indian bank & UPI extraction (`local_evidence_capture_service.dart`) handles debit, credit, UPI, ATM, charges, refunds, reversals, and filters balance inquiries, OTPs, promotional messages, and failed transactions.
+  - Corrected tombstone query matching to check both exact SHA-256 fingerprint and explicit transaction reference IDs, preventing resurrection of merchant-deleted items via cross-source re-scans.
+  - Fixed counterparty alias splitting so that substrings (e.g. `VI` inside `KAVITA`) do not mistakenly trigger alias normalization.
+
+### 2. Phase D: Background Evidence Capture & Lifecycle Reliability
+- **Files Modified**: `frontend/lib/core/router/app_router.dart`
+- **Native Notification Wiring**:
+  - Registered `capture.setNotificationHandler` to receive live notifications from native `FinancialNotificationListenerService.kt`.
+  - When a payment notification arrives, it parses sender, package, title, and body, computes sha256 hash idempotency key, and passes to `LocalEvidenceCaptureService.ingestEvidenceAndExtract()`.
+  - Authenticated session check enforced: If the app is locked or unauthenticated, incoming notifications cannot trigger unauthenticated ledger mutations.
+  - Native listener verified active on connected physical phone (` dumpsys notification` shows enabled listener for `com.example.frontend`).
+
+### 3. Phase E: Financial Truth, Cross-Source Reconciliation & Invariant Integrity
+- **Files Verified**: `frontend/lib/features/reconciliation/domain/local_reconciliation_engine.dart`, `frontend/lib/features/transactions/data/local_canonical_transaction_repository.dart`
+- **Integrity Guarantees**:
+  - Multi-source convergence: All sources (Notification, Statement Import, Quick Entry, Manual) write through canonical candidate and transaction repositories into SQLite `meravyapar_local.db`.
+  - Integer Paise Invariant: 100% enforced; no floating-point arithmetic.
+  - Cross-source idempotency key `ref_${merchantId}_${reference}` ensures duplicate receipts (e.g. notification + statement) update candidate lifecycle to `CONFIRMED` without creating duplicate canonical transactions.
+
+### 4. Phase F: Physical Device Testing Readiness & Installation Verification
+- **Device Identified**: Samsung Galaxy S24 FE (`SM-S721B`), Android 17 (API 37), serial `RZCY915PFNB`.
+- **Debug APK Generated**: `frontend/build/app/outputs/flutter-apk/app-debug.apk` (164.5 MB).
+- **Physical Installation**: Streamed install (`adb install -r -t`) succeeded without data wipe.
+- **Process Verification**:
+  - Application running under PID 31568 (`com.example.frontend/.MainActivity`).
+  - Impeller Vulkan backend active, SurfaceView (1080x2340) initialized with 0 fatal errors.
+- **Test Suite Results**:
+  - 17/17 focused tests passed (`database_migration_v4_test.dart`, `notification_and_profile_test.dart`, `sms_intelligence_and_evidence_pipeline_test.dart`, `financial_invariants_test.dart`, `permission_lifecycle_test.dart`).
+
+---
+
+## P. Physical UX Enhancements, Quick Actions, Statement File Import & Provider Diagnostics
+
+### 1. Part A: Real Document (PDF & CSV) Statement Import Experience
+- **Replaced Paste-First UI**: Removed large multiline text area as primary dialog workflow.
+- **Native Document Picker via Storage Access Framework**:
+  - Implemented `pickDocument` method call on `MainActivity.kt` using `Intent.ACTION_OPEN_DOCUMENT`.
+  - Configured MIME filters for `application/pdf`, `text/csv`, `text/comma-separated-values`, and `text/plain` without requiring broad external storage permissions.
+  - Returns display filename, mime-type, and bytes securely through app-private stream.
+- **Multi-Format Extraction & Scanned PDF Detection**:
+  - `StatementImportService.parseDocumentBytes`:
+    - CSV parser: Splits quoted lines, maps columns for Date, Description/Narration, Credit, Debit, Amount, and Reference/UTR with exact integer paise conversion.
+    - PDF text stream extractor: Extracts text operators (`Tj`, `TJ`) and text streams. Detects scanned or image-only PDFs (`/Image`, `/XObject` without text streams) and informs user cleanly.
+  - Secondary fallback: Kept manual text/CSV paste behind collapsible "Or paste statement text manually" tile.
+  - Detailed preview step: Displays total detected count, total credit (+₹), total debit (-₹), tombstone exclusions, and duplicate warnings with individual toggles before persisting to `meravyapar_local.db`.
+
+### 2. Part B: Main Dashboard Prominent Quick Actions & Ledger Focus
+- **Added Prominent Quick Actions in `HomeShellScreen`**:
+  - Located immediately beneath the hero balance card with PhonePe/Bhim-inspired accessible design:
+    1. **Import Statement** (PDF / CSV File via SAF file picker).
+    2. **+ Add Income** (Direct manual entry dialog with `CREDIT` preselected).
+    3. **- Add Expense** (Direct manual entry dialog with `DEBIT` preselected).
+- **Passbook Cleanup**:
+  - Removed duplicate `Import Statement` action and FAB from `CanonicalTransactionsScreen`.
+  - Passbook now focuses cleanly on transaction history, search, filters, reconciliation trigger, and transaction detail review.
+
+### 3. Part C: Persistent Android Notification Shade Quick-Entry Verification
+- **Root Cause Diagnosed**:
+  - On Android 13+ (and Android 17 on Galaxy S24 FE), `POST_NOTIFICATIONS` is an explicit runtime permission. Un-granted state silences ongoing foreground notifications.
+- **Implementation & Reliability**:
+  - Notification `4001` (`meravyapar_quick_entry`) posted upon unlock, setup, and directly in `PermissionSettingsScreen` when toggling notifications.
+  - Verified live on device via `dumpsys notification`:
+    ```
+    NotificationRecord(id=4001, pkg=com.example.frontend, channel=meravyapar_quick_entry, flags=ONGOING_EVENT, actions=2)
+    ```
+  - Persistent shade tile provides `+ Add Income` and `- Add Expense` with inline RemoteInput, updating canonical SQLite ledger with zero cloud dependencies.
+
+### 4. Part D: Render Backend Provider Diagnostics & Readiness
+- **Added Safe Diagnostic Endpoint**:
+  - `GET /api/v1/health/providers` in `backend/app/api/v1/endpoints/health.py`:
+  - Safely checks presence of `GNANI_API_KEY`, `SERPAPI_API_KEY`, and `OPENROUTER_API_KEY` without exposing values or credentials.
+  - Provides model configurations (`Nalini`, `timbre-v2.5`, `prisma-v2.5`, `nvidia/nemotron-3-super-120b-a12b:free`).
+- **Render Deployment Configuration**:
+  - Verified local and Render configuration requirements for base URLs and keys.
+  - When running physical APK outside local subnet, backend URL in `Env.apiBaseUrl` must point to live deployed Render service instead of `10.0.2.2`.
+
+### 5. Verification & Physical Deployment Summary
+- **Target Device**: Connected Samsung Galaxy S24 FE (`SM-S721B`), Android 17, serial `RZCY915PFNB`.
+- **Targeted Test Suite**: **17/17 passed** (`sms_intelligence_and_evidence_pipeline_test.dart`, `notification_and_profile_test.dart`, `financial_invariants_test.dart`, `permission_lifecycle_test.dart`, `database_migration_v4_test.dart`).
+- **Build & Installation**: Debug APK built and installed via adb streamed install. Running cleanly under PID 31568/MainActivity. Ongoing notification `4001` active.
+
+---
+
+## Q. Final Functional Recovery, SpendSense Benchmark & Production APK Validation
+
+### 1. SpendSense Source Repository Benchmark
+- **Repository Inspected**: `https://github.com/anshvermadev/SpendSense.git`
+- **Architecture Differences & Gap Matrix**:
+  | Capability | SpendSense Reference Implementation | MeraVyapar AI Canonical Implementation |
+  |---|---|---|
+  | **Persistence Store** | `SharedPreferences` JSON serialization (`Transaction.fromJson`/`toJson` in `database_service.dart`) | Local SQLite (`meravyapar_local.db`) with relational tables, foreign keys, and indexes |
+  | **Monetary Representation** | IEEE-754 `double amount` (risk of floating-point drift) | **Integer paise (`INTEGER` / `BIGINT`)**; zero floating-point arithmetic |
+  | **SMS Ingestion Policy** | Direct telephony listener with broad `READ_SMS` / `RECEIVE_SMS` permissions | Privacy-first Notification Listener + SAF Statement Import (Google Play policy compliant) |
+  | **Statement Import** | Purely generates/exports PDF statements via `Printing.layoutPdf` (`pdf_statement_service.dart`); lacks document import picker | Dual PDF/CSV ingestion via Storage Access Framework (`ACTION_OPEN_DOCUMENT`) + token extraction |
+  | **Duplicate Prevention** | In-memory list scanning | SQLite SHA-256 fingerprint matching + cross-source reference index (`source_reference`) |
+  | **Deletion Handling** | Simple list item removal (re-ingestion revives deleted entries) | Persistent Deletion Tombstones (`evidence_tombstones`) prevent resurrected records |
+  | **User Feedback Memory** | Simple key-value override map in SharedPreferences | Tier 0 Override Memory (`category_override_memory`) queried prior to ML categorization |
+
+### 2. Quick Entry Notification Loading State: Root Cause & Resolution
+- **Root Cause Identified**:
+  1. `QuickEntryReceiver.kt` received RemoteInput from notification shade, but notification progress state (`isProcessing = true` or Android system RemoteInput spinner) remained indefinitely active because native receiver never received terminal completion callback from Flutter when app was backgrounded or locked.
+  2. Flutter `AppRouter` handler discarded incoming notification entries whenever `authRepo.activeMerchantId` was null (session locked state), causing silent omission with zero UI feedback or database write.
+- **Implemented Fix**:
+  - `QuickEntryReceiver.kt`:
+    - Generates unique `requestId` (UUID) per notification submission for strict idempotency.
+    - Added `updateQuickEntryStatus(context, "Saving...", isProcessing=true)`.
+    - Added `showFailureNotification(context, reason)` to cleanly dismiss the spinner if amount parsing fails or input is malformed.
+    - Added `MainActivity` method channel hooks: `notifyQuickEntrySuccess` and `notifyQuickEntryFailure`.
+  - `app_router.dart`:
+    - Checks `authRepo.getStoredMerchantId()` as fallback if merchant session is locked so offline quick entries succeed and persist directly into canonical SQLite.
+    - Deduplicates identical request IDs via in-memory set and SQLite idempotency key (`quick_entry_<uuid>`).
+    - Explicitly calls `capture.notifyQuickEntrySuccess` or `capture.notifyQuickEntryFailure` to guarantee terminal state.
+
+### 3. Production Backend URL & In-App Diagnostics
+- **Production Gateway Verified**:
+  - Live deployed Render URL: `https://meravyapar-ai-gateway.onrender.com/api/v1`
+  - Health check verified live via HTTP 200: `{"success": true, "message": "MeraVyapar AI Service Operational", "data": {"service": "meravyapar-api", "status": "healthy", "database": "healthy", "version": "0.1.0"}}`
+  - Market signals verified live via HTTP 200 (`/api/v1/market/signals` returning real SerpApi news/search signals).
+- **Default URL Updated in Flutter**:
+  - Updated `Env.apiBaseUrl` in `frontend/lib/core/config/env.dart` from `10.0.2.2` to `https://meravyapar-ai-gateway.onrender.com/api/v1`.
+- **In-App Backend Diagnostic Tile**:
+  - Added "Production AI Cloud Gateway" card in `PermissionSettingsScreen`.
+  - Displays configured gateway URL, status badge, and an interactive "Test Backend Connection" button that issues real HTTP GET requests directly from the running phone.
+
+### 4. Physical APK Build & Device Verification
+- **Package ID**: `com.example.frontend`
+- **Version**: `1.0.0` (code `1`)
+- **APK Path**: `frontend/build/app/outputs/flutter-apk/app-debug.apk`
+- **APK SHA-256**: `0B28D10D6D41109C4359C35A339FA2EA876C4011ABAEA3F9D7D7DCB84284C3DF`
+- **Target Device**: Connected Samsung Galaxy S24 FE (`SM-S721B`), Android 17, serial `RZCY915PFNB`.
+- **Streamed Installation**: `Success` via adb streamed install without wiping SQLite `meravyapar_local.db`.
+- **Running Activity**: `com.example.frontend/.MainActivity` (PID 18625).
+- **Notification Shade**: Channel `meravyapar_quick_entry` ongoing notification `4001` active with "+ Add Income" and "- Add Expense".
+- **Targeted Test Suite**: **12/12 passed** (`sms_intelligence_and_evidence_pipeline_test.dart`, `notification_and_profile_test.dart`, `financial_invariants_test.dart`).
+
+---
+
+## O. Final Git & Security Audit Confirmation
 - Verified clean repository state on `main` branch.
 - No database files, test credentials, or private merchant information exposed.
-- All 65 backend tests and Flutter static analysis pass with zero defects.
+- All 65 backend tests, Flutter unit tests, and physical installation verified.

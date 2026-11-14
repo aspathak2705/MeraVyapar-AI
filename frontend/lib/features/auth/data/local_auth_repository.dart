@@ -52,6 +52,11 @@ class LocalAuthRepository {
   bool get isAuthenticated => _currentSession != null;
   String? get activeMerchantId => _currentSession?.merchantId;
 
+  /// Get configured merchant ID if device is initialized
+  Future<String?> getStoredMerchantId() async {
+    return await _secureStorage.read(key: _keyMerchantId);
+  }
+
   /// Check whether a local merchant account is already configured.
   Future<bool> hasLocalMerchant() async {
     final id = await _secureStorage.read(key: _keyMerchantId);

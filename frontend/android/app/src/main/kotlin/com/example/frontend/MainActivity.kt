@@ -205,6 +205,16 @@ class MainActivity : FlutterActivity() {
                     }
                 }
 
+                "notifyQuickEntryFailure" -> {
+                    val reason = call.argument<String>("reason") ?: "Failed to save entry"
+                    try {
+                        QuickEntryReceiver.showFailureNotification(this, reason)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("NOTIFICATION_ERROR", e.message, null)
+                    }
+                }
+
                 "pickDocument" -> {
                     if (pendingFilePickerResult != null) {
                         result.error("CONCURRENT_REQUEST", "File picker already active", null)
@@ -263,7 +273,9 @@ class MainActivity : FlutterActivity() {
         if (intent?.action == QuickEntryReceiver.ACTION_SUBMIT_QUICK_ENTRY) {
             val text = intent.getStringExtra("quick_entry_text") ?: return
             val type = intent.getStringExtra("quick_entry_type") ?: "CREDIT"
+            val requestId = intent.getStringExtra("quick_entry_request_id") ?: java.util.UUID.randomUUID().toString()
             val payload = mapOf(
+                "requestId" to requestId,
                 "text" to text,
                 "type" to type,
                 "timestamp" to System.currentTimeMillis()
