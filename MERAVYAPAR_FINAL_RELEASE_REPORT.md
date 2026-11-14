@@ -86,8 +86,8 @@
 | Simulated Payment Sandbox | `SimulatedPaymentGatewayAdapter` | Local Sandbox Order Ledger + HMAC verification | VERIFIED — AUTOMATED (8/8) |
 | Encrypted Backup & Restore | `EncryptedLocalBackupService` | Merchant Passphrase + PBKDF2-HMAC-SHA256 + EtM | VERIFIED — AUTOMATED (2/2) |
 | Android Permission Lifecycle | `PermissionSettingsScreen` / `MainActivity` | Runtime checks, rationale banners, Settings navigation | VERIFIED — AUTOMATED (3/3) |
-| KharidSaathi Procurement Hub | `ProcurementDashboardScreen` / `LocalProcurementRepository` | Local SQLite V4 (`procurement_*`) + `QuotationComparisonEngine` | VERIFIED — AUTOMATED (5/5) |
-| Android Release Packaging | Gradle 8.3 / AGP 8.3.2 | Flutter release toolchain (`app-release.apk`) | VERIFIED — BUILD (53.7 MB) |
+| KharidSaathi Procurement Hub | `ProcurementDashboardScreen` / `LocalProcurementRepository` | Local SQLite V4 (`procurement_*`) + `QuotationComparisonEngine` | VERIFIED — AUTOMATED (10/10) |
+| Android Release Packaging | Gradle 8.3 / AGP 8.3.2 | Flutter release toolchain (`app-release.apk`) | VERIFIED — BUILD (54.25 MB) |
 
 ---
 
