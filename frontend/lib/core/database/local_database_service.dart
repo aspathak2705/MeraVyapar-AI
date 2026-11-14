@@ -42,19 +42,38 @@ class LocalDatabaseService {
     return p.join(dbDir.path, LocalDatabaseSchema.databaseFileName);
   }
 
-  /// Initialize local database schema tables atomically.
-  Future<void> initialize({LocalDatabaseDriver? customDriver}) async {
+  /// Initialize local database schema tables atomically and apply incremental migrations.
+  Future<void> initialize({LocalDatabaseDriver? customDriver, String? customDbPath}) async {
     if (_isInitialized) return;
 
-    _databaseFilePath = await getDatabasePath();
+    _databaseFilePath = customDbPath ?? await getDatabasePath();
     _activeDriver = customDriver ?? SqfliteDatabaseDriver();
 
     await _activeDriver!.open(_databaseFilePath!);
     // Enable WAL mode and foreign key constraints for production SQLite integrity
     await _activeDriver!.execute('PRAGMA journal_mode = WAL;');
     await _activeDriver!.execute('PRAGMA foreign_keys = ON;');
-    for (final sql in LocalDatabaseSchema.createStatementsV3) {
-      await _activeDriver!.execute(sql);
+
+    // Inspect user_version PRAGMA to perform safe incremental migration
+    final versionRows = await _activeDriver!.query('PRAGMA user_version;');
+    final currentDbVersion = versionRows.isNotEmpty && versionRows.first['user_version'] != null
+        ? (versionRows.first['user_version'] as num).toInt()
+        : 0;
+
+    if (currentDbVersion == 0) {
+      // Fresh install: execute full V4 schema atomically
+      for (final sql in LocalDatabaseSchema.createStatementsV4) {
+        await _activeDriver!.execute(sql);
+      }
+      await _activeDriver!.execute('PRAGMA user_version = ${LocalDatabaseSchema.version};');
+    } else if (currentDbVersion < 4) {
+      // Existing V3 (or earlier) database: apply additive procurement migration inside a transaction
+      await _activeDriver!.transaction((txn) async {
+        for (final sql in LocalDatabaseSchema.procurementStatementsV4) {
+          await txn.execute(sql);
+        }
+        await txn.execute('PRAGMA user_version = 4;');
+      });
     }
 
     _isInitialized = true;

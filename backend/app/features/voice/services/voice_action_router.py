@@ -62,11 +62,31 @@ class VoiceActionRouter:
         if any(w in lower_text for w in ["compare", "तुलना", "काउन्ट", "kaun better", "कम्पैरिजन", "फरक"]):
             return self._handle_procurement_comparison_query(language_code)
 
-        # 2b. Purchase request creation / procurement draft
+        # 2b. Add / Register Supplier
+        if any(w in lower_text for w in ["supplier add", "नया सप्लायर", "सप्लायर जोड़ो", "नवीन पुरवठादार", "add vendor", "add supplier"]):
+            return self._handle_add_supplier_intent(raw_text, language_code)
+
+        # 2c. Capture Supplier Quotation
+        if any(w in lower_text for w in ["quote", "कोटेशन", "भाव मिला", "दर दिली", "quotation मिला", "supplier quote"]):
+            return self._handle_capture_quotation_intent(raw_text, language_code)
+
+        # 2d. Query Supplier Purchasing History
+        if any(w in lower_text for w in ["supplier history", "सप्लायर का इतिहास", "पिछली खरीद", "मागील खरेदी", "past purchase"]):
+            return self._handle_supplier_history_query(language_code)
+
+        # 2e. Generate Negotiation Draft
+        if any(w in lower_text for w in ["negotiate", "मोलभाव", "डिस्काउंट मांगो", "सौदा", "कमी करायला सांगा", "negotiation draft"]):
+            return self._handle_negotiation_draft_intent(raw_text, language_code)
+
+        # 2f. Record Purchase Outcome
+        if any(w in lower_text for w in ["order confirm", "खरीद पक्की", "डील फाइनल", "खरेदी झाली", "purchase recorded", "order placed"]):
+            return self._handle_record_purchase_outcome_intent(raw_text, language_code)
+
+        # 2g. Purchase request creation / procurement draft
         if any(w in lower_text for w in ["चाहिए", "खरीदना", "purchase", "order", "सप्लायर से मंगाना", "मागवायचे"]):
             return self._handle_procurement_request_intent(raw_text, language_code)
 
-        # 2c. Supplier obligations / upcoming payables
+        # 2h. Supplier obligations / upcoming payables
         if any(w in lower_text for w in ["supplier", "सप्लायर", "देना है", "देय", "देणी", "हप्ता", "obligation"]):
             return self._handle_supplier_obligations_query(language_code)
 
@@ -420,5 +440,101 @@ class VoiceActionRouter:
             "confirmation_required": False,
             "candidate_action": None,
             "metadata": {}
+        }
+
+    def _handle_add_supplier_intent(self, raw_text: str, lang: str) -> Dict[str, Any]:
+        candidate = {
+            "action_type": "ADD_SUPPLIER",
+            "raw_prompt": raw_text,
+            "source": "voice_procurement",
+        }
+        if "hi" in lang:
+            text = f"सप्लायर विवरण '{raw_text}' के आधार पर नया सप्लायर जोड़ने का ड्राफ्ट तैयार है। क्या आप इसे सहेजना चाहते हैं?"
+        elif "mr" in lang:
+            text = f"पुरवठादार तपशील '{raw_text}' वर आधारित नवीन पुरवठादार जोडण्याचा मसुदा तयार आहे. आपण सेव्ह करू इच्छिता?"
+        else:
+            text = f"Prepared draft to add verified supplier based on '{raw_text}'. Do you want to confirm?"
+        return {
+            "intent": "ADD_SUPPLIER",
+            "response_text": text,
+            "confirmation_required": True,
+            "candidate_action": candidate,
+            "metadata": {"prompt": raw_text}
+        }
+
+    def _handle_capture_quotation_intent(self, raw_text: str, lang: str) -> Dict[str, Any]:
+        candidate = {
+            "action_type": "CAPTURE_SUPPLIER_QUOTATION",
+            "raw_prompt": raw_text,
+            "source": "voice_procurement",
+        }
+        if "hi" in lang:
+            text = f"कोटेशन विवरण '{raw_text}' दर्ज करने के लिए तैयार है। क्या आप इसे सुरक्षित करना चाहते हैं?"
+        elif "mr" in lang:
+            text = f"कोटेशन तपशील '{raw_text}' नोंदवण्यासाठी तयार आहे. आपण पुष्टी करू इच्छिता?"
+        else:
+            text = f"Quotation details parsed from '{raw_text}'. Do you want to record this quotation?"
+        return {
+            "intent": "CAPTURE_SUPPLIER_QUOTATION",
+            "response_text": text,
+            "confirmation_required": True,
+            "candidate_action": candidate,
+            "metadata": {"prompt": raw_text}
+        }
+
+    def _handle_supplier_history_query(self, lang: str) -> Dict[str, Any]:
+        if "hi" in lang:
+            text = "आपकी पिछली खरीद और सप्लायर लेन-देन का इतिहास स्क्रीन पर तैयार है।"
+        elif "mr" in lang:
+            text = "तुमचा मागील खरेदी आणि पुरवठादार व्यवहारांचा इतिहास स्क्रीनवर उपलब्ध आहे."
+        else:
+            text = "Your past supplier procurement and order history is ready on screen."
+        return {
+            "intent": "QUERY_SUPPLIER_HISTORY",
+            "response_text": text,
+            "confirmation_required": False,
+            "candidate_action": None,
+            "metadata": {}
+        }
+
+    def _handle_negotiation_draft_intent(self, raw_text: str, lang: str) -> Dict[str, Any]:
+        candidate = {
+            "action_type": "GENERATE_NEGOTIATION_DRAFT",
+            "raw_prompt": raw_text,
+            "channel": "WHATSAPP",
+            "source": "voice_procurement",
+        }
+        if "hi" in lang:
+            text = "आपके ऐतिहासिक खरीद भाव और मौजूदा कोटेशन के आधार पर बातचीत का संदेश (ड्राफ्ट) तैयार किया गया है। स्क्रीन पर समीक्षा करें।"
+        elif "mr" in lang:
+            text = "तुमच्या मागील खरेदी दर आणि चालू कोटेशनच्या आधारे वाटाघाटीचा संदेश (मसुदा) तयार केला आहे. स्क्रीनवर तपासा."
+        else:
+            text = "Negotiation draft generated based on your past purchase history and quotation spread. Ready for review."
+        return {
+            "intent": "GENERATE_NEGOTIATION_DRAFT",
+            "response_text": text,
+            "confirmation_required": True,
+            "candidate_action": candidate,
+            "metadata": {"prompt": raw_text}
+        }
+
+    def _handle_record_purchase_outcome_intent(self, raw_text: str, lang: str) -> Dict[str, Any]:
+        candidate = {
+            "action_type": "RECORD_PURCHASE_OUTCOME",
+            "raw_prompt": raw_text,
+            "source": "voice_procurement",
+        }
+        if "hi" in lang:
+            text = f"खरीद निष्कर्ष '{raw_text}' को रिकॉर्ड करके सप्लायर देयता अपडेट करने के लिए पुष्टि करें।"
+        elif "mr" in lang:
+            text = f"खरेदी निष्कर्ष '{raw_text}' नोंदवून पुरवठादार देणी अद्यतनित करण्यासाठी पुष्टी करा."
+        else:
+            text = f"Confirm to record purchase outcome from '{raw_text}' and update supplier obligation."
+        return {
+            "intent": "RECORD_PURCHASE_OUTCOME",
+            "response_text": text,
+            "confirmation_required": True,
+            "candidate_action": candidate,
+            "metadata": {"prompt": raw_text}
         }
 

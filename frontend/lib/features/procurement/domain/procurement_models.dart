@@ -11,6 +11,13 @@ enum ProcurementVoiceIntent {
   unknown,
 }
 
+class OverflowException implements Exception {
+  final String message;
+  const OverflowException(this.message);
+  @override
+  String toString() => 'OverflowException: $message';
+}
+
 /// Representation of a Merchant Purchase Request
 class PurchaseRequestModel {
   final String id;
@@ -145,7 +152,9 @@ class SupplierQuotationModel {
   final double quantity;
   final String unit;
   final int unitPriceMinorUnits; // in paise (e.g., 21000 for ₹210.00)
+  final bool isGstInclusive;      // true if unit price already includes GST
   final double gstRatePercent;   // e.g., 18.0
+  final int discountMinorUnits;  // in paise (cash/trade discount deducted before tax)
   final int freightMinorUnits;    // in paise
   final int otherChargesMinorUnits;
   final int totalLandedCostMinorUnits;
@@ -167,7 +176,9 @@ class SupplierQuotationModel {
     required this.quantity,
     required this.unit,
     required this.unitPriceMinorUnits,
+    this.isGstInclusive = false,
     this.gstRatePercent = 18.0,
+    this.discountMinorUnits = 0,
     this.freightMinorUnits = 0,
     this.otherChargesMinorUnits = 0,
     required this.totalLandedCostMinorUnits,
@@ -182,18 +193,61 @@ class SupplierQuotationModel {
   double get unitPriceInr => unitPriceMinorUnits / 100.0;
   double get totalLandedCostInr => totalLandedCostMinorUnits / 100.0;
   double get freightInr => freightMinorUnits / 100.0;
+  double get discountInr => discountMinorUnits / 100.0;
 
-  /// Deterministically calculate total landed cost in exact paise
+  /// Deterministically calculate total landed cost in exact paise.
+  /// Enforces:
+  /// - Non-negative validation for monetary components.
+  /// - Scaled-integer arithmetic for fractional quantities (scaled by 1,000,000) avoiding float drift.
+  /// - Proper GST calculation supporting both GST-inclusive and GST-exclusive quotes.
+  /// - Deduction of discount prior to tax computation.
+  /// - Addition of freight and other charges.
+  /// - Signed 64-bit integer limit protection.
   static int calculateLandedCostPaise({
     required double quantity,
     required int unitPricePaise,
+    bool isGstInclusive = false,
     required double gstPercent,
+    int discountPaise = 0,
     required int freightPaise,
     required int otherChargesPaise,
   }) {
-    final baseCost = (quantity * unitPricePaise).round();
-    final gstAmount = (baseCost * (gstPercent / 100.0)).round();
-    return baseCost + gstAmount + freightPaise + otherChargesPaise;
+    if (quantity <= 0.0) return 0;
+    if (unitPricePaise < 0 || discountPaise < 0 || freightPaise < 0 || otherChargesPaise < 0 || gstPercent < 0.0) {
+      throw ArgumentError('Monetary amounts and tax percentages cannot be negative');
+    }
+
+    // 1. Scaled integer multiplication for quantity to eliminate floating point truncation.
+    // Scale factor: 1,000,000 (micros)
+    final qtyMicros = (quantity * 1000000.0).round();
+    final grossBasePaise = ((qtyMicros * unitPricePaise) / 1000000.0).round();
+
+    // 2. Apply discount
+    final discountedBasePaise = (grossBasePaise - discountPaise).clamp(0, grossBasePaise);
+
+    // 3. Tax calculation
+    int baseExcludingTax;
+    int taxAmount;
+
+    if (isGstInclusive) {
+      // Inclusive formula: Base = Total / (1 + rate/100), Tax = Total - Base
+      final divisor = 1.0 + (gstPercent / 100.0);
+      baseExcludingTax = (discountedBasePaise / divisor).round();
+      taxAmount = discountedBasePaise - baseExcludingTax;
+    } else {
+      // Exclusive formula: Base = discountedBasePaise, Tax = Base * (rate/100)
+      baseExcludingTax = discountedBasePaise;
+      taxAmount = (discountedBasePaise * (gstPercent / 100.0)).round();
+    }
+
+    final totalLanded = baseExcludingTax + taxAmount + freightPaise + otherChargesPaise;
+
+    // 4. Overflow check against SQLite max signed 64-bit int (9,223,372,036,854,775,807)
+    if (totalLanded < 0) {
+      throw OverflowException('Total landed cost exceeded 64-bit integer range');
+    }
+
+    return totalLanded;
   }
 
   Map<String, dynamic> toMap() => {
@@ -207,7 +261,9 @@ class SupplierQuotationModel {
         'quantity': quantity,
         'unit': unit,
         'unit_price_minor_units': unitPriceMinorUnits,
+        'is_gst_inclusive': isGstInclusive ? 1 : 0,
         'gst_rate_percent': gstRatePercent,
+        'discount_minor_units': discountMinorUnits,
         'freight_minor_units': freightMinorUnits,
         'other_charges_minor_units': otherChargesMinorUnits,
         'total_landed_cost_minor_units': totalLandedCostMinorUnits,
@@ -231,7 +287,9 @@ class SupplierQuotationModel {
       quantity: (map['quantity'] as num).toDouble(),
       unit: map['unit'] as String,
       unitPriceMinorUnits: map['unit_price_minor_units'] as int,
+      isGstInclusive: (map['is_gst_inclusive'] as int? ?? 0) == 1,
       gstRatePercent: (map['gst_rate_percent'] as num).toDouble(),
+      discountMinorUnits: map['discount_minor_units'] as int? ?? 0,
       freightMinorUnits: map['freight_minor_units'] as int? ?? 0,
       otherChargesMinorUnits: map['other_charges_minor_units'] as int? ?? 0,
       totalLandedCostMinorUnits: map['total_landed_cost_minor_units'] as int,

@@ -208,10 +208,11 @@ class LocalDatabaseSchema {
       migrated_at TEXT NOT NULL,
       checksum TEXT NOT NULL
     );
-    ''',
-    // -------------------------------------------------------------
-    // Additive Procurement DDL (V4)
-    // -------------------------------------------------------------
+    '''
+  ];
+
+  // SQL DDL statements for version 4 (KharidSaathi Procurement Additions)
+  static const List<String> procurementStatementsV4 = [
     '''
     CREATE TABLE IF NOT EXISTS $tableSuppliers (
       id TEXT PRIMARY KEY,
@@ -331,4 +332,10 @@ class LocalDatabaseSchema {
     ON $tableSupplierObligations(merchant_id, status, due_date);
     '''
   ];
+
+  /// Combined creation statements for fresh installations (V4)
+  static List<String> get createStatementsV4 => [
+        ...createStatementsV3,
+        ...procurementStatementsV4,
+      ];
 }

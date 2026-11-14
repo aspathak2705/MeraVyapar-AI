@@ -18,7 +18,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.PluginRegistry
 
-class MainActivity : FlutterActivity(), PluginRegistry.RequestPermissionsResultListener {
+class MainActivity : FlutterActivity() {
     private val CHANNEL = "com.meravyapar.ai/capture"
     private var methodChannel: MethodChannel? = null
 
@@ -212,11 +212,12 @@ class MainActivity : FlutterActivity(), PluginRegistry.RequestPermissionsResultL
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
-    ): Boolean {
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         val res = pendingPermissionResult
         pendingPermissionResult = null
 
-        if (res == null) return false
+        if (res == null) return
 
         if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             res.success("GRANTED")
@@ -229,6 +230,5 @@ class MainActivity : FlutterActivity(), PluginRegistry.RequestPermissionsResultL
                 res.success("DENIED")
             }
         }
-        return true
     }
 }

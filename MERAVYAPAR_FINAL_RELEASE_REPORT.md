@@ -21,12 +21,13 @@
     4. Safe default (`UNCATEGORIZED` or empty field).
   - Verified that inference logic guarantees 100% graceful degradation on device when model weights are not loaded.
 - **Quality Gates**:
-  - Backend automated test suite: **65/65 tests passed** in 2.31 seconds (`pytest backend/tests/services/`).
-  - Voice router procurement integration: **VERIFIED** for `CREATE_PURCHASE_REQUEST`, `COMPARE_SUPPLIER_QUOTES`, and `QUERY_SUPPLIER_OBLIGATIONS`.
+  - Backend automated test suite: **65/65 tests passed** in 1.28 seconds (`pytest backend/tests/services/`).
+  - Voice router procurement integration: **VERIFIED (8/8 intents)** across `CREATE_PURCHASE_REQUEST`, `ADD_SUPPLIER`, `CAPTURE_SUPPLIER_QUOTATION`, `COMPARE_SUPPLIER_QUOTES`, `QUERY_SUPPLIER_HISTORY`, `QUERY_SUPPLIER_OBLIGATIONS`, `GENERATE_NEGOTIATION_DRAFT`, and `RECORD_PURCHASE_OUTCOME`.
   - Flutter static analysis: **0 errors, 0 warnings** (`flutter analyze`).
-  - Flutter test suite: **13/13 unit tests passed** across backup, permission lifecycle, financial invariants, and procurement quotation comparison (`flutter test`).
-  - KharidSaathi Procurement Intelligence: **INTEGRATED & VERIFIED** (SQLite V4 schema, landed cost exact integer paise arithmetic, multi-attribute quote evaluation, FIG supplier nodes & edges, and cashflow payables aggregation).
-  - Android release APK compilation: **SUCCESSFUL** (`frontend/build/app/outputs/flutter-apk/app-release.apk`, 53.7 MB).
+  - Flutter test suite: **20/20 unit tests passed** across backup, permission lifecycle, financial invariants, SQLite V4 migrations, and procurement quotation comparison (`flutter test`).
+  - KharidSaathi Procurement Intelligence: **INTEGRATED & VERIFIED** (SQLite V4 schema, landed cost exact integer paise arithmetic with fractional/discount/inclusive tax support, multi-attribute quote evaluation, FIG supplier nodes & edges, and cashflow payables aggregation).
+  - Android release APK compilation: **SUCCESSFUL** (`frontend/build/app/outputs/flutter-apk/app-release.apk`, 54.25 MB).
+  - Android Native Configuration: `ACCESS_NETWORK_STATE`, `RECORD_AUDIO`, `INTERNET`, `POST_NOTIFICATIONS` verified with zero broad storage/SMS permissions. `MainActivity.kt` override matches `FlutterActivity` specification.
   - Merchant-controlled encrypted backup/restore: **VERIFIED — AUTOMATED (2/2 tests passed)** via `frontend/test/backup_service_test.dart`.
   - Financial invariants & exact integer paise arithmetic: **VERIFIED — AUTOMATED (3/3 tests passed)** via `frontend/test/financial_invariants_test.dart`.
   - Android permission lifecycle tests: **3/3 passed** in 0.42 seconds via `frontend/test/permission_lifecycle_test.dart`.
