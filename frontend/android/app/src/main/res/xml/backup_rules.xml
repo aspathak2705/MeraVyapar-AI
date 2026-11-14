@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <!-- Exclude raw financial evidence from cloud backup -->
+    <!-- Exclude raw financial database, evidence and keystore tokens from automatic cloud backup -->
+    <exclude domain="database" path="meravyapar_local.db" />
+    <exclude domain="database" path="meravyapar_local.db-wal" />
+    <exclude domain="database" path="meravyapar_local.db-shm" />
+    <exclude domain="file" path="database" />
     <exclude domain="file" path="evidence" />
+    <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
 </full-backup-content>

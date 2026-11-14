@@ -46,7 +46,7 @@
       3. `google_news`: **HTTP 200 OK** (23 normalized items, e.g., RBI MSME lending reports).
     - Zero unapproved engines called.
   - **OpenRouter (Nemotron)**: **AUTHENTICATED & VERIFIED — LIVE**.
-    - Request to `https://openrouter.ai/api/v1/auth/key` returned **HTTP 200 OK** (`label: sk-or-v1-b89...`).
+    - Request to `https://openrouter.ai/api/v1/auth/key` returned **HTTP 200 OK** (key label authenticated).
     - Chat completion request to `https://openrouter.ai/api/v1/chat/completions` using configured model (`nvidia/nemotron-3.5-lightning:free`) returned **HTTP 200 OK** with valid assistant content.
     - Grounding Guard protection verified: Model-generated numbers strictly cross-checked against deterministic SQLite context package.
 - **Physical Android Device Verification**:

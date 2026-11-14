@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <data-extraction-rules>
     <cloud-backup>
-        <!-- Exclude raw financial evidence from Android 12+ cloud backup -->
+        <!-- Exclude raw financial database, evidence and keystore tokens from Android 12+ cloud backup -->
+        <exclude domain="database" path="meravyapar_local.db" />
+        <exclude domain="database" path="meravyapar_local.db-wal" />
+        <exclude domain="database" path="meravyapar_local.db-shm" />
+        <exclude domain="file" path="database" />
         <exclude domain="file" path="evidence" />
+        <exclude domain="sharedpref" path="FlutterSecureStorage.xml" />
     </cloud-backup>
     <device-transfer>
-        <!-- Allow or exclude device-to-device transfer as needed -->
+        <!-- Retain explicit exclusions to prevent unencrypted direct extraction -->
+        <exclude domain="database" path="meravyapar_local.db" />
+        <exclude domain="database" path="meravyapar_local.db-wal" />
+        <exclude domain="database" path="meravyapar_local.db-shm" />
+        <exclude domain="file" path="database" />
         <exclude domain="file" path="evidence" />
     </device-transfer>
 </data-extraction-rules>
