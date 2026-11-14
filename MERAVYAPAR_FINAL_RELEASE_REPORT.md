@@ -285,9 +285,15 @@ To enable live proxy responses from Gnani, SerpApi, and OpenRouter when deployin
    - `LocalEvidenceCaptureService.dart` handles natural UPI formats such as `"KAVITA SANDEEP PATHAK paid you ₹1.00"` -> credited as exact integer paise (100 paise) into local SQLite evidence and candidate tables.
 3. **First-Class Manual Transaction Entry**:
    - Dedicated interactive entry dialog wired to Home Shell and Passbook screens for recording manual Income (`CREDIT`), Expense (`DEBIT`), with Cash, UPI, Cheque, and Bank Transfer modes in exact integer paise.
-4. **Merchant Device Backup Retention**:
+4. **Persistent Merchant Business Profile**:
+   - Persistent `MerchantBusinessProfile` model and SQLite table `merchant_business_profile` implemented.
+   - Dedicated `BusinessProfileScreen` allows editing trade name, category, business model (retail/wholesale/services), commodities sold, city/state, customer segment (B2B/B2C), sales channels, and turnover range.
+5. **App Identity & Branding**:
+   - Android application label and strings updated to **"Mera Vyapar AI"** (`@string/app_name`).
+   - Preserves package namespace `com.example.frontend` for signing identity while presenting user-facing branding.
+6. **Merchant Device Backup Retention**:
    - As SQLite is the canonical source of truth, device loss will result in data loss unless the merchant exports an encrypted backup via `EncryptedLocalBackupService` to local SD/USB or device storage.
-5. **Physical Device Installation**:
+7. **Physical Device Installation**:
    - Release APK (`app-release.apk`, 54.3 MB) compiled cleanly and ready for sideloading via `adb install frontend/build/app/outputs/flutter-apk/app-release.apk`.
 
 ---

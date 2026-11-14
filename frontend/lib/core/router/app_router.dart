@@ -35,6 +35,7 @@ import '../../features/actions/presentation/reminder_draft_screen.dart';
 import '../../features/intelligence/presentation/unified_financial_intelligence_screen.dart';
 import '../../features/capture/presentation/permission_settings_screen.dart';
 import '../../features/procurement/presentation/procurement_dashboard_screen.dart';
+import '../../features/onboarding/presentation/business_profile_screen.dart';
 import '../../core/database/local_database_service.dart';
 
 // --- Local Repository Providers ---
@@ -473,6 +474,12 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
       case '/settings/permissions':
         return PermissionSettingsScreen(
+          onBack: _popRoute,
+        );
+
+      case '/settings/profile':
+        return BusinessProfileScreen(
+          merchantId: merchantId,
           onBack: _popRoute,
         );
 

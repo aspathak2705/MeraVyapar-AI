@@ -95,6 +95,12 @@ class HomeShellScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          // Business Profile Settings Button
+          IconButton(
+            icon: const Icon(Icons.storefront_rounded, size: 20),
+            tooltip: 'Business Profile',
+            onPressed: () => onNavigateToRoute?.call('/settings/profile'),
+          ),
           // Permissions / Privacy Settings Button
           IconButton(
             icon: const Icon(Icons.security_rounded, size: 20),

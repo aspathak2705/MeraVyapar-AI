@@ -8,6 +8,7 @@ class LocalDatabaseSchema {
 
   // Table Names
   static const String tableMerchantProfile = 'merchant_profile';
+  static const String tableMerchantBusinessProfile = 'merchant_business_profile';
   static const String tableCanonicalTransactions = 'canonical_transactions';
   static const String tableFinancialCounterparties = 'financial_counterparties';
   static const String tablePaymentPromises = 'payment_promises';
@@ -37,6 +38,23 @@ class LocalDatabaseSchema {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'ACTIVE'
+    );
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS $tableMerchantBusinessProfile (
+      merchant_id TEXT PRIMARY KEY,
+      business_name TEXT NOT NULL,
+      business_category TEXT NOT NULL,
+      business_type TEXT NOT NULL,
+      products_and_services TEXT,
+      city TEXT,
+      state TEXT,
+      customer_type TEXT,
+      sales_channels TEXT,
+      main_procurement_categories TEXT,
+      turnover_range TEXT,
+      business_goals TEXT,
+      updated_at TEXT NOT NULL
     );
     ''',
     '''
