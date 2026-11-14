@@ -49,9 +49,8 @@ class HomeShellScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const isDark = false;
     final positionAsync = ref.watch(financialPositionMetricsProvider);
-    final themeMode = ref.watch(themeModeProvider);
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSecondaryBackground : AppColors.lightSecondaryBackground,
@@ -101,19 +100,6 @@ class HomeShellScreen extends ConsumerWidget {
             icon: const Icon(Icons.security_rounded, size: 20),
             tooltip: 'Device Permissions & Privacy',
             onPressed: () => onNavigateToRoute?.call('/settings/permissions'),
-          ),
-          // Theme Toggle Button
-          IconButton(
-            icon: Icon(
-              themeMode == ThemeMode.dark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-              size: 20,
-            ),
-            tooltip: 'Toggle Theme',
-            onPressed: () {
-              ref.read(themeModeProvider.notifier).setThemeMode(
-                    themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
-                  );
-            },
           ),
           IconButton(
             icon: const Icon(AppIcons.lock, size: 20),

@@ -277,10 +277,18 @@ To enable live proxy responses from Gnani, SerpApi, and OpenRouter when deployin
 | `SIMULATOR_WEBHOOK_SECRET` | HMAC secret for simulated payment signature generation | Required for simulated sandbox webhook dispatch |
 
 ### Remaining Operational Notes:
-1. **Merchant Device Backup Retention**:
+1. **Light Mode UI Enforcement & Mobile Stability**:
+   - System and app theme fixed permanently to `ThemeMode.light` with dark theme override redirecting to `lightTheme`. Removed dark mode toggle buttons and purged dead conditional branches.
+   - Screen overflow and keyboard obstruction resolved in procurement dialogs and manual entry sheets via scrollable views.
+2. **Notification-Driven Payment Ingestion**:
+   - `FinancialNotificationListenerService.kt` expanded with Indian UPI regex matching (`paid you ₹`, `sent you ₹`, `received ₹`).
+   - `LocalEvidenceCaptureService.dart` handles natural UPI formats such as `"KAVITA SANDEEP PATHAK paid you ₹1.00"` -> credited as exact integer paise (100 paise) into local SQLite evidence and candidate tables.
+3. **First-Class Manual Transaction Entry**:
+   - Dedicated interactive entry dialog wired to Home Shell and Passbook screens for recording manual Income (`CREDIT`), Expense (`DEBIT`), with Cash, UPI, Cheque, and Bank Transfer modes in exact integer paise.
+4. **Merchant Device Backup Retention**:
    - As SQLite is the canonical source of truth, device loss will result in data loss unless the merchant exports an encrypted backup via `EncryptedLocalBackupService` to local SD/USB or device storage.
-2. **Physical Device Installation**:
-   - Release APK (`app-release.apk`) is built and ready for sideloading via `adb install frontend/build/app/outputs/flutter-apk/app-release.apk`.
+5. **Physical Device Installation**:
+   - Release APK (`app-release.apk`, 54.3 MB) compiled cleanly and ready for sideloading via `adb install frontend/build/app/outputs/flutter-apk/app-release.apk`.
 
 ---
 

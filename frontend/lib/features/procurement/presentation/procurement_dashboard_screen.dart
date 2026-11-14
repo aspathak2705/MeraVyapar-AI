@@ -438,13 +438,17 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('New Purchase Request'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: itemCtrl, decoration: const InputDecoration(labelText: 'Item Name')),
-            TextField(controller: qtyCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Quantity')),
-            TextField(controller: unitCtrl, decoration: const InputDecoration(labelText: 'Unit (e.g. kg, bags, pcs)')),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: itemCtrl, decoration: const InputDecoration(labelText: 'Item Name')),
+              const SizedBox(height: 8),
+              TextField(controller: qtyCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Quantity')),
+              const SizedBox(height: 8),
+              TextField(controller: unitCtrl, decoration: const InputDecoration(labelText: 'Unit (e.g. kg, bags, pcs)')),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
@@ -481,13 +485,17 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Add Verified Supplier'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Supplier Name')),
-            TextField(controller: phoneCtrl, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone Number')),
-            TextField(controller: categoryCtrl, decoration: const InputDecoration(labelText: 'Category')),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Supplier Name')),
+              const SizedBox(height: 8),
+              TextField(controller: phoneCtrl, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone Number')),
+              const SizedBox(height: 8),
+              TextField(controller: categoryCtrl, decoration: const InputDecoration(labelText: 'Category')),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),

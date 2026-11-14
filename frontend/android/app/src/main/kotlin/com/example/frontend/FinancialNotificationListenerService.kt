@@ -22,7 +22,8 @@ class FinancialNotificationListenerService : NotificationListenerService() {
         // Financial filtering keywords for Indian merchant transactions
         private val FINANCIAL_KEYWORDS = setOf(
             "credited", "debited", "paid to", "received from", "upi",
-            "vpa", "bank", "a/c", "inr", "rs.", "txn", "ref no", "imps", "neft"
+            "vpa", "bank", "a/c", "inr", "rs.", "txn", "ref no", "imps", "neft",
+            "paid you", "sent you", "payment of", "received ₹", "paid ₹", "₹"
         )
     }
 

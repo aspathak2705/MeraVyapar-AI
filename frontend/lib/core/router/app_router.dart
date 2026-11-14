@@ -367,6 +367,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
               isLoading: snapshot.connectionState == ConnectionState.waiting,
               onRunReconciliation: () {},
               onTransactionTap: (tx) => _navigateTo('/transactions/detail', {'tx': tx}),
+              onAddTransaction: () => _showManualEntryDialog(context, merchantId, txRepo),
             );
           },
         );
@@ -483,6 +484,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
       default:
         return HomeShellScreen(
+          onAddPaymentReceived: () => _showManualEntryDialog(context, merchantId, ref.read(localCanonicalTransactionRepositoryProvider), defaultType: 'CREDIT'),
+          onAddExpense: () => _showManualEntryDialog(context, merchantId, ref.read(localCanonicalTransactionRepositoryProvider), defaultType: 'DEBIT'),
           onOpenVoiceAssistant: () {
             showModalBottomSheet(
               context: context,
@@ -498,5 +501,114 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onNavigateToRoute: _navigateTo,
         );
     }
+  }
+
+  void _showManualEntryDialog(
+    BuildContext context,
+    String merchantId,
+    LocalCanonicalTransactionRepository txRepo, {
+    String defaultType = 'CREDIT',
+  }) {
+    final amtCtrl = TextEditingController();
+    final partyCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    String txType = defaultType; // 'CREDIT' (Money In) or 'DEBIT' (Money Out)
+    String paymentMode = 'CASH';
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('Add Manual Entry'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SegmentedButton<String>(
+                  segments: const [
+                    ButtonSegment(value: 'CREDIT', label: Text('Income (+)')),
+                    ButtonSegment(value: 'DEBIT', label: Text('Expense (-)')),
+                  ],
+                  selected: {txType},
+                  onSelectionChanged: (val) {
+                    setDialogState(() => txType = val.first);
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: amtCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: 'Amount (₹)',
+                    hintText: 'e.g. 500.00',
+                    prefixText: '₹ ',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: partyCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Counterparty / Customer / Vendor',
+                    hintText: 'e.g. Ramesh Kirana',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                DropdownButtonFormField<String>(
+                  value: paymentMode,
+                  decoration: const InputDecoration(labelText: 'Payment Mode'),
+                  items: const [
+                    DropdownMenuItem(value: 'CASH', child: Text('Cash')),
+                    DropdownMenuItem(value: 'UPI', child: Text('UPI / QR')),
+                    DropdownMenuItem(value: 'BANK_TRANSFER', child: Text('Bank Transfer / NEFT')),
+                    DropdownMenuItem(value: 'CHEQUE', child: Text('Cheque')),
+                  ],
+                  onChanged: (val) {
+                    if (val != null) setDialogState(() => paymentMode = val);
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: descCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Notes / Description (Optional)',
+                    hintText: 'e.g. Wholesale flour payment',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                final amtText = amtCtrl.text.trim();
+                final parsedAmt = double.tryParse(amtText);
+                if (parsedAmt == null || parsedAmt <= 0) return;
+
+                final navigator = Navigator.of(context);
+                await txRepo.createTransaction(
+                  merchantId: merchantId,
+                  amount: amtText,
+                  transactionType: txType,
+                  paymentMode: paymentMode,
+                  counterpartyName: partyCtrl.text.trim().isEmpty ? null : partyCtrl.text.trim(),
+                  description: descCtrl.text.trim().isEmpty ? null : descCtrl.text.trim(),
+                  sourceType: 'MANUAL',
+                );
+
+                if (mounted) {
+                  navigator.pop();
+                  setState(() {});
+                }
+              },
+              child: const Text('Save Entry'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

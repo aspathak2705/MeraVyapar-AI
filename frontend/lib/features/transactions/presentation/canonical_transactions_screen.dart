@@ -9,6 +9,7 @@ class CanonicalTransactionsScreen extends StatelessWidget {
   final VoidCallback onRunReconciliation;
   final Function(CanonicalTransactionModel tx) onTransactionTap;
   final VoidCallback? onBack;
+  final VoidCallback? onAddTransaction;
 
   const CanonicalTransactionsScreen({
     super.key,
@@ -17,12 +18,11 @@ class CanonicalTransactionsScreen extends StatelessWidget {
     required this.onRunReconciliation,
     required this.onTransactionTap,
     this.onBack,
+    this.onAddTransaction,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Passbook & Transactions'),
@@ -41,6 +41,15 @@ class CanonicalTransactionsScreen extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButton: onAddTransaction != null
+          ? FloatingActionButton.extended(
+              onPressed: onAddTransaction,
+              backgroundColor: AppColors.primaryPurple,
+              foregroundColor: Colors.white,
+              icon: const Icon(Icons.add_rounded),
+              label: const Text('Add Entry', style: TextStyle(fontWeight: FontWeight.bold)),
+            )
+          : null,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : transactions.isEmpty
@@ -56,14 +65,14 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: isDark ? AppColors.darkLavenderSurface : AppColors.lightLavender,
+                              decoration: const BoxDecoration(
+                                color: AppColors.lightLavender,
                                 shape: BoxShape.circle,
                               ),
-                              child: Icon(
+                              child: const Icon(
                                 AppIcons.transactions,
                                 size: 40,
-                                color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+                                color: AppColors.primaryPurple,
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -98,13 +107,13 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                     final isCredit = tx.transactionType == 'MONEY_IN' || tx.transactionType == 'CREDIT';
                     final status = tx.reconciliationStatus;
 
-                    Color statusColor = isDark ? AppColors.darkTextMuted : AppColors.lightTextMuted;
+                    Color statusColor = AppColors.lightTextMuted;
                     String statusText = 'Unresolved';
                     if (status == 'RECONCILED') {
-                      statusColor = isDark ? AppColors.darkSuccess : AppColors.success;
+                      statusColor = AppColors.success;
                       statusText = '✓ Reconciled';
                     } else if (status == 'REQUIRES_REVIEW') {
-                      statusColor = isDark ? AppColors.darkWarning : AppColors.warning;
+                      statusColor = AppColors.warning;
                       statusText = 'Needs Review';
                     }
 
@@ -115,16 +124,12 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                         leading: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: isCredit
-                                ? (isDark ? AppColors.darkSuccessBg : AppColors.successLight)
-                                : (isDark ? AppColors.darkErrorBg : AppColors.errorLight),
+                            color: isCredit ? AppColors.successLight : AppColors.errorLight,
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
                             isCredit ? AppIcons.inflow : AppIcons.outflow,
-                            color: isCredit
-                                ? (isDark ? AppColors.darkSuccess : AppColors.success)
-                                : (isDark ? AppColors.darkError : AppColors.error),
+                            color: isCredit ? AppColors.success : AppColors.error,
                             size: 20,
                           ),
                         ),
@@ -166,9 +171,7 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w800,
                                   fontSize: 15,
                                   letterSpacing: -0.3,
-                                  color: isCredit
-                                      ? (isDark ? AppColors.darkSuccess : AppColors.success)
-                                      : (isDark ? AppColors.darkError : AppColors.error),
+                                  color: isCredit ? AppColors.success : AppColors.error,
                                 ),
                               )
                             : null,

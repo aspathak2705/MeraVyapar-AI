@@ -149,8 +149,9 @@ class LocalEvidenceCaptureService {
     }
 
     // 2. Extract transaction amount (ignore "Avail Bal", "Bal Rs.", "Balance:")
+    // Matches: "paid you ₹1.00", "sent you ₹500", "paid ₹250", "received ₹100", "credited Rs. 50", etc.
     final txAmtRegex = RegExp(
-      r'(?:debited(?:\s+by)?|credited(?:\s+with)?|paid|received|sent|transferred|spent)\s+(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)',
+      r'(?:debited(?:\s+by)?|credited(?:\s+with)?|paid\s+you|sent\s+you|paid|received|sent|transferred|spent)\s+(?:Rs\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?)',
       caseSensitive: false,
     );
     final txMatch = txAmtRegex.firstMatch(text);
@@ -158,8 +159,8 @@ class LocalEvidenceCaptureService {
     if (txMatch != null) {
       result['amount'] = txMatch.group(1)!.replaceAll(',', '');
     } else {
-      // Fallback: match currency amount not preceded by balance keywords
-      final generalAmtRegex = RegExp(r'(?<!bal(?:ance)?[\s\:\.]*)(?:Rs\.?|INR)\s*([\d,]+(?:\.\d{1,2})?)', caseSensitive: false);
+      // Fallback: match currency amount (Rs., INR, ₹) not preceded by balance keywords
+      final generalAmtRegex = RegExp(r'(?<!bal(?:ance)?[\s\:\.]*)(?:Rs\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?)', caseSensitive: false);
       final generalMatch = generalAmtRegex.firstMatch(text);
       if (generalMatch != null) {
         result['amount'] = generalMatch.group(1)!.replaceAll(',', '');
@@ -167,9 +168,10 @@ class LocalEvidenceCaptureService {
     }
 
     // 3. Direction regex
-    if (lower.contains('credited') || lower.contains('received') || lower.contains('deposited') || lower.contains('refunded')) {
+    // "KAVITA SANDEEP PATHAK paid you ₹1.00" -> CREDIT (merchant received money)
+    if (lower.contains('paid you') || lower.contains('sent you') || lower.contains('credited') || lower.contains('received') || lower.contains('deposited') || lower.contains('refunded')) {
       result['type'] = 'CREDIT';
-    } else if (lower.contains('debited') || lower.contains('sent') || lower.contains('paid') || lower.contains('withdrawn')) {
+    } else if (lower.contains('you paid') || lower.contains('debited') || lower.contains('sent') || lower.contains('paid') || lower.contains('withdrawn')) {
       result['type'] = 'DEBIT';
     }
 
@@ -181,12 +183,19 @@ class LocalEvidenceCaptureService {
     }
 
     // 5. Counterparty extraction
-    final cpRegex = RegExp(r'(?:to|from|by|at|VPA)\s+([A-Za-z0-9\.\@\s]{3,35}?)(?:\s+on|\s+ref|\s+upi|\s+avl|\.|$)', caseSensitive: false);
-    final cpMatch = cpRegex.firstMatch(text);
-    if (cpMatch != null) {
-      final cpCandidate = cpMatch.group(1)!.trim();
-      if (!cpCandidate.toLowerCase().contains('account') && !cpCandidate.toLowerCase().contains('your')) {
-        result['counterparty'] = cpCandidate;
+    // Handle "<NAME> paid you ₹..." e.g. "KAVITA SANDEEP PATHAK paid you ₹1.00"
+    final paidYouRegex = RegExp(r'^([A-Za-z0-9\s]{3,35}?)\s+(?:paid|sent)\s+you', caseSensitive: false);
+    final paidYouMatch = paidYouRegex.firstMatch(text.trim());
+    if (paidYouMatch != null) {
+      result['counterparty'] = paidYouMatch.group(1)!.trim();
+    } else {
+      final cpRegex = RegExp(r'(?:to|from|by|at|VPA)\s+([A-Za-z0-9\.\@\s]{3,35}?)(?:\s+on|\s+ref|\s+upi|\s+avl|\.|$)', caseSensitive: false);
+      final cpMatch = cpRegex.firstMatch(text);
+      if (cpMatch != null) {
+        final cpCandidate = cpMatch.group(1)!.trim();
+        if (!cpCandidate.toLowerCase().contains('account') && !cpCandidate.toLowerCase().contains('your')) {
+          result['counterparty'] = cpCandidate;
+        }
       }
     }
 
