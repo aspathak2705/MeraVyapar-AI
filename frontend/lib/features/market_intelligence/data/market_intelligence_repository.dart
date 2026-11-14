@@ -7,8 +7,11 @@ class MarketIntelligenceRepository {
   MarketIntelligenceRepository({ApiClient? apiClient})
       : _apiClient = apiClient ?? ApiClient();
 
-  Future<List<MerchantMarketRelevanceModel>> getRelevantSignals() async {
-    final res = await _apiClient.get('/market-intelligence/relevant');
+  Future<List<MerchantMarketRelevanceModel>> getRelevantSignals({String? query}) async {
+    final path = (query != null && query.trim().isNotEmpty)
+        ? '/market-intelligence/relevant?query=${Uri.encodeComponent(query.trim())}'
+        : '/market-intelligence/relevant';
+    final res = await _apiClient.get(path);
     final List list = res['data'] ?? [];
     return list.map((item) => MerchantMarketRelevanceModel.fromJson(item)).toList();
   }

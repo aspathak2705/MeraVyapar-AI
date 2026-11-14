@@ -17,11 +17,15 @@ abstract class DeviceEvidenceCapture {
   Future<bool> openAppSettings();
   Future<bool> openNotificationListenerSettings();
   void setNotificationHandler(Future<void> Function(Map<String, dynamic> data) handler);
+  void setQuickEntryHandler(Future<void> Function(Map<String, dynamic> data) handler);
+  Future<bool> showQuickEntryNotification();
+  Future<bool> notifyQuickEntrySuccess(String amount, String type);
 }
 
 class AndroidDeviceEvidenceCapture implements DeviceEvidenceCapture {
   static const MethodChannel _channel = MethodChannel('com.meravyapar.ai/capture');
   Future<void> Function(Map<String, dynamic> data)? _notificationHandler;
+  Future<void> Function(Map<String, dynamic> data)? _quickEntryHandler;
 
   AndroidDeviceEvidenceCapture() {
     _channel.setMethodCallHandler(_handleNativeCall);
@@ -33,12 +37,47 @@ class AndroidDeviceEvidenceCapture implements DeviceEvidenceCapture {
       if (args != null && _notificationHandler != null) {
         await _notificationHandler!(Map<String, dynamic>.from(args));
       }
+    } else if (call.method == 'onQuickEntrySubmitted') {
+      final Map<dynamic, dynamic>? args = call.arguments as Map<dynamic, dynamic>?;
+      if (args != null && _quickEntryHandler != null) {
+        await _quickEntryHandler!(Map<String, dynamic>.from(args));
+      }
     }
   }
 
   @override
   void setNotificationHandler(Future<void> Function(Map<String, dynamic> data) handler) {
     _notificationHandler = handler;
+  }
+
+  @override
+  void setQuickEntryHandler(Future<void> Function(Map<String, dynamic> data) handler) {
+    _quickEntryHandler = handler;
+  }
+
+  @override
+  Future<bool> showQuickEntryNotification() async {
+    if (!isPlatformSupported) return false;
+    try {
+      final bool? result = await _channel.invokeMethod<bool>('showQuickEntryNotification');
+      return result ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> notifyQuickEntrySuccess(String amount, String type) async {
+    if (!isPlatformSupported) return false;
+    try {
+      final bool? result = await _channel.invokeMethod<bool>('notifyQuickEntrySuccess', {
+        'amount': amount,
+        'type': type,
+      });
+      return result ?? false;
+    } catch (_) {
+      return false;
+    }
   }
 
   @override

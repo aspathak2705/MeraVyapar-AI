@@ -345,7 +345,61 @@ To enable live proxy responses from Gnani, SerpApi, and OpenRouter when deployin
 
 ---
 
-## L. Final Git & Security Audit Confirmation
+## L. Focused UX, Persistence & Financial Workflow Improvements
+
+### 1. Passbook & Transactions Navigation Fix
+- **Files Modified**: `frontend/lib/core/router/app_router.dart`, `frontend/lib/features/transactions/presentation/canonical_transactions_screen.dart`
+- **Verification Result**:
+  - Implemented back-stack tracking `_navigationStack` in `AppRouter` and wrapped root in `PopScope` to preserve previous route history.
+  - Pushed routes navigate back to their exact previous caller instead of forcing navigation to `/`.
+  - On the Passbook screen, back button is always visible in the AppBar.
+  - Preserved Run Reconciliation, Add Entry, and integrated the new Import Statement action.
+
+### 2. Merchant Business Profile Onboarding Prefill & Persistence
+- **Files Modified**: `frontend/lib/features/onboarding/data/local_business_profile_repository.dart`, `frontend/lib/features/onboarding/domain/merchant_business_profile.dart`, `frontend/lib/features/onboarding/presentation/business_profile_screen.dart`
+- **Verification Result**:
+  - Traced data flow: Onboarding input -> Secure Storage (`mv_local_merchant_name`) -> `LocalAuthRepository.currentSession.displayName`.
+  - `LocalBusinessProfileRepository.getProfile()` updated to automatically prefill missing or untouched `"My Business"` profile entries with the merchant's saved onboarding business name.
+  - Verified custom merchant profile modifications are strictly preserved and never overwritten by defaults.
+  - Verified profile reads, updates, and persists to local SQLite `merchant_business_profile` table (verified via automated test `notification_and_profile_test.dart`).
+
+### 3. External Market Signals Personalization & Manual Search
+- **Files Modified**: `frontend/lib/features/market_intelligence/data/market_intelligence_repository.dart`, `frontend/lib/features/market_intelligence/presentation/relevant_market_signals_screen.dart`, `frontend/lib/core/router/app_router.dart`
+- **Verification Result**:
+  - Replaced static empty screen with interactive, stateful `RelevantMarketSignalsScreen`.
+  - Added query generation deriving terms from merchant's active business category, procurement commodities, and city/state (e.g. "wholesale grocery commodities kirana retail Maharashtra").
+  - Added persistent top search bar with query execution passing directly to `/market-intelligence/relevant?query=...`.
+  - Wired to backend `SerpApiClient` across approved Google engines (`google`, `google_shopping`, `google_news`) with verified `SERPAPI_API_KEY`.
+  - Results display headlines, factual summaries, provider attribution, publication date, and grounded business explanations based on merchant profile.
+  - Distinct UI states implemented: Loading, Loaded, Empty (with specific commodity suggestions), Network Error, and Provider Not Configured. No mock data generated.
+
+### 4. Statement & Financial History Import
+- **Files Added / Modified**: `frontend/lib/features/transactions/domain/statement_import_service.dart`, `frontend/lib/core/router/app_router.dart`, `frontend/lib/features/transactions/presentation/canonical_transactions_screen.dart`
+- **Verification Result**:
+  - Implemented `StatementImportService` supporting structured CSV exports, UPI statement histories, and plain-text extracts.
+  - Normalizes transactions with exact integer paise amounts, transaction dates, and UTR/Cheque references.
+  - Pre-import duplicate detection cross-references existing SQLite canonical transactions matching reference IDs and amount-date fingerprints.
+  - Added interactive dialog workflow: Source Document naming -> Document paste/import -> Extraction & Review preview -> Merchant selection/exclusion checkboxes -> Confirmation commit to SQLite.
+  - Explicit Format Limitations: CSV statements and plain text extracts are fully supported and verified; binary PDF text parsing is supported if pasted or extracted via system; proprietary binary XLS/XLSX without external parsers is explicitly not claimed.
+
+### 5. Quick Entry Notification Shade Experience
+- **Files Added / Modified**: `frontend/android/app/src/main/kotlin/com/example/frontend/QuickEntryReceiver.kt`, `frontend/android/app/src/main/kotlin/com/example/frontend/MainActivity.kt`, `frontend/android/app/src/main/AndroidManifest.xml`, `frontend/lib/features/capture/data/device_evidence_capture.dart`, `frontend/lib/core/router/app_router.dart`
+- **Verification Result**:
+  - Added native `QuickEntryReceiver.kt` utilizing Android `RemoteInput` for "+ Add Income" and "- Add Expense".
+  - Persistent notification shade entry displayed upon successful merchant PIN authentication.
+  - Dispatches inline submissions directly to Flutter via `MethodChannel('com.meravyapar.ai/capture')`.
+  - Amount parsed safely into integer paise; direction mapped to `CREDIT` or `DEBIT`.
+  - Committed to local SQLite canonical ledger via `LocalCanonicalTransactionRepository` with idempotency guards.
+  - Confirmation notification displayed only after SQLite successfully records transaction.
+  - Graceful fallback: If app is locked/unauthenticated, transactions cannot bypass PIN and require application unlock.
+
+### 6. Scope Audit & File Justifications
+- `device_evidence_capture.dart`: Extended the existing capture MethodChannel abstraction to expose native notification handlers (`setQuickEntryHandler`, `showQuickEntryNotification`, `notifyQuickEntrySuccess`) without adding duplicate services or third-party packages.
+- `permission_lifecycle_test.dart`: Updated `MockDeviceEvidenceCapture` to satisfy the updated `DeviceEvidenceCapture` interface. All 3 unit tests pass.
+
+---
+
+## M. Final Git & Security Audit Confirmation
 - Verified clean repository state on `main` branch.
 - No database files, test credentials, or private merchant information exposed.
 - All 65 backend tests and Flutter static analysis pass with zero defects.

@@ -49,6 +49,15 @@ class MockDeviceEvidenceCapture implements DeviceEvidenceCapture {
   Future<bool> openNotificationListenerSettings() async => true;
 
   @override
+  void setQuickEntryHandler(Future<void> Function(Map<String, dynamic> data) handler) {}
+
+  @override
+  Future<bool> showQuickEntryNotification() async => true;
+
+  @override
+  Future<bool> notifyQuickEntrySuccess(String amount, String type) async => true;
+
+  @override
   void setNotificationHandler(Future<void> Function(Map<String, dynamic> data) handler) {}
 }
 

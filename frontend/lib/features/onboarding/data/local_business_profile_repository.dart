@@ -24,13 +24,26 @@ class LocalBusinessProfileRepository {
     );
 
     if (rows.isNotEmpty) {
-      return MerchantBusinessProfile.fromMap(rows.first);
+      final existing = MerchantBusinessProfile.fromMap(rows.first);
+      // If business name is missing, empty, or default, and we have a valid fallback name, update it
+      if ((existing.businessName.isEmpty || existing.businessName == 'My Business') &&
+          fallbackName != null &&
+          fallbackName.trim().isNotEmpty &&
+          fallbackName.trim() != 'My Business') {
+        final updated = existing.copyWith(
+          businessName: fallbackName.trim(),
+          updatedAt: DateTime.now().toUtc().toIso8601String(),
+        );
+        await saveProfile(updated);
+        return updated;
+      }
+      return existing;
     }
 
     // Default initialized profile based on merchant
     final defaultProfile = MerchantBusinessProfile(
       merchantId: merchantId,
-      businessName: fallbackName ?? 'My Business',
+      businessName: (fallbackName != null && fallbackName.trim().isNotEmpty) ? fallbackName.trim() : 'My Business',
       updatedAt: DateTime.now().toUtc().toIso8601String(),
     );
 

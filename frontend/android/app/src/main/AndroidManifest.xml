@@ -48,6 +48,15 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <!-- Quick Entry Broadcast Receiver for Notification Shade RemoteInput -->
+        <receiver
+            android:name=".QuickEntryReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.meravyapar.ai.ACTION_SUBMIT_QUICK_ENTRY" />
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

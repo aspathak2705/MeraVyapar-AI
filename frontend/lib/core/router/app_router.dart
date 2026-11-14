@@ -36,6 +36,9 @@ import '../../features/intelligence/presentation/unified_financial_intelligence_
 import '../../features/capture/presentation/permission_settings_screen.dart';
 import '../../features/procurement/presentation/procurement_dashboard_screen.dart';
 import '../../features/onboarding/presentation/business_profile_screen.dart';
+import '../../features/onboarding/data/local_business_profile_repository.dart';
+import '../../features/transactions/domain/statement_import_service.dart';
+import '../../features/capture/data/device_evidence_capture.dart';
 import '../../core/database/local_database_service.dart';
 
 // --- Local Repository Providers ---
@@ -94,12 +97,64 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
   // Navigation State
   String _currentRoute = '/';
+  final List<String> _navigationStack = ['/'];
   final Map<String, dynamic> _routeArgs = {};
 
   @override
   void initState() {
     super.initState();
     _initLocalSession();
+    _setupQuickEntryListener();
+  }
+
+  void _setupQuickEntryListener() {
+    final capture = AndroidDeviceEvidenceCapture();
+    capture.setQuickEntryHandler((data) async {
+      final authRepo = ref.read(localAuthRepositoryProvider);
+      final activeMerchantId = authRepo.activeMerchantId;
+      if (activeMerchantId == null) {
+        // Merchant not authenticated yet, cannot commit transaction without session
+        return;
+      }
+
+      final text = data['text'] as String? ?? '';
+      final defaultType = data['type'] as String? ?? 'CREDIT';
+      if (text.isEmpty) return;
+
+      // Extract amount and parse description
+      final amtMatch = RegExp(r'(?:Rs\.?|INR|₹)?\s*([\d,]+(?:\.\d{1,2})?)').firstMatch(text);
+      if (amtMatch == null) return;
+
+      final amtStr = amtMatch.group(1)!.replaceAll(',', '');
+      final parsed = double.tryParse(amtStr);
+      if (parsed == null || parsed <= 0) return;
+
+      // Determine transaction direction
+      String txType = defaultType;
+      final lower = text.toLowerCase();
+      if (lower.contains('expense') || lower.contains('paid') || lower.contains('debit')) {
+        txType = 'DEBIT';
+      } else if (lower.contains('income') || lower.contains('received') || lower.contains('credit')) {
+        txType = 'CREDIT';
+      }
+
+      final txRepo = ref.read(localCanonicalTransactionRepositoryProvider);
+      final tx = await txRepo.createTransaction(
+        merchantId: activeMerchantId,
+        amount: (parsed).toStringAsFixed(2),
+        transactionType: txType,
+        paymentMode: 'CASH',
+        description: 'Quick Entry: $text',
+        sourceType: 'QUICK_ENTRY',
+      );
+
+      // Notify Android native confirmation shade
+      await capture.notifyQuickEntrySuccess(tx.amount ?? amtStr, txType);
+
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -143,6 +198,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         _authStatus = LocalAuthStatus.authenticated;
         _isLoading = false;
         _errorMessage = null;
+        AndroidDeviceEvidenceCapture().showQuickEntryNotification();
       });
     } catch (e) {
       setState(() {
@@ -164,6 +220,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         if (success) {
           _authStatus = LocalAuthStatus.authenticated;
           _errorMessage = null;
+          // Show quick entry notification in Android shade upon successful merchant unlock
+          AndroidDeviceEvidenceCapture().showQuickEntryNotification();
         } else {
           _errorMessage = 'Invalid PIN. Please try again.';
         }
@@ -180,6 +238,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
   void _navigateTo(String route, [Map<String, dynamic>? args]) {
     setState(() {
       _currentRoute = route;
+      _navigationStack.add(route);
       if (args != null) {
         _routeArgs.clear();
         _routeArgs.addAll(args);
@@ -189,7 +248,14 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
   void _popRoute() {
     setState(() {
-      _currentRoute = '/';
+      if (_navigationStack.length > 1) {
+        _navigationStack.removeLast();
+        _currentRoute = _navigationStack.last;
+      } else {
+        _currentRoute = '/';
+        _navigationStack.clear();
+        _navigationStack.add('/');
+      }
       _routeArgs.clear();
     });
   }
@@ -319,7 +385,14 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     final authRepo = ref.read(localAuthRepositoryProvider);
     final activeMerchantId = authRepo.activeMerchantId ?? 'local_merchant';
 
-    return _buildCurrentScreen(activeMerchantId);
+    return PopScope(
+      canPop: _currentRoute == '/',
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        _popRoute();
+      },
+      child: _buildCurrentScreen(activeMerchantId),
+    );
   }
 
   Widget _buildCurrentScreen(String merchantId) {
@@ -368,7 +441,9 @@ class _AppRouterState extends ConsumerState<AppRouter> {
               isLoading: snapshot.connectionState == ConnectionState.waiting,
               onRunReconciliation: () {},
               onTransactionTap: (tx) => _navigateTo('/transactions/detail', {'tx': tx}),
+              onBack: _popRoute,
               onAddTransaction: () => _showManualEntryDialog(context, merchantId, txRepo),
+              onImportStatement: () => _showStatementImportDialog(context, merchantId, txRepo),
             );
           },
         );
@@ -428,13 +503,24 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
       case '/market':
         final marketRepo = ref.read(marketIntelligenceRepositoryProvider);
+        final profileRepo = ref.read(localBusinessProfileRepositoryProvider);
+        final authRepo = ref.read(localAuthRepositoryProvider);
+        final fallbackName = authRepo.currentSession?.displayName;
+
         return FutureBuilder(
-          future: marketRepo.getRelevantSignals(),
+          future: Future.wait([
+            profileRepo.getProfile(merchantId: merchantId, fallbackName: fallbackName),
+            marketRepo.getRelevantSignals(),
+          ]),
           builder: (context, snapshot) {
-            final signals = snapshot.data ?? [];
+            final data = snapshot.data;
+            final profile = data != null ? data[0] as MerchantBusinessProfile : null;
+            final signals = data != null ? (data[1] as List).cast<MerchantMarketRelevanceModel>() : <MerchantMarketRelevanceModel>[];
+
             return RelevantMarketSignalsScreen(
-              signals: signals,
-              onRefresh: () => setState(() {}),
+              initialSignals: signals,
+              merchantProfile: profile,
+              onFetchSignals: ({String? query}) => marketRepo.getRelevantSignals(query: query),
               onBack: _popRoute,
               onSignalTap: (sig) => _navigateTo('/market/detail', {'signal': sig}),
             );
@@ -613,6 +699,190 @@ class _AppRouterState extends ConsumerState<AppRouter> {
               },
               child: const Text('Save Entry'),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showStatementImportDialog(
+    BuildContext context,
+    String merchantId,
+    LocalCanonicalTransactionRepository txRepo,
+  ) {
+    final statementService = StatementImportService(txRepo: txRepo);
+    final rawTextCtrl = TextEditingController();
+    String docName = 'Statement_${DateTime.now().toIso8601String().substring(0, 10)}.csv';
+    List<ExtractedStatementRecord> extractedRecords = [];
+    bool isPreviewMode = false;
+    bool isProcessing = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (dialogCtx, setDialogState) => AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.file_upload_outlined, color: AppColors.primaryPurple),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  isPreviewMode ? 'Review Extracted Statement' : 'Import Financial Statement',
+                  style: const TextStyle(fontSize: 18),
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (!isPreviewMode) ...[
+                    const Text(
+                      'Paste transaction history text or CSV statement export below to extract and verify previous records.',
+                      style: TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      onChanged: (val) {
+                        if (val.trim().isNotEmpty) docName = val.trim();
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Source Document Name',
+                        hintText: 'e.g. HDFC_Statement_Oct2026.csv',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: rawTextCtrl,
+                      maxLines: 8,
+                      decoration: const InputDecoration(
+                        labelText: 'Statement Text / CSV Export',
+                        hintText: 'Date,Description,Amount,Type\n2026-10-12,UPI/Rahul,1500.00,CREDIT\n2026-10-14,Wholesale Spices,420.00,DEBIT',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Supported formats: Bank CSV exports, UPI statement text, and PDF text extracts.',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                    ),
+                  ] else ...[
+                    Text(
+                      'Found ${extractedRecords.length} records. Exclude incorrect or duplicate transactions before confirming:',
+                      style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                    ),
+                    const SizedBox(height: 12),
+                    ...extractedRecords.map((rec) {
+                      final isCredit = rec.type == 'CREDIT';
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          color: rec.isPossibleDuplicate ? const Color(0xFFFEF2F2) : const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: rec.isPossibleDuplicate ? Colors.red.shade200 : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        child: CheckboxListTile(
+                          value: rec.isSelected,
+                          onChanged: (val) {
+                            setDialogState(() {
+                              rec.isSelected = val ?? false;
+                            });
+                          },
+                          dense: true,
+                          title: Row(
+                            children: [
+                              Text(
+                                '${isCredit ? "+" : "-"} ₹${rec.amount}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: isCredit ? AppColors.success : AppColors.error,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  rec.counterparty ?? rec.description,
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Date: ${rec.date} • ${rec.description}', style: const TextStyle(fontSize: 11)),
+                              if (rec.isPossibleDuplicate)
+                                Text(
+                                  '⚠ Possible Duplicate: ${rec.duplicateReason}',
+                                  style: TextStyle(fontSize: 11, color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                                ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isProcessing ? null : () => Navigator.pop(ctx),
+              child: const Text('Cancel'),
+            ),
+            if (!isPreviewMode)
+              FilledButton(
+                onPressed: isProcessing
+                    ? null
+                    : () async {
+                        final content = rawTextCtrl.text.trim();
+                        if (content.isEmpty) return;
+
+                        setDialogState(() => isProcessing = true);
+                        final parsed = statementService.parseStatementContent(content);
+                        final evaluated = await statementService.detectDuplicates(
+                          merchantId: merchantId,
+                          candidates: parsed,
+                        );
+
+                        setDialogState(() {
+                          extractedRecords = evaluated;
+                          isPreviewMode = true;
+                          isProcessing = false;
+                        });
+                      },
+                child: isProcessing ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Extract & Preview'),
+              )
+            else
+              FilledButton(
+                onPressed: isProcessing
+                    ? null
+                    : () async {
+                        setDialogState(() => isProcessing = true);
+                        final count = await statementService.persistConfirmedTransactions(
+                          merchantId: merchantId,
+                          confirmedRecords: extractedRecords,
+                          sourceDocumentName: docName,
+                        );
+
+                        if (context.mounted) {
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Successfully imported $count transactions into private ledger')),
+                          );
+                          setState(() {});
+                        }
+                      },
+                child: isProcessing ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Confirm & Save'),
+              ),
           ],
         ),
       ),

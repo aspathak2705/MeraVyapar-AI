@@ -29,6 +29,38 @@ class MerchantBusinessProfile {
     required this.updatedAt,
   });
 
+  MerchantBusinessProfile copyWith({
+    String? merchantId,
+    String? businessName,
+    String? businessCategory,
+    String? businessType,
+    String? productsAndServices,
+    String? city,
+    String? state,
+    String? customerType,
+    String? salesChannels,
+    String? mainProcurementCategories,
+    String? turnoverRange,
+    String? businessGoals,
+    String? updatedAt,
+  }) {
+    return MerchantBusinessProfile(
+      merchantId: merchantId ?? this.merchantId,
+      businessName: businessName ?? this.businessName,
+      businessCategory: businessCategory ?? this.businessCategory,
+      businessType: businessType ?? this.businessType,
+      productsAndServices: productsAndServices ?? this.productsAndServices,
+      city: city ?? this.city,
+      state: state ?? this.state,
+      customerType: customerType ?? this.customerType,
+      salesChannels: salesChannels ?? this.salesChannels,
+      mainProcurementCategories: mainProcurementCategories ?? this.mainProcurementCategories,
+      turnoverRange: turnoverRange ?? this.turnoverRange,
+      businessGoals: businessGoals ?? this.businessGoals,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'merchant_id': merchantId,

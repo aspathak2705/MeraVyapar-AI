@@ -10,6 +10,7 @@ class CanonicalTransactionsScreen extends StatelessWidget {
   final Function(CanonicalTransactionModel tx) onTransactionTap;
   final VoidCallback? onBack;
   final VoidCallback? onAddTransaction;
+  final VoidCallback? onImportStatement;
 
   const CanonicalTransactionsScreen({
     super.key,
@@ -19,6 +20,7 @@ class CanonicalTransactionsScreen extends StatelessWidget {
     required this.onTransactionTap,
     this.onBack,
     this.onAddTransaction,
+    this.onImportStatement,
   });
 
   @override
@@ -26,14 +28,18 @@ class CanonicalTransactionsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Passbook & Transactions'),
-        leading: onBack != null
-            ? IconButton(
-                icon: const Icon(AppIcons.arrowBack),
-                tooltip: 'Back',
-                onPressed: onBack,
-              )
-            : null,
+        leading: IconButton(
+          icon: const Icon(AppIcons.arrowBack),
+          tooltip: 'Back',
+          onPressed: onBack ?? () => Navigator.of(context).maybePop(),
+        ),
         actions: [
+          if (onImportStatement != null)
+            IconButton(
+              icon: const Icon(Icons.file_upload_outlined),
+              tooltip: 'Import Statement / History',
+              onPressed: onImportStatement,
+            ),
           IconButton(
             icon: const Icon(AppIcons.refresh),
             tooltip: 'Run Reconciliation Pass',
@@ -41,15 +47,33 @@ class CanonicalTransactionsScreen extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: onAddTransaction != null
-          ? FloatingActionButton.extended(
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (onImportStatement != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: FloatingActionButton.extended(
+                heroTag: 'fab_import_statement',
+                onPressed: onImportStatement,
+                backgroundColor: AppColors.lightLavender,
+                foregroundColor: AppColors.primaryPurple,
+                icon: const Icon(Icons.file_upload_outlined, size: 20),
+                label: const Text('Import Statement', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              ),
+            ),
+          if (onAddTransaction != null)
+            FloatingActionButton.extended(
+              heroTag: 'fab_add_entry',
               onPressed: onAddTransaction,
               backgroundColor: AppColors.primaryPurple,
               foregroundColor: Colors.white,
               icon: const Icon(Icons.add_rounded),
               label: const Text('Add Entry', style: TextStyle(fontWeight: FontWeight.bold)),
-            )
-          : null,
+            ),
+        ],
+      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : transactions.isEmpty

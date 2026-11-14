@@ -183,6 +183,26 @@ class MainActivity : FlutterActivity() {
                     }
                 }
 
+                "showQuickEntryNotification" -> {
+                    try {
+                        QuickEntryReceiver.showQuickEntryNotification(this)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("NOTIFICATION_ERROR", e.message, null)
+                    }
+                }
+
+                "notifyQuickEntrySuccess" -> {
+                    val amount = call.argument<String>("amount") ?: "0.00"
+                    val type = call.argument<String>("type") ?: "CREDIT"
+                    try {
+                        QuickEntryReceiver.showSuccessConfirmationNotification(this, amount, type)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("NOTIFICATION_ERROR", e.message, null)
+                    }
+                }
+
                 else -> result.notImplemented()
             }
         }
@@ -191,6 +211,36 @@ class MainActivity : FlutterActivity() {
         FinancialNotificationListenerService.notificationCallback = { data ->
             runOnUiThread {
                 methodChannel?.invokeMethod("onNotificationReceived", data)
+            }
+        }
+
+        // Connect quick entry notification callback to Flutter MethodChannel
+        QuickEntryReceiver.quickEntryCallback = { data ->
+            runOnUiThread {
+                methodChannel?.invokeMethod("onQuickEntrySubmitted", data)
+            }
+        }
+
+        // Handle intent if launched directly from QuickEntryReceiver
+        handleQuickEntryIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleQuickEntryIntent(intent)
+    }
+
+    private fun handleQuickEntryIntent(intent: Intent?) {
+        if (intent?.action == QuickEntryReceiver.ACTION_SUBMIT_QUICK_ENTRY) {
+            val text = intent.getStringExtra("quick_entry_text") ?: return
+            val type = intent.getStringExtra("quick_entry_type") ?: "CREDIT"
+            val payload = mapOf(
+                "text" to text,
+                "type" to type,
+                "timestamp" to System.currentTimeMillis()
+            )
+            runOnUiThread {
+                methodChannel?.invokeMethod("onQuickEntrySubmitted", payload)
             }
         }
     }

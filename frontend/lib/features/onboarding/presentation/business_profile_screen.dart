@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../data/local_business_profile_repository.dart';
 import '../domain/merchant_business_profile.dart';
+import '../../auth/data/local_auth_repository.dart';
 
 class BusinessProfileScreen extends ConsumerStatefulWidget {
   final String merchantId;
@@ -63,7 +64,9 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
 
   Future<void> _loadProfile() async {
     final repo = ref.read(localBusinessProfileRepositoryProvider);
-    final profile = await repo.getProfile(merchantId: widget.merchantId);
+    final authRepo = ref.read(localAuthRepositoryProvider);
+    final fallbackName = authRepo.currentSession?.displayName;
+    final profile = await repo.getProfile(merchantId: widget.merchantId, fallbackName: fallbackName);
     if (mounted) {
       setState(() {
         _nameController.text = profile.businessName;
