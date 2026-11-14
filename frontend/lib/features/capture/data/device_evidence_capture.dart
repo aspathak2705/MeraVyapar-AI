@@ -20,6 +20,7 @@ abstract class DeviceEvidenceCapture {
   void setQuickEntryHandler(Future<void> Function(Map<String, dynamic> data) handler);
   Future<bool> showQuickEntryNotification();
   Future<bool> notifyQuickEntrySuccess(String amount, String type);
+  Future<Map<String, dynamic>?> pickDocument();
 }
 
 class AndroidDeviceEvidenceCapture implements DeviceEvidenceCapture {
@@ -163,6 +164,20 @@ class AndroidDeviceEvidenceCapture implements DeviceEvidenceCapture {
       return res ?? false;
     } catch (_) {
       return false;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>?> pickDocument() async {
+    if (!isPlatformSupported) return null;
+    try {
+      final dynamic res = await _channel.invokeMethod('pickDocument');
+      if (res is Map) {
+        return Map<String, dynamic>.from(res);
+      }
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 

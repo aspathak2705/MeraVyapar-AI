@@ -133,11 +133,14 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
                     // 3. Post Notifications (Android 13+)
                     _buildPermissionTile(
                       icon: Icons.notifications_outlined,
-                      title: 'App Notifications (Reminders)',
-                      description: 'Allows MeraVyapar to alert you when customer payment promises are due or cashflow requires attention.',
+                      title: 'App Notifications & Quick Entry Shade',
+                      description: 'Allows MeraVyapar to maintain ongoing quick-entry tile in notification shade (+ Add Income, - Add Expense) and due reminders.',
                       status: _statuses['POST_NOTIFICATIONS'] ?? PermissionLifecycleStatus.notRequested,
                       onRequest: () async {
-                        await _capture.requestFeaturePermission('POST_NOTIFICATIONS');
+                        final res = await _capture.requestFeaturePermission('POST_NOTIFICATIONS');
+                        if (res == PermissionLifecycleStatus.granted) {
+                          await _capture.showQuickEntryNotification();
+                        }
                         await _refreshStatuses();
                       },
                       onOpenSettings: () => _capture.openAppSettings(),
@@ -446,10 +449,6 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
               style: TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.35),
             ),
           ],
-        ),
-      ),
-    );
-  }
         ),
       ),
     );

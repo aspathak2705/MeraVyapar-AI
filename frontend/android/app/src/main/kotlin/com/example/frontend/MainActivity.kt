@@ -24,8 +24,10 @@ class MainActivity : FlutterActivity() {
 
     private val PERMISSION_REQ_RECORD_AUDIO = 1001
     private val PERMISSION_REQ_POST_NOTIFICATIONS = 1002
+    private val REQUEST_CODE_PICK_DOCUMENT = 2001
 
     private var pendingPermissionResult: MethodChannel.Result? = null
+    private var pendingFilePickerResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -203,6 +205,33 @@ class MainActivity : FlutterActivity() {
                     }
                 }
 
+                "pickDocument" -> {
+                    if (pendingFilePickerResult != null) {
+                        result.error("CONCURRENT_REQUEST", "File picker already active", null)
+                        return@setMethodCallHandler
+                    }
+                    pendingFilePickerResult = result
+                    try {
+                        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                            type = "*/*"
+                            putExtra(
+                                Intent.EXTRA_MIME_TYPES,
+                                arrayOf(
+                                    "application/pdf",
+                                    "text/csv",
+                                    "text/comma-separated-values",
+                                    "text/plain"
+                                )
+                            )
+                        }
+                        startActivityForResult(intent, REQUEST_CODE_PICK_DOCUMENT)
+                    } catch (e: Exception) {
+                        pendingFilePickerResult = null
+                        result.error("PICKER_ERROR", e.message, null)
+                    }
+                }
+
                 else -> result.notImplemented()
             }
         }
@@ -278,6 +307,53 @@ class MainActivity : FlutterActivity() {
                 res.success("PERMANENTLY_DENIED")
             } else {
                 res.success("DENIED")
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_PICK_DOCUMENT) {
+            val res = pendingFilePickerResult
+            pendingFilePickerResult = null
+            if (res == null) return
+
+            if (resultCode == RESULT_OK && data?.data != null) {
+                val uri = data.data!!
+                try {
+                    val contentResolver = applicationContext.contentResolver
+                    var displayName = "statement_import"
+                    val cursor = contentResolver.query(uri, null, null, null, null)
+                    cursor?.use {
+                        if (it.moveToFirst()) {
+                            val nameIndex = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                            if (nameIndex != -1) {
+                                displayName = it.getString(nameIndex) ?: displayName
+                            }
+                        }
+                    }
+
+                    val inputStream = contentResolver.openInputStream(uri)
+                    val bytes = inputStream?.readBytes()
+                    inputStream?.close()
+
+                    if (bytes != null) {
+                        res.success(
+                            mapOf(
+                                "fileName" to displayName,
+                                "bytes" to bytes,
+                                "uri" to uri.toString(),
+                                "mimeType" to (contentResolver.getType(uri) ?: "application/octet-stream")
+                            )
+                        )
+                    } else {
+                        res.error("READ_FAILED", "Could not read file stream", null)
+                    }
+                } catch (e: Exception) {
+                    res.error("FILE_ERROR", e.message, null)
+                }
+            } else {
+                res.success(null)
             }
         }
     }

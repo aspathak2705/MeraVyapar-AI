@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config/env.dart';
@@ -41,6 +43,7 @@ import '../../features/onboarding/data/local_business_profile_repository.dart';
 import '../../features/onboarding/domain/merchant_business_profile.dart';
 import '../../features/transactions/domain/statement_import_service.dart';
 import '../../features/capture/data/device_evidence_capture.dart';
+import '../../features/capture/domain/local_evidence_capture_service.dart';
 import '../../core/database/local_database_service.dart';
 
 // --- Local Repository Providers ---
@@ -49,6 +52,7 @@ import '../../core/database/local_database_service.dart';
 final localCanonicalTransactionRepositoryProvider = Provider((ref) => LocalCanonicalTransactionRepository());
 final localMemoryRepositoryProvider = Provider((ref) => LocalMemoryRepository());
 final localActionRepositoryProvider = Provider((ref) => LocalActionRepository());
+final localEvidenceCaptureServiceProvider = Provider((ref) => LocalEvidenceCaptureService());
 
 // --- Gateway / Unmigrated Providers ---
 final evidenceRepositoryProvider = Provider((ref) => EvidenceRepository());
@@ -106,11 +110,48 @@ class _AppRouterState extends ConsumerState<AppRouter> {
   void initState() {
     super.initState();
     _initLocalSession();
-    _setupQuickEntryListener();
+    _setupCaptureListeners();
   }
 
-  void _setupQuickEntryListener() {
+  void _setupCaptureListeners() {
     final capture = AndroidDeviceEvidenceCapture();
+
+    // 1. Passive Financial Notification Listener
+    capture.setNotificationHandler((data) async {
+      final authRepo = ref.read(localAuthRepositoryProvider);
+      final activeMerchantId = authRepo.activeMerchantId;
+      if (activeMerchantId == null) {
+        // App locked or unauthenticated merchant session: ignore unauthenticated mutation
+        return;
+      }
+
+      final packageName = data['packageName'] as String? ?? 'unknown';
+      final title = data['title'] as String? ?? '';
+      final text = data['text'] as String? ?? '';
+      final fullText = '$title $text'.trim();
+      if (fullText.isEmpty) return;
+
+      final captureService = ref.read(localEvidenceCaptureServiceProvider);
+      final timestamp = data['timestamp'] as int? ?? DateTime.now().millisecondsSinceEpoch;
+      final sha256Hash = sha256.convert(utf8.encode('$packageName|$timestamp|$fullText')).toString();
+
+      await captureService.ingestEvidenceAndExtract(
+        merchantId: activeMerchantId,
+        filename: 'notif_${timestamp}.txt',
+        mimeType: 'text/plain',
+        fileSizeBytes: fullText.length,
+        sha256Hash: sha256Hash,
+        storageRelativePath: 'evidence/notif_${timestamp}.txt',
+        sourceType: 'NOTIFICATION',
+        rawText: fullText,
+      );
+
+      if (mounted) {
+        setState(() {});
+      }
+    });
+
+    // 2. Quick Entry Shade RemoteInput Listener
     capture.setQuickEntryHandler((data) async {
       final authRepo = ref.read(localAuthRepositoryProvider);
       final activeMerchantId = authRepo.activeMerchantId;
@@ -581,6 +622,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         return HomeShellScreen(
           onAddPaymentReceived: () => _showManualEntryDialog(context, merchantId, ref.read(localCanonicalTransactionRepositoryProvider), defaultType: 'CREDIT'),
           onAddExpense: () => _showManualEntryDialog(context, merchantId, ref.read(localCanonicalTransactionRepositoryProvider), defaultType: 'DEBIT'),
+          onImportStatement: () => _showStatementImportDialog(context, merchantId, ref.read(localCanonicalTransactionRepositoryProvider)),
           onOpenVoiceAssistant: () {
             showModalBottomSheet(
               context: context,
@@ -713,11 +755,30 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     LocalCanonicalTransactionRepository txRepo,
   ) {
     final statementService = StatementImportService(txRepo: txRepo);
+    final captureService = AndroidDeviceEvidenceCapture();
     final rawTextCtrl = TextEditingController();
     String docName = 'Statement_${DateTime.now().toIso8601String().substring(0, 10)}.csv';
     List<ExtractedStatementRecord> extractedRecords = [];
     bool isPreviewMode = false;
     bool isProcessing = false;
+    bool showManualPaste = false;
+    String? statusMessage;
+    int totalCreditPaise = 0;
+    int totalDebitPaise = 0;
+
+    void updateTotals() {
+      totalCreditPaise = 0;
+      totalDebitPaise = 0;
+      for (final rec in extractedRecords) {
+        if (!rec.isSelected) continue;
+        final paise = (double.tryParse(rec.amount) ?? 0.0 * 100).round();
+        if (rec.type == 'CREDIT') {
+          totalCreditPaise += (double.parse(rec.amount) * 100).round();
+        } else {
+          totalDebitPaise += (double.parse(rec.amount) * 100).round();
+        }
+      }
+    }
 
     showDialog(
       context: context,
@@ -743,39 +804,216 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (!isPreviewMode) ...[
-                    const Text(
-                      'Paste transaction history text or CSV statement export below to extract and verify previous records.',
-                      style: TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4),
+                    // Primary Document Picker Card
+                    InkWell(
+                      onTap: isProcessing
+                          ? null
+                          : () async {
+                              setDialogState(() {
+                                isProcessing = true;
+                                statusMessage = null;
+                              });
+
+                              try {
+                                final fileData = await captureService.pickDocument();
+                                if (fileData == null) {
+                                  setDialogState(() {
+                                    isProcessing = false;
+                                  });
+                                  return;
+                                }
+
+                                final pickedName = fileData['fileName'] as String? ?? 'Imported_Statement';
+                                final bytes = fileData['bytes'] as List<dynamic>?;
+                                if (bytes == null || bytes.isEmpty) {
+                                  setDialogState(() {
+                                    isProcessing = false;
+                                    statusMessage = 'Could not read document contents';
+                                  });
+                                  return;
+                                }
+
+                                docName = pickedName;
+                                final parseResult = statementService.parseDocumentBytes(
+                                  bytes.cast<int>(),
+                                  pickedName,
+                                );
+
+                                if (parseResult.records.isEmpty) {
+                                  setDialogState(() {
+                                    isProcessing = false;
+                                    statusMessage = parseResult.diagnosticMessage ?? 'No transactions found in file';
+                                  });
+                                  return;
+                                }
+
+                                final evaluated = await statementService.detectDuplicates(
+                                  merchantId: merchantId,
+                                  candidates: parseResult.records,
+                                );
+
+                                setDialogState(() {
+                                  extractedRecords = evaluated;
+                                  updateTotals();
+                                  isPreviewMode = true;
+                                  isProcessing = false;
+                                });
+                              } catch (e) {
+                                setDialogState(() {
+                                  isProcessing = false;
+                                  statusMessage = 'Import error: ${e.toString()}';
+                                });
+                              }
+                            },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3E8FF),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFC084FC), width: 1.5),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF7E22CE),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.file_present_rounded, color: Colors.white, size: 28),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: const [
+                                  Text(
+                                    'Choose PDF or CSV File',
+                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF581C87)),
+                                  ),
+                                  SizedBox(height: 3),
+                                  Text(
+                                    'Tap to select native bank statement from device storage (Storage Access Framework)',
+                                    style: TextStyle(fontSize: 11, color: Color(0xFF7E22CE)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      onChanged: (val) {
-                        if (val.trim().isNotEmpty) docName = val.trim();
+
+                    if (statusMessage != null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEF2F2),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFFECACA)),
+                        ),
+                        child: Text(
+                          statusMessage!,
+                          style: const TextStyle(fontSize: 12, color: Color(0xFFB91C1C), fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 16),
+
+                    // Secondary Collapsible Text Paste
+                    InkWell(
+                      onTap: () {
+                        setDialogState(() {
+                          showManualPaste = !showManualPaste;
+                        });
                       },
-                      decoration: const InputDecoration(
-                        labelText: 'Source Document Name',
-                        hintText: 'e.g. HDFC_Statement_Oct2026.csv',
+                      child: Row(
+                        children: [
+                          Icon(
+                            showManualPaste ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                            size: 18,
+                            color: const Color(0xFF64748B),
+                          ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            'Or paste statement text manually',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: rawTextCtrl,
-                      maxLines: 8,
-                      decoration: const InputDecoration(
-                        labelText: 'Statement Text / CSV Export',
-                        hintText: 'Date,Description,Amount,Type\n2026-10-12,UPI/Rahul,1500.00,CREDIT\n2026-10-14,Wholesale Spices,420.00,DEBIT',
-                        border: OutlineInputBorder(),
+
+                    if (showManualPaste) ...[
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: rawTextCtrl,
+                        maxLines: 5,
+                        decoration: const InputDecoration(
+                          labelText: 'Statement Text / Raw CSV',
+                          hintText: 'Date,Description,Amount,Type\n2026-10-12,UPI/Rahul,1500.00,CREDIT\n2026-10-14,Wholesale Spices,420.00,DEBIT',
+                          border: OutlineInputBorder(),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Supported formats: Bank CSV exports, UPI statement text, and PDF text extracts.',
-                      style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
-                    ),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: isProcessing
+                              ? null
+                              : () async {
+                                  final content = rawTextCtrl.text.trim();
+                                  if (content.isEmpty) return;
+
+                                  setDialogState(() => isProcessing = true);
+                                  final parsed = statementService.parseStatementContent(content);
+                                  if (parsed.isEmpty) {
+                                    setDialogState(() {
+                                      isProcessing = false;
+                                      statusMessage = 'No valid transaction records detected in pasted text';
+                                    });
+                                    return;
+                                  }
+
+                                  final evaluated = await statementService.detectDuplicates(
+                                    merchantId: merchantId,
+                                    candidates: parsed,
+                                  );
+
+                                  setDialogState(() {
+                                    extractedRecords = evaluated;
+                                    updateTotals();
+                                    isPreviewMode = true;
+                                    isProcessing = false;
+                                  });
+                                },
+                          icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+                          label: const Text('Parse Text'),
+                        ),
+                      ),
+                    ],
                   ] else ...[
-                    Text(
-                      'Found ${extractedRecords.length} records. Exclude incorrect or duplicate transactions before confirming:',
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF64748B)),
+                    // Preview Summary Header
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Source: $docName', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Detected: ${extractedRecords.length} records | Total Credit: +₹${(totalCreditPaise / 100.0).toStringAsFixed(2)} | Total Debit: -₹${(totalDebitPaise / 100.0).toStringAsFixed(2)}',
+                            style: const TextStyle(fontSize: 11, color: Color(0xFF475569)),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 12),
                     ...extractedRecords.map((rec) {
@@ -794,6 +1032,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                           onChanged: (val) {
                             setDialogState(() {
                               rec.isSelected = val ?? false;
+                              updateTotals();
                             });
                           },
                           dense: true,
@@ -840,30 +1079,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
               onPressed: isProcessing ? null : () => Navigator.pop(ctx),
               child: const Text('Cancel'),
             ),
-            if (!isPreviewMode)
-              FilledButton(
-                onPressed: isProcessing
-                    ? null
-                    : () async {
-                        final content = rawTextCtrl.text.trim();
-                        if (content.isEmpty) return;
-
-                        setDialogState(() => isProcessing = true);
-                        final parsed = statementService.parseStatementContent(content);
-                        final evaluated = await statementService.detectDuplicates(
-                          merchantId: merchantId,
-                          candidates: parsed,
-                        );
-
-                        setDialogState(() {
-                          extractedRecords = evaluated;
-                          isPreviewMode = true;
-                          isProcessing = false;
-                        });
-                      },
-                child: isProcessing ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Extract & Preview'),
-              )
-            else
+            if (isPreviewMode)
               FilledButton(
                 onPressed: isProcessing
                     ? null

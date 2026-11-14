@@ -55,6 +55,18 @@ class ExtractedStatementRecord {
   }
 }
 
+class StatementParseResult {
+  final List<ExtractedStatementRecord> records;
+  final bool isScannedOrEmptyPdf;
+  final String? diagnosticMessage;
+
+  const StatementParseResult({
+    required this.records,
+    this.isScannedOrEmptyPdf = false,
+    this.diagnosticMessage,
+  });
+}
+
 class StatementImportService {
   final LocalDatabaseService _dbService;
   final LocalCanonicalTransactionRepository _txRepo;
@@ -64,6 +76,81 @@ class StatementImportService {
     LocalCanonicalTransactionRepository? txRepo,
   })  : _dbService = dbService ?? LocalDatabaseService.instance,
         _txRepo = txRepo ?? LocalCanonicalTransactionRepository();
+
+  /// Extract text and records directly from document bytes (PDF or CSV/TXT).
+  StatementParseResult parseDocumentBytes(List<int> bytes, String fileName) {
+    final lowerName = fileName.toLowerCase();
+    if (lowerName.endsWith('.pdf')) {
+      return _parsePdfBytes(bytes, fileName);
+    } else {
+      final content = utf8.decode(bytes, allowMalformed: true);
+      final records = parseStatementContent(content, formatHint: 'CSV');
+      return StatementParseResult(
+        records: records,
+        diagnosticMessage: records.isEmpty ? 'No transactions detected in CSV file' : null,
+      );
+    }
+  }
+
+  /// PDF stream parsing: extracts ASCII/UTF8 character sequences between BT..ET or text objects.
+  StatementParseResult _parsePdfBytes(List<int> bytes, String fileName) {
+    final raw = latin1.decode(bytes);
+    final textBuffer = StringBuffer();
+
+    // 1. Check if PDF contains text objects or Tj/TJ operators
+    final textObjRegex = RegExp(r'\(([^)]+)\)\s*Tj', multiLine: true);
+    final arrayRegex = RegExp(r'\[([^\]]+)\]\s*TJ', multiLine: true);
+
+    final matches = textObjRegex.allMatches(raw);
+    for (final m in matches) {
+      textBuffer.writeln(m.group(1));
+    }
+
+    final arrayMatches = arrayRegex.allMatches(raw);
+    for (final am in arrayMatches) {
+      final inner = am.group(1) ?? '';
+      final innerTextRegex = RegExp(r'\(([^)]+)\)');
+      final parts = innerTextRegex.allMatches(inner).map((p) => p.group(1) ?? '').join(' ');
+      if (parts.isNotEmpty) {
+        textBuffer.writeln(parts);
+      }
+    }
+
+    // 2. If no text objects extracted via operators, look for stream text blocks
+    if (textBuffer.length < 50) {
+      final streamRegex = RegExp(r'stream[\r\n]+([\s\S]*?)[\r\n]+endstream');
+      for (final sm in streamRegex.allMatches(raw)) {
+        final block = sm.group(1) ?? '';
+        final cleanChars = block.replaceAll(RegExp(r'[^\x20-\x7E\r\n]'), ' ');
+        if (cleanChars.contains('Cr') || cleanChars.contains('Dr') || cleanChars.contains('INR') || cleanChars.contains('/')) {
+          textBuffer.writeln(cleanChars);
+        }
+      }
+    }
+
+    final extractedText = textBuffer.toString();
+
+    // Check if PDF appears to be image/scanned only
+    if (extractedText.trim().length < 20 || (!extractedText.contains(RegExp(r'\d')))) {
+      final hasImages = raw.contains('/Image') || raw.contains('/XObject');
+      return StatementParseResult(
+        records: [],
+        isScannedOrEmptyPdf: true,
+        diagnosticMessage: hasImages
+            ? 'Scanned or image-only PDF detected. Please upload digital PDF statement with selectable text or CSV export.'
+            : 'No recognizable transaction text found in PDF document.',
+      );
+    }
+
+    final records = parseStatementContent(extractedText, formatHint: 'TEXT');
+    return StatementParseResult(
+      records: records,
+      isScannedOrEmptyPdf: records.isEmpty,
+      diagnosticMessage: records.isEmpty
+          ? 'Digital PDF text parsed but no debit/credit lines matching bank patterns were identified.'
+          : null,
+    );
+  }
 
   /// Parse text or raw bytes from a selected statement (CSV, PDF-extracted text, TXT, UPI export)
   /// and normalize into extracted records.

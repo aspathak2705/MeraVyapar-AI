@@ -34,44 +34,11 @@ class CanonicalTransactionsScreen extends StatelessWidget {
           onPressed: onBack ?? () => Navigator.of(context).maybePop(),
         ),
         actions: [
-          if (onImportStatement != null)
-            IconButton(
-              icon: const Icon(Icons.file_upload_outlined),
-              tooltip: 'Import Statement / History',
-              onPressed: onImportStatement,
-            ),
           IconButton(
             icon: const Icon(AppIcons.refresh),
             tooltip: 'Run Reconciliation Pass',
             onPressed: onRunReconciliation,
           ),
-        ],
-      ),
-      floatingActionButton: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (onImportStatement != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: FloatingActionButton.extended(
-                heroTag: 'fab_import_statement',
-                onPressed: onImportStatement,
-                backgroundColor: AppColors.lightLavender,
-                foregroundColor: AppColors.primaryPurple,
-                icon: const Icon(Icons.file_upload_outlined, size: 20),
-                label: const Text('Import Statement', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-              ),
-            ),
-          if (onAddTransaction != null)
-            FloatingActionButton.extended(
-              heroTag: 'fab_add_entry',
-              onPressed: onAddTransaction,
-              backgroundColor: AppColors.primaryPurple,
-              foregroundColor: Colors.white,
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Add Entry', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
         ],
       ),
       body: isLoading

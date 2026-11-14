@@ -24,6 +24,7 @@ class HomeShellScreen extends ConsumerWidget {
   final VoidCallback? onOpenMarketSignals;
   final VoidCallback? onOpenActionCenter;
   final VoidCallback? onOpenFinancialIntelligence;
+  final VoidCallback? onImportStatement;
   final void Function(String route)? onNavigateToRoute;
 
   const HomeShellScreen({
@@ -44,6 +45,7 @@ class HomeShellScreen extends ConsumerWidget {
     this.onOpenMarketSignals,
     this.onOpenActionCenter,
     this.onOpenFinancialIntelligence,
+    this.onImportStatement,
     this.onNavigateToRoute,
   });
 
@@ -122,6 +124,11 @@ class HomeShellScreen extends ConsumerWidget {
             children: [
               // 1. Primary Financial Overview Card (PhonePe-inspired Purple Hero Surface)
               _buildFinancialHeroCard(context, isDark, positionAsync),
+
+              const SizedBox(height: 16),
+
+              // Prominent Direct Quick Actions (Statement Import & Direct Manual Entry)
+              _buildProminentQuickActions(context, isDark),
 
               const SizedBox(height: 24),
 
@@ -466,6 +473,156 @@ class HomeShellScreen extends ConsumerWidget {
         trailing: const Icon(AppIcons.chevronRight),
         onTap: () => (onOpenFinancialIntelligence ?? () => onNavigateToRoute?.call('/intelligence'))(),
       ),
+    );
+  }
+
+  Widget _buildProminentQuickActions(BuildContext context, bool isDark) {
+    return Row(
+      children: [
+        // 1. Import Statement (PDF/CSV)
+        Expanded(
+          child: InkWell(
+            onTap: onImportStatement,
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF2E2440) : const Color(0xFFF3E8FF),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF583B8B) : const Color(0xFFD8B4FE),
+                  width: 1.2,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.upload_file_rounded,
+                    color: isDark ? const Color(0xFFD8B4FE) : const Color(0xFF6B21A8),
+                    size: 24,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Import Statement',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : const Color(0xFF4C1D95),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'PDF / CSV File',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? const Color(0xFFC4B5FD) : const Color(0xFF6D28D9),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        // 2. Add Income (+ Receive)
+        Expanded(
+          child: InkWell(
+            onTap: onAddPaymentReceived,
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF132F23) : const Color(0xFFECFDF5),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF047857) : const Color(0xFFA7F3D0),
+                  width: 1.2,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.arrow_downward_rounded,
+                    color: isDark ? const Color(0xFF6EE7B7) : const Color(0xFF047857),
+                    size: 24,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '+ Add Income',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : const Color(0xFF065F46),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Cash / Credit',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? const Color(0xFFA7F3D0) : const Color(0xFF059669),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        // 3. Add Expense (- Pay)
+        Expanded(
+          child: InkWell(
+            onTap: onAddExpense,
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF3B1F20) : const Color(0xFFFEF2F2),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark ? const Color(0xFFB91C1C) : const Color(0xFFFECACA),
+                  width: 1.2,
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.arrow_upward_rounded,
+                    color: isDark ? const Color(0xFFFCA5A5) : const Color(0xFFB91C1C),
+                    size: 24,
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    '- Add Expense',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : const Color(0xFF991B1B),
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Debit / Spend',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? const Color(0xFFFECACA) : const Color(0xFFDC2626),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
