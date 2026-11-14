@@ -24,7 +24,7 @@
   - Backend automated test suite: **65/65 tests passed** in 1.28 seconds (`pytest backend/tests/services/`).
   - Voice router procurement integration: **VERIFIED (8/8 intents)** across `CREATE_PURCHASE_REQUEST`, `ADD_SUPPLIER`, `CAPTURE_SUPPLIER_QUOTATION`, `COMPARE_SUPPLIER_QUOTES`, `QUERY_SUPPLIER_HISTORY`, `QUERY_SUPPLIER_OBLIGATIONS`, `GENERATE_NEGOTIATION_DRAFT`, and `RECORD_PURCHASE_OUTCOME`.
   - Flutter static analysis: **0 errors, 0 warnings** (`flutter analyze`).
-  - Flutter test suite: **20/20 unit tests passed** across backup, permission lifecycle, financial invariants, SQLite V4 migrations, and procurement quotation comparison (`flutter test`).
+  - Flutter test suite: **26/26 unit and integration tests passed** across backup, permission lifecycle, financial invariants, SQLite V4 migrations, notification parsing regression, business profile persistence, and unified architecture runtime derivation (`flutter test`).
   - KharidSaathi Procurement Intelligence: **INTEGRATED & VERIFIED** (SQLite V4 schema, landed cost exact integer paise arithmetic with fractional/discount/inclusive tax support, multi-attribute quote evaluation, FIG supplier nodes & edges, and cashflow payables aggregation).
   - Android release APK compilation: **SUCCESSFUL** (`frontend/build/app/outputs/flutter-apk/app-release.apk`, 54.25 MB).
   - Android Native Configuration: `ACCESS_NETWORK_STATE`, `RECORD_AUDIO`, `INTERNET`, `POST_NOTIFICATIONS` verified with zero broad storage/SMS permissions. `MainActivity.kt` override matches `FlutterActivity` specification.
