@@ -5,6 +5,7 @@ import '../domain/canonical_transaction_model.dart';
 import '../../../core/database/local_database_service.dart';
 import '../../../core/database/local_database_schema.dart';
 import '../../../core/database/migration/migration_verification_service.dart';
+import '../../capture/domain/local_evidence_capture_service.dart';
 
 class ExtractedStatementRecord {
   final String date; // YYYY-MM-DD or raw date string
@@ -96,9 +97,38 @@ class StatementImportService {
     final existingTxs = await _txRepo.getCanonicalTransactions(merchantId: merchantId);
     final List<ExtractedStatementRecord> evaluated = [];
 
+    // Check tombstones in batch
+    final tombstones = await driver.query(
+      '''
+      SELECT evidence_fingerprint, source_reference FROM ${LocalDatabaseSchema.tableEvidenceTombstones}
+      WHERE merchant_id = ?
+      ''',
+      [merchantId],
+    );
+    final tombstoneFps = tombstones.map((t) => t['evidence_fingerprint'] as String?).whereType<String>().toSet();
+    final tombstoneRefs = tombstones.map((t) => (t['source_reference'] as String?)?.toLowerCase()).whereType<String>().toSet();
+
     for (final cand in candidates) {
       bool isDup = false;
       String? reason;
+
+      // Check tombstone rejection
+      final candFp = LocalEvidenceCaptureService.generateEvidenceFingerprint(
+        merchantId: merchantId,
+        amountPaise: _amountToPaise(cand.amount),
+        direction: cand.type,
+        reference: cand.reference,
+        counterparty: cand.counterparty,
+      );
+
+      if (tombstoneFps.contains(candFp) || (cand.reference != null && tombstoneRefs.contains(cand.reference!.toLowerCase()))) {
+        evaluated.add(cand.copyWith(
+          isPossibleDuplicate: true,
+          duplicateReason: 'Previously deleted/rejected by merchant (tombstone active)',
+          isSelected: false,
+        ));
+        continue;
+      }
 
       // 1. Reference matching
       if (cand.reference != null && cand.reference!.isNotEmpty) {

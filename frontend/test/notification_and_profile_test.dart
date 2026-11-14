@@ -136,7 +136,8 @@ void main() {
       );
 
       // Verify exact extraction properties
-      expect(candidate.transactionType, equals('CREDIT'));
+      expect(candidate, isNotNull);
+      expect(candidate!.transactionType, equals('CREDIT'));
       expect(candidate.amount, equals('1.00'));
       expect(candidate.counterpartyName, equals('KAVITA SANDEEP PATHAK'));
 
@@ -166,9 +167,8 @@ void main() {
         rawText: 'Payment of Rs. 500 from Rajesh failed due to bank timeout',
       );
 
-      // Rejected transaction defaults safely to 0 paise UNKNOWN
-      expect(candidate.transactionType, equals('UNKNOWN'));
-      expect(candidate.amount, equals('0.00'));
+      // Failed transaction is rejected from candidate creation entirely
+      expect(candidate, isNull);
     });
   });
 

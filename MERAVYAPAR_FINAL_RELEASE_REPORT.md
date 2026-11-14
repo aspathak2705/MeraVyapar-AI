@@ -399,7 +399,65 @@ To enable live proxy responses from Gnani, SerpApi, and OpenRouter when deployin
 
 ---
 
-## M. Final Git & Security Audit Confirmation
+## M. Advanced Financial Evidence Ingestion, SMS Intelligence & Reconciliation Engine (SpendSense Integration)
+
+### 1. Architectural Upgrades & SQLite Schema V5
+- **SQLite Schema Migration V5**: Additive, non-destructive migration introducing:
+  - `financial_evidence_tombstones`: Stores deterministic SHA-256 evidence fingerprints and reference IDs for merchant-deleted or rejected transactions. Prevents historical inbox recovery, re-scanned statements, or duplicate broadcasts from resurrecting deleted ledger records.
+  - `merchant_counterparty_overrides`: Stores Tier 0 user categorization corrections mapping raw counterparty aliases to normalized business names and specific accounting categories with optional historical propagation.
+- **Migration Verification**: Verified fresh install (sets `user_version = 5` and executes full schema) and incremental migration from V3/V4 (executes V5 statements inside transaction without recreating existing tables).
+
+### 2. High-Precision Deterministic Financial SMS Extraction
+- **Files Modified**: `frontend/lib/features/capture/domain/local_evidence_capture_service.dart`
+- **Capabilities & Verification**:
+  - Distinguishes settled financial transactions from non-transactional messages:
+    - **OTP & Security codes**: Filtered and rejected (`rawClassification = 'OTP'`).
+    - **Promotional / Marketing**: Filtered and rejected (`rawClassification = 'PROMO'`).
+    - **Payment Requests**: Filtered with `NEEDS_REVIEW` (`rawClassification = 'PAYMENT_REQUEST'`), never counted as settled credit.
+    - **Failed / Declined Payments**: Rejected at gate (`rawClassification = 'FAILED'`), never counted as settled debit.
+    - **Balance-Only SMS**: Filtered (`rawClassification = 'BALANCE_ONLY'`), balance amounts never extracted as transaction amounts.
+  - Indian Bank & UPI Formats supported: Extracts exact integer paise amounts from HDFC, SBI, ICICI, Axis, PNB, BoB, Kotak, Paytm, PhonePe, GPay, BharatPe.
+  - Normalizes counterparties with known merchant alias mapping (e.g. `AMZN` -> Amazon, `AVENUE SUPERMARTS` -> DMart) and extracts masked account numbers (`XX1234`).
+  - Integer paise precision invariant strictly maintained across all amounts (`100` paise = ₹1.00, `45050` paise = ₹450.50, `12500075` paise = ₹1,25,000.75).
+
+### 3. Deletion Tombstones & Anti-Resurrection Protection
+- **Files Modified**: `frontend/lib/features/transactions/data/local_canonical_transaction_repository.dart`, `frontend/lib/features/transactions/domain/statement_import_service.dart`
+- **Behavior**:
+  - `deleteTransactionWithTombstone()` records the SHA-256 fingerprint `(merchantId | amountPaise | direction | reference | counterparty)` into `financial_evidence_tombstones`.
+  - When re-ingesting raw evidence (SMS or statement import), the fingerprint and source reference are checked against active tombstones. Re-scans and inbox imports safely mark tombstoned records as previously deleted without creating transaction candidates or canonical records.
+
+### 4. Classification Memory & Feedback Loop (Tier 0 Override)
+- **Files Modified**: `frontend/lib/features/capture/domain/local_evidence_capture_service.dart`
+- **Behavior**:
+  - Explicit merchant corrections record local counterparty overrides (`recordCounterpartyOverride`).
+  - Future evidence matching the raw alias automatically applies the user-confirmed normalized name and category.
+  - When merchant approves historical propagation, past canonical transactions for that counterparty are updated in SQLite.
+
+### 5. Google Play Policy & Distribution Governance
+- **Files Modified**: `frontend/lib/features/capture/presentation/permission_settings_screen.dart`
+- **Findings & Policy Gate**:
+  - Under current Google Play Store Permissions Policy, financial and expense tracking applications are **ineligible** for broad `READ_SMS` / `RECEIVE_SMS` permissions unless registered as the default SMS app.
+  - Mera Vyapar AI strictly adheres to Play Store distribution rules: Passive capture operates via authorized Notification Listener (`FinancialNotificationListenerService`), user-confirmed Statement Import (`StatementImportService`), and Notification Shade Quick Entry (`QuickEntryReceiver`).
+  - The in-app Privacy & Permissions settings screen clearly communicates this policy limitation to the merchant.
+
+### 6. Focused Verification Results
+- **New Test Suite**: `frontend/test/sms_intelligence_and_evidence_pipeline_test.dart` (**6/6 passed**):
+  1. Credit SMS extraction with counterparty and UPI UTR.
+  2. Debit SMS extraction with masked account and alias normalization (`DMart`).
+  3. Non-transaction filtering (OTP, Balance inquiry, Failed payment).
+  4. Integer paise multi-format Indian currency parsing.
+  5. Deletion tombstones blocking resurrection of deleted transactions.
+  6. User categorization memory applying Tier 0 override.
+- **Regression Tests**:
+  - `database_migration_v4_test.dart`: **2/2 passed** (Fresh install & V3->V5 migration).
+  - `notification_and_profile_test.dart`: **3/3 passed** (GPay/PhonePe parsing, rejection of failed payments, business profile persistence).
+  - `financial_invariants_test.dart`: **3/3 passed** (Integer paise precision & invariants).
+  - `permission_lifecycle_test.dart`: **3/3 passed** (Permission transitions).
+  - Total focused test suite: **17/17 tests passing**.
+
+---
+
+## N. Final Git & Security Audit Confirmation
 - Verified clean repository state on `main` branch.
 - No database files, test credentials, or private merchant information exposed.
 - All 65 backend tests and Flutter static analysis pass with zero defects.

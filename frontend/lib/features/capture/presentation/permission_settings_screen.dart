@@ -155,7 +155,12 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
 
                     const SizedBox(height: 12),
 
-                    // 5. Encrypted Backup File Access
+                    // 5. SMS Permission Policy Status
+                    _buildSmsPolicyTile(),
+
+                    const SizedBox(height: 12),
+
+                    // 6. Encrypted Backup File Access
                     _buildBackupAccessTile(),
 
                     const SizedBox(height: 24),
@@ -391,6 +396,60 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
               style: TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.35),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSmsPolicyTile() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Color(0xFFE2E8F0)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.sms_outlined, color: Color(0xFFD97706), size: 22),
+                const SizedBox(width: 10),
+                const Expanded(
+                  child: Text(
+                    'SMS Ingestion & Google Play Policy',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF3C7),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Play Policy Gated',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF92400E),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Under Google Play Store Permissions Policy, general financial/expense tracking apps are not eligible for broad READ_SMS or RECEIVE_SMS permissions unless registered as default SMS handler. Passive capture operates strictly via authorized Notification Listener, user-selected Statement Import, and Quick Entry shade.',
+              style: TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.35),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
         ),
       ),
     );

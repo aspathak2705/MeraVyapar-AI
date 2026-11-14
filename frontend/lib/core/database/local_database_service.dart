@@ -61,19 +61,30 @@ class LocalDatabaseService {
         : 0;
 
     if (currentDbVersion == 0) {
-      // Fresh install: execute full V4 schema atomically
-      for (final sql in LocalDatabaseSchema.createStatementsV4) {
+      // Fresh install: execute full V5 schema atomically
+      for (final sql in LocalDatabaseSchema.createStatementsV5) {
         await _activeDriver!.execute(sql);
       }
       await _activeDriver!.execute('PRAGMA user_version = ${LocalDatabaseSchema.version};');
-    } else if (currentDbVersion < 4) {
-      // Existing V3 (or earlier) database: apply additive procurement migration inside a transaction
-      await _activeDriver!.transaction((txn) async {
-        for (final sql in LocalDatabaseSchema.procurementStatementsV4) {
-          await txn.execute(sql);
-        }
-        await txn.execute('PRAGMA user_version = 4;');
-      });
+    } else {
+      if (currentDbVersion < 4) {
+        // Upgrade to V4 (procurement)
+        await _activeDriver!.transaction((txn) async {
+          for (final sql in LocalDatabaseSchema.procurementStatementsV4) {
+            await txn.execute(sql);
+          }
+          await txn.execute('PRAGMA user_version = 4;');
+        });
+      }
+      if (currentDbVersion < 5) {
+        // Upgrade to V5 (evidence tombstones & counterparty overrides)
+        await _activeDriver!.transaction((txn) async {
+          for (final sql in LocalDatabaseSchema.evidenceIntelligenceStatementsV5) {
+            await txn.execute(sql);
+          }
+          await txn.execute('PRAGMA user_version = 5;');
+        });
+      }
     }
 
     _isInitialized = true;

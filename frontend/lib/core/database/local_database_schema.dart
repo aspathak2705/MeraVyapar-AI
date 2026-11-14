@@ -3,7 +3,7 @@
 /// Preserves financial precision using integer minor units (paise: 1 INR = 100 paise)
 /// and ISO-8601 UTC timestamp strings.
 class LocalDatabaseSchema {
-  static const int version = 4;
+  static const int version = 5;
   static const String databaseFileName = 'meravyapar_local.db';
 
   // Table Names
@@ -25,6 +25,10 @@ class LocalDatabaseSchema {
   static const String tableSupplierQuotations = 'procurement_supplier_quotations';
   static const String tablePurchaseOrders = 'procurement_purchase_orders';
   static const String tableSupplierObligations = 'procurement_supplier_obligations';
+
+  // Evidence Intelligence & Reconciliation Tables (Additive V5)
+  static const String tableEvidenceTombstones = 'financial_evidence_tombstones';
+  static const String tableCounterpartyOverrides = 'merchant_counterparty_overrides';
 
   // SQL DDL statements for version 3
   static const List<String> createStatementsV3 = [
@@ -351,9 +355,46 @@ class LocalDatabaseSchema {
     '''
   ];
 
-  /// Combined creation statements for fresh installations (V4)
-  static List<String> get createStatementsV4 => [
+  // SQL DDL statements for version 5 (Evidence Ingestion & Reconciliation Additions)
+  static const List<String> evidenceIntelligenceStatementsV5 = [
+    '''
+    CREATE TABLE IF NOT EXISTS $tableEvidenceTombstones (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      evidence_fingerprint TEXT NOT NULL,
+      source_reference TEXT,
+      reason TEXT NOT NULL DEFAULT 'MERCHANT_DELETED',
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_tombstones_merchant_fp
+    ON $tableEvidenceTombstones(merchant_id, evidence_fingerprint);
+    ''',
+    '''
+    CREATE TABLE IF NOT EXISTS $tableCounterpartyOverrides (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      raw_counterparty_alias TEXT NOT NULL,
+      normalized_name TEXT NOT NULL,
+      assigned_category TEXT NOT NULL,
+      apply_to_historical INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_counterparty_overrides_merchant_alias
+    ON $tableCounterpartyOverrides(merchant_id, raw_counterparty_alias);
+    '''
+  ];
+
+  /// Combined creation statements for fresh installations (V5)
+  static List<String> get createStatementsV5 => [
         ...createStatementsV3,
         ...procurementStatementsV4,
+        ...evidenceIntelligenceStatementsV5,
       ];
 }

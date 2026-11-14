@@ -50,19 +50,19 @@ class TestDatabaseDriver implements LocalDatabaseDriver {
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  group('SQLite V4 Schema & Migration Verification', () {
+  group('SQLite V4/V5 Schema & Migration Verification', () {
     setUp(() {
       LocalDatabaseService.instance.reset();
     });
 
-    test('Fresh installation initializes full V4 schema and sets user_version to 4', () async {
+    test('Fresh installation initializes full V5 schema and sets user_version to 5', () async {
       final driver = TestDatabaseDriver();
       driver.pragmaStore['user_version'] = 0; // Fresh install
 
       await LocalDatabaseService.instance.initialize(customDriver: driver, customDbPath: ':memory:');
 
       expect(driver.isOpen, isTrue);
-      expect(driver.pragmaStore['user_version'], equals(4));
+      expect(driver.pragmaStore['user_version'], equals(5));
 
       // Check all procurement tables exist in executed statements
       expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableSuppliers)), isTrue);
@@ -71,23 +71,31 @@ void main() {
       expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tablePurchaseOrders)), isTrue);
       expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableSupplierObligations)), isTrue);
 
+      // Check V5 evidence intelligence tables exist
+      expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableEvidenceTombstones)), isTrue);
+      expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableCounterpartyOverrides)), isTrue);
+
       // Check existing V3 canonical tables also exist
       expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableCanonicalTransactions)), isTrue);
       expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableMerchantProfile)), isTrue);
     });
 
-    test('Upgrade from existing V3 database applies additive procurement migration transactionally', () async {
+    test('Upgrade from existing V3 database applies additive procurement and evidence migrations', () async {
       final driver = TestDatabaseDriver();
       driver.pragmaStore['user_version'] = 3; // Existing V3 database
 
       await LocalDatabaseService.instance.initialize(customDriver: driver, customDbPath: ':memory:');
 
       expect(driver.isOpen, isTrue);
-      expect(driver.pragmaStore['user_version'], equals(4));
+      expect(driver.pragmaStore['user_version'], equals(5));
 
       // Should execute procurement statements
       expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableSuppliers)), isTrue);
       expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableSupplierObligations)), isTrue);
+
+      // Should execute V5 evidence intelligence statements
+      expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableEvidenceTombstones)), isTrue);
+      expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableCounterpartyOverrides)), isTrue);
 
       // Should not re-run V3 baseline table creation statements (e.g. tableCanonicalTransactions)
       expect(driver.executedStatements.any((s) => s.contains(LocalDatabaseSchema.tableCanonicalTransactions)), isFalse);

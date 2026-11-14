@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/database/local_database_service.dart';
 import '../../../../core/database/local_database_schema.dart';
@@ -172,5 +174,59 @@ class LocalCanonicalTransactionRepository {
       isSimulated: false,
       candidateLinks: const [],
     );
+  }
+
+  /// Delete canonical transaction and install evidence tombstone to prevent resurrection
+  Future<void> deleteTransactionWithTombstone({
+    required String merchantId,
+    required String transactionId,
+    String reason = 'MERCHANT_DELETED',
+  }) async {
+    final driver = _dbService.driver;
+    if (driver == null) throw StateError('Database not initialized');
+
+    final txRows = await driver.query(
+      '''
+      SELECT * FROM ${LocalDatabaseSchema.tableCanonicalTransactions}
+      WHERE id = ? AND merchant_id = ?
+      ''',
+      [transactionId, merchantId],
+    );
+
+    if (txRows.isEmpty) return;
+
+    final row = txRows.first;
+    final amountPaise = row['amount_minor_units'] as int? ?? 0;
+    final direction = row['transaction_type'] as String? ?? 'UNKNOWN';
+    final dateStr = row['occurred_at'] as String? ?? '';
+    final ref = row['transaction_reference'] as String?;
+    final counterparty = row['counterparty_name'] as String?;
+
+    // Compute fingerprint
+    final rawFp = '$merchantId|$amountPaise|$direction|${ref ?? ''}|${counterparty?.toLowerCase() ?? ''}';
+    final fp = sha256.convert(utf8.encode(rawFp)).toString();
+
+    await driver.transaction((txn) async {
+      // 1. Delete canonical transaction
+      await txn.execute(
+        '''
+        DELETE FROM ${LocalDatabaseSchema.tableCanonicalTransactions}
+        WHERE id = ? AND merchant_id = ?
+        ''',
+        [transactionId, merchantId],
+      );
+
+      // 2. Insert deletion tombstone
+      final nowIso = DateTime.now().toUtc().toIso8601String();
+      final tombstoneId = const Uuid().v4();
+      await txn.execute(
+        '''
+        INSERT OR IGNORE INTO ${LocalDatabaseSchema.tableEvidenceTombstones} (
+          id, merchant_id, evidence_fingerprint, source_reference, reason, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?)
+        ''',
+        [tombstoneId, merchantId, fp, ref, reason, nowIso],
+      );
+    });
   }
 }
