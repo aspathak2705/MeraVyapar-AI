@@ -12,6 +12,8 @@ import '../../features/events/data/event_repository.dart';
 import '../../features/evidence/data/evidence_repository.dart';
 import '../../features/capture/data/capture_repository.dart';
 import '../../features/intelligence/data/intelligence_repository.dart';
+import '../../features/intelligence/domain/grounded_insight_model.dart';
+import '../../features/intelligence/presentation/merchant_assistant_screen.dart';
 import '../../features/market_intelligence/data/market_intelligence_repository.dart';
 import '../../features/voice/data/voice_repository.dart';
 import '../../features/voice/services/audio_recording_service.dart';
@@ -119,6 +121,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
   String _currentRoute = '/';
   final List<String> _navigationStack = ['/'];
   final Map<String, dynamic> _routeArgs = {};
+  bool _isAssistantLoading = false;
+  FinancialQueryResultModel? _lastAssistantResult;
 
   @override
   void initState() {
@@ -549,6 +553,47 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         return UnifiedFinancialIntelligenceScreen(
           onBack: _popRoute,
           onNavigate: _navigateTo,
+        );
+
+      case '/assistant':
+        final intelligenceRepo = ref.read(intelligenceRepositoryProvider);
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Nemotron AI Assistant'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: _popRoute,
+            ),
+          ),
+          body: MerchantAssistantScreen(
+            isLoading: _isAssistantLoading,
+            lastResult: _lastAssistantResult,
+            onQuerySubmit: (question) async {
+              setState(() {
+                _isAssistantLoading = true;
+              });
+              try {
+                final result = await intelligenceRepo.queryIntelligence(
+                  question: question,
+                );
+                if (mounted) {
+                  setState(() {
+                    _lastAssistantResult = result;
+                    _isAssistantLoading = false;
+                  });
+                }
+              } catch (e) {
+                if (mounted) {
+                  setState(() {
+                    _isAssistantLoading = false;
+                  });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('AI Assistant Error: $e')),
+                  );
+                }
+              }
+            },
+          ),
         );
 
       case '/receivables':
