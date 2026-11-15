@@ -76,6 +76,9 @@ def get_relevant_market_signals_stateless(
             source_id = uuid4()
             relevance_id = uuid4()
 
+            # Preserve actual source publication timestamps. Never substitute the current time for an unknown publication date.
+            pub_date_str = item.published_date if item.published_date else None
+
             src = {
                 "id": str(source_id),
                 "provider_name": "SerpApi",
@@ -83,7 +86,7 @@ def get_relevant_market_signals_stateless(
                 "source_url": item.url or f"https://google.com/search?q={clean_query}",
                 "external_identifier": f"serpapi_{idx}",
                 "title": item.title or clean_query,
-                "published_at": now.isoformat(),
+                "published_at": pub_date_str,
                 "retrieved_at": now.isoformat(),
                 "content_hash": f"hash_{event_id}",
                 "created_at": now.isoformat(),
@@ -98,7 +101,7 @@ def get_relevant_market_signals_stateless(
                 "sector": "Retail & Wholesale",
                 "affected_domains": ["INVENTORY", "EXPENSE"],
                 "event_status": "ACTIVE",
-                "occurred_at": now.isoformat(),
+                "occurred_at": pub_date_str or now.isoformat(),
                 "detected_at": now.isoformat(),
                 "source_id": str(source_id),
                 "source": src,

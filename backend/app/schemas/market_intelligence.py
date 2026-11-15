@@ -13,7 +13,7 @@ class MarketSourceResponse(BaseModel):
     source_url: str
     external_identifier: Optional[str] = None
     title: str
-    published_at: datetime
+    published_at: Optional[datetime] = None
     retrieved_at: datetime
     content_hash: str
     created_at: datetime
@@ -61,7 +61,7 @@ class MarketIngestRequest(BaseModel):
     source_url: str
     title: str
     summary: str
-    published_at: datetime
+    published_at: Optional[datetime] = None
     event_type: Optional[MarketEventType] = MarketEventType.OTHER
     geography: Optional[str] = "IN"
     sector: Optional[str] = None

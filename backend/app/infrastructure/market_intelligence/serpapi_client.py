@@ -1,3 +1,4 @@
+import re
 import logging
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
@@ -96,15 +97,25 @@ class SerpApiClient:
         # Build outbound request params
         request_params = {**raw_params, "engine": engine.value, "api_key": self.api_key}
 
+        def _scrub_credentials(msg: str) -> str:
+            if not msg:
+                return ""
+            scrubbed = re.sub(r"(api_key|key|token|secret)=[^&\s]+", r"\1=[REDACTED]", msg, flags=re.IGNORECASE)
+            if self.api_key and self.api_key in scrubbed:
+                scrubbed = scrubbed.replace(self.api_key, "[REDACTED]")
+            return scrubbed
+
         try:
             with httpx.Client(timeout=self.timeout_seconds) as client:
                 response = client.get(self.base_url, params=request_params)
         except httpx.TimeoutException as exc:
-            logger.error("SerpApi request timed out for engine %s: %s", engine.value, str(exc))
-            raise SerpApiTimeoutError(f"SerpApi request timed out after {self.timeout_seconds}s") from exc
+            sanitized_err = _scrub_credentials(str(exc))
+            logger.error("SerpApi request timed out for engine %s: %s", engine.value, sanitized_err)
+            raise SerpApiTimeoutError(f"SerpApi request timed out after {self.timeout_seconds}s") from None
         except httpx.RequestError as exc:
-            logger.error("SerpApi connection failure for engine %s: %s", engine.value, str(exc))
-            raise SerpApiUnavailableError(f"SerpApi connection error: {str(exc)}") from exc
+            sanitized_err = _scrub_credentials(str(exc))
+            logger.error("SerpApi connection failure for engine %s: %s", engine.value, sanitized_err)
+            raise SerpApiUnavailableError(f"SerpApi connection error: {sanitized_err}") from None
 
         if response.status_code == 429:
             raise SerpApiRateLimitError("SerpApi rate limit or quota exceeded (HTTP 429).")

@@ -8,6 +8,9 @@ class SerpApiEngine(str, Enum):
     SEARCH = "google"
     SHOPPING = "google_shopping"
     NEWS = "google_news"
+    TRENDS = "google_trends"
+    MAPS = "google_maps"
+    FINANCE = "google_finance"
 
 
 class ExternalEvidenceSource(BaseModel):

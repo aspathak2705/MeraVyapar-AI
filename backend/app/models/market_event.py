@@ -1,5 +1,6 @@
 import uuid
 import enum
+from typing import Any
 from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, ForeignKey, Enum as SQLEnum, Index
 from sqlalchemy.dialects.postgresql import UUID, JSONB
@@ -12,6 +13,7 @@ class MarketEventType(str, enum.Enum):
     INFLATION_CHANGE = "INFLATION_CHANGE"
     CURRENCY_MOVEMENT = "CURRENCY_MOVEMENT"
     COMMODITY_PRICE_MOVEMENT = "COMMODITY_PRICE_MOVEMENT"
+    PRICE_VARIATION = "COMMODITY_PRICE_MOVEMENT"  # Direct semantic alias preventing AttributeError
     GOVERNMENT_POLICY = "GOVERNMENT_POLICY"
     SECTOR_DEVELOPMENT = "SECTOR_DEVELOPMENT"
     PAYMENT_INDUSTRY_CHANGE = "PAYMENT_INDUSTRY_CHANGE"
@@ -19,6 +21,21 @@ class MarketEventType(str, enum.Enum):
     ECONOMIC_EVENT = "ECONOMIC_EVENT"
     SUPPLY_CHAIN_EVENT = "SUPPLY_CHAIN_EVENT"
     OTHER = "OTHER"
+
+    @classmethod
+    def from_string(cls, val: Any) -> "MarketEventType":
+        """Explicitly handles known string values and safe fallback to OTHER."""
+        if isinstance(val, cls):
+            return val
+        if not val or not isinstance(val, str):
+            return cls.OTHER
+        clean = val.strip().upper()
+        if clean in cls.__members__:
+            return cls[clean]
+        for item in cls:
+            if item.value == clean:
+                return item
+        return cls.OTHER
 
 
 class MarketEvent(Base):

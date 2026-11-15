@@ -61,13 +61,21 @@ class SerpApiMarketFeedAdapter(MarketIntelligenceProvider):
                 "source_name": source_name,
             }
 
+            # Preserve actual source publication timestamps. Never substitute the current time for an unknown publication date.
+            pub_date = None
+            if item.published_date:
+                try:
+                    pub_date = datetime.fromisoformat(item.published_date.replace("Z", "+00:00"))
+                except (ValueError, TypeError):
+                    pub_date = None
+
             requests.append(MarketIngestRequest(
                 provider_name=self.provider_name,
                 source_name=source_name,
                 source_url=source_url,
                 title=item.title,
                 summary=summary,
-                published_at=now,
+                published_at=pub_date,
                 event_type=event_type,
                 geography=geography,
                 sector=sector,
