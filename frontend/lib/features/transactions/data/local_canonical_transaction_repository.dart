@@ -204,7 +204,6 @@ class LocalCanonicalTransactionRepository {
     final row = txRows.first;
     final amountPaise = row['amount_minor_units'] as int? ?? 0;
     final direction = row['transaction_type'] as String? ?? 'UNKNOWN';
-    final dateStr = row['occurred_at'] as String? ?? '';
     final ref = row['transaction_reference'] as String?;
     final counterparty = row['counterparty_name'] as String?;
 

@@ -54,7 +54,7 @@ class GroundedInsightPersistenceService:
             context_version="2.0",
             content=content_dict,
             source_references=source_refs,
-            model_identifier=grounded_insight.model_metadata.get("model", "nvidia/nemotron-3-super-120b-a12b:free"),
+            model_identifier=grounded_insight.model_metadata.get("model", "nvidia/nemotron-3.5-lightning:free"),
             status="CURRENT",
             generated_at=now
         )

@@ -21,6 +21,7 @@ router = APIRouter(prefix="/financial-intelligence", tags=["Financial Intelligen
 
 
 @router.post("/query", response_model=APIResponse)
+@router.post("/ask", response_model=APIResponse)
 def query_financial_intelligence_stateless(
     payload: FinancialQueryRequest,
     request: Request,

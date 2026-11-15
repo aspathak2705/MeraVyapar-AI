@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     # OpenRouter & Nemotron Intelligence Configuration
     OPENROUTER_API_KEY: Optional[str] = None
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
-    FINANCIAL_INTELLIGENCE_MODEL: str = "nvidia/nemotron-3-super-120b-a12b:free"
+    FINANCIAL_INTELLIGENCE_MODEL: str = "nvidia/nemotron-3.5-lightning:free"
     NEMOTRON_REASONING_ENABLED: bool = True
 
     # Market Intelligence Internal Ingestion Security

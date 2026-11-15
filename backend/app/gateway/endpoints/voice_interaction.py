@@ -22,6 +22,7 @@ router = APIRouter(prefix="/voice", tags=["Voice Interaction"])
 
 
 @router.post("/interact", response_model=VoiceInteractionResponse)
+@router.post("/interaction", response_model=VoiceInteractionResponse)
 async def process_voice_interaction_stateless(
     request: Request,
     audio_file: UploadFile = File(..., description="Audio file recorded by mobile merchant"),

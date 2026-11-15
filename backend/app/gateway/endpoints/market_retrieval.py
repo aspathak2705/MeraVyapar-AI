@@ -77,15 +77,19 @@ def get_relevant_market_signals_stateless(
             relevance_id = uuid4()
 
             # Preserve actual source publication timestamps. Never substitute the current time for an unknown publication date.
-            pub_date_str = item.published_date if item.published_date else None
+            pub_date_str = getattr(item, "published_date", None)
+            item_source_name = getattr(item, "source_name", None) or "Google Market Search"
+            item_url = getattr(item, "url", None) or f"https://google.com/search?q={clean_query}"
+            item_title = getattr(item, "title", None) or clean_query
+            item_snippet = getattr(item, "snippet", None)
 
             src = {
                 "id": str(source_id),
                 "provider_name": "SerpApi",
-                "source_name": item.source_name or "Google Market Search",
-                "source_url": item.url or f"https://google.com/search?q={clean_query}",
+                "source_name": item_source_name,
+                "source_url": item_url,
                 "external_identifier": f"serpapi_{idx}",
-                "title": item.title or clean_query,
+                "title": item_title,
                 "published_at": pub_date_str,
                 "retrieved_at": now.isoformat(),
                 "content_hash": f"hash_{event_id}",
@@ -95,8 +99,8 @@ def get_relevant_market_signals_stateless(
             ev = {
                 "id": str(event_id),
                 "event_type": MarketEventType.COMMODITY_PRICE_MOVEMENT.value,
-                "title": item.title or "Observed Commodity Market Signal",
-                "summary": item.snippet or item.title or "Market trend reported by external source.",
+                "title": item_title,
+                "summary": item_snippet or item_title or "Market trend reported by external source.",
                 "geography": "IN",
                 "sector": "Retail & Wholesale",
                 "affected_domains": ["INVENTORY", "EXPENSE"],
@@ -122,7 +126,7 @@ def get_relevant_market_signals_stateless(
                 "market_event": ev,
             }
 
-            searchable = f"{item.title or ''} {item.snippet or ''}".lower()
+            searchable = f"{item_title or ''} {item_snippet or ''}".lower()
             relevance_score = sum(term in searchable for term in context_terms)
             rel["context_snapshot"]["relevance_score"] = relevance_score
             records.append((relevance_score, rel))

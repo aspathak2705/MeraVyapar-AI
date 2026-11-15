@@ -32,7 +32,6 @@ import '../../features/events/presentation/receivables_screen.dart';
 import '../../features/events/presentation/receivable_detail_screen.dart';
 import '../../features/market_intelligence/presentation/relevant_market_signals_screen.dart';
 import '../../features/market_intelligence/presentation/market_signal_detail_screen.dart';
-import '../../features/market_intelligence/domain/merchant_market_relevance_model.dart';
 import '../../features/actions/data/local_action_repository.dart';
 import '../../features/actions/presentation/action_center_screen.dart';
 import '../../features/voice/services/wake_word_detector_service.dart';
@@ -733,11 +732,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         final authRepo = ref.read(localAuthRepositoryProvider);
         final fallbackName = authRepo.currentSession?.displayName;
 
-        return FutureBuilder(
+        return FutureBuilder<MerchantBusinessProfile?>(
           future: profileRepo.getProfile(
               merchantId: merchantId, fallbackName: fallbackName),
           builder: (context, snapshot) {
-            final profile = snapshot.data as MerchantBusinessProfile?;
+            final profile = snapshot.data;
 
             return RelevantMarketSignalsScreen(
               initialSignals: const [],

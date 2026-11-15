@@ -20,7 +20,7 @@ class InsightPersistenceService:
         focus_entity_id: Optional[UUID] = None,
         model_identifier: Optional[str] = None
     ) -> GeneratedInsight:
-        resolved_model = model_identifier or getattr(settings, "FINANCIAL_INTELLIGENCE_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
+        resolved_model = model_identifier or getattr(settings, "FINANCIAL_INTELLIGENCE_MODEL", "nvidia/nemotron-3.5-lightning:free")
         db_insight = GeneratedInsight(
             merchant_id=merchant_id,
             insight_type=insight_type,

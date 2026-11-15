@@ -54,7 +54,7 @@ class EvidenceFusionEngine:
     def __init__(self, client: Optional[OpenAI] = None):
         self.api_key = getattr(settings, "OPENROUTER_API_KEY", None)
         self.base_url = getattr(settings, "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-        self.model = getattr(settings, "FINANCIAL_INTELLIGENCE_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
+        self.model = getattr(settings, "FINANCIAL_INTELLIGENCE_MODEL", "nvidia/nemotron-3.5-lightning:free")
         self.reasoning_enabled = getattr(settings, "NEMOTRON_REASONING_ENABLED", True)
 
         self.client = client

@@ -18,7 +18,7 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
     def __init__(self):
         self.api_key = getattr(settings, "OPENROUTER_API_KEY", None) or os.environ.get("OPENROUTER_API_KEY")
         self.base_url = getattr(settings, "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
-        self.model = getattr(settings, "FINANCIAL_INTELLIGENCE_MODEL", "nvidia/nemotron-3-super-120b-a12b:free")
+        self.model = getattr(settings, "FINANCIAL_INTELLIGENCE_MODEL", "nvidia/nemotron-3.5-lightning:free")
         self.reasoning_enabled = getattr(settings, "NEMOTRON_REASONING_ENABLED", True)
 
         self.client: Optional[OpenAI] = None
@@ -64,14 +64,16 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
         """
         # Collect all numeric values present in context package (events, payment_promises, receivables, computed_metrics)
         context_str = json.dumps(context_package.model_dump(mode="json"))
+        clean_context = re.sub(r'(?<=\d),(?=\d)', '', context_str)
         # Find monetary numbers in context
-        context_numbers = set(re.findall(r'\b\d+(?:\.\d+)?\b', context_str))
+        context_numbers = set(re.findall(r'\b\d+(?:\.\d+)?\b', clean_context))
 
         # Check summary, why_it_matters, and key_facts for fabricated numbers
         all_text_to_check = [insight.summary, insight.why_it_matters] + [kf.value for kf in insight.key_facts]
 
         for text in all_text_to_check:
-            found_numbers = set(re.findall(r'\b\d+(?:\.\d+)?\b', text))
+            clean_text = re.sub(r'(?<=\d),(?=\d)', '', text or "")
+            found_numbers = set(re.findall(r'\b\d+(?:\.\d+)?\b', clean_text))
             fabricated = [num for num in found_numbers if num not in context_numbers and float(num) > 0]
             if fabricated:
                 logger.warning(f"Fabricated monetary amounts detected in model response: {fabricated}")
