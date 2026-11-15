@@ -49,17 +49,27 @@ def query_financial_intelligence_stateless(
             data=query_res.model_dump(mode="json"),
         )
 
-    # Build sanitized context package for Nemotron grounding
+    # Build sanitized context package for Nemotron grounding using device-supplied sanitized context if provided
+    raw_ctx = payload.sanitized_context or {}
+    merchant_uuid = uuid4()
+    if installation.installation_id:
+        try:
+            merchant_uuid = UUID(installation.installation_id)
+        except Exception:
+            pass
+
     context_pkg = FinancialContextPackage(
         context_version="2.0",
-        merchant_id=uuid4(),
-        focus_type="GENERAL",
+        merchant_id=merchant_uuid,
+        focus_type=str(raw_ctx.get("focus_type", "GENERAL")),
         focus_entity_id=payload.focus_entity_id,
-        events=[],
-        payment_promises=[],
-        receivables=[],
-        counterparties=[],
-        computed_metrics={"status": "device_local_snapshot"},
+        events=raw_ctx.get("events", []),
+        payment_promises=raw_ctx.get("payment_promises", []),
+        receivables=raw_ctx.get("receivables", []),
+        counterparties=raw_ctx.get("counterparties", []),
+        computed_metrics=raw_ctx.get("computed_metrics", {"status": "device_local_snapshot"}),
+        cashflow_context=raw_ctx.get("cashflow_context"),
+        receivable_behavior_context=raw_ctx.get("receivable_behavior_context"),
         provenance_sources=[],
     )
 

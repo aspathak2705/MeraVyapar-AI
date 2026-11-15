@@ -49,6 +49,7 @@ class FinancialContextPackage(BaseModel):
 class FinancialQueryRequest(BaseModel):
     question: str
     focus_entity_id: Optional[UUID] = None
+    sanitized_context: Optional[Dict[str, Any]] = None
 
 
 class FinancialQueryResponse(BaseModel):
