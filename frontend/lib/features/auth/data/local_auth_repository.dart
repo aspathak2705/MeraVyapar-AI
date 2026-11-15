@@ -3,6 +3,8 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/database/local_database_service.dart';
+import '../../../core/database/local_database_schema.dart';
 
 final localAuthRepositoryProvider = Provider((ref) => LocalAuthRepository());
 
@@ -83,6 +85,9 @@ class LocalAuthRepository {
     await _secureStorage.write(key: _keyPinHash, value: pinHash);
     await _secureStorage.write(key: _keyFailedAttempts, value: '0');
 
+    // Ensure corresponding record in SQLite merchant_profile table
+    await _syncMerchantProfileToDb(merchantId, displayName);
+
     _currentSession = LocalMerchantSession(
       merchantId: merchantId,
       displayName: displayName,
@@ -90,6 +95,21 @@ class LocalAuthRepository {
     );
 
     return _currentSession!;
+  }
+
+  Future<void> _syncMerchantProfileToDb(String merchantId, String displayName) async {
+    final driver = LocalDatabaseService.instance.driver;
+    if (driver != null) {
+      final nowIso = DateTime.now().toUtc().toIso8601String();
+      await driver.execute(
+        '''
+        INSERT OR IGNORE INTO ${LocalDatabaseSchema.tableMerchantProfile} (
+          id, display_name, currency, created_at, updated_at, status
+        ) VALUES (?, ?, 'INR', ?, ?, 'ACTIVE')
+        ''',
+        [merchantId, displayName, nowIso, nowIso],
+      );
+    }
   }
 
   /// Authenticate merchant via PIN.
@@ -117,6 +137,9 @@ class LocalAuthRepository {
       // Reset failed attempts on success
       await _secureStorage.write(key: _keyFailedAttempts, value: '0');
       await _secureStorage.delete(key: _keyLockoutUntil);
+
+      // Ensure merchant_profile exists in SQLite
+      await _syncMerchantProfileToDb(merchantId, displayName);
 
       _currentSession = LocalMerchantSession(
         merchantId: merchantId,

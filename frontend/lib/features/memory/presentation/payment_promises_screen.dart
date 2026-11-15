@@ -7,6 +7,7 @@ class PaymentPromisesScreen extends StatefulWidget {
   final List<CounterpartyModel> counterparties;
   final Function(Map<String, String> data) onCreatePromise;
   final Function(String promiseId) onFulfillPromise;
+  final VoidCallback? onBack;
 
   const PaymentPromisesScreen({
     super.key,
@@ -14,6 +15,7 @@ class PaymentPromisesScreen extends StatefulWidget {
     required this.counterparties,
     required this.onCreatePromise,
     required this.onFulfillPromise,
+    this.onBack,
   });
 
   @override
@@ -139,6 +141,13 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
     return Scaffold(
       appBar: AppBar(
         title: const Text('Payment Promises Memory'),
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: widget.onBack,
+              )
+            : null,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [

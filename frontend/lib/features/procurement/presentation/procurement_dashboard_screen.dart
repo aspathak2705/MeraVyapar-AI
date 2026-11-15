@@ -455,7 +455,6 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
           FilledButton(
             onPressed: () async {
               if (itemCtrl.text.trim().isNotEmpty) {
-                final navigator = Navigator.of(context);
                 await repo.createPurchaseRequest(
                   merchantId: widget.merchantId,
                   title: itemCtrl.text.trim(),
@@ -463,8 +462,10 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
                   quantity: double.tryParse(qtyCtrl.text.trim()) ?? 1.0,
                   unit: unitCtrl.text.trim(),
                 );
+                if (ctx.mounted) {
+                  Navigator.pop(ctx);
+                }
                 if (mounted) {
-                  navigator.pop();
                   setState(() {});
                 }
               }
@@ -502,15 +503,16 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
           FilledButton(
             onPressed: () async {
               if (nameCtrl.text.trim().isNotEmpty) {
-                final navigator = Navigator.of(context);
                 await repo.createSupplier(
                   merchantId: widget.merchantId,
                   name: nameCtrl.text.trim(),
                   phoneNumber: phoneCtrl.text.trim().isEmpty ? null : phoneCtrl.text.trim(),
                   category: categoryCtrl.text.trim(),
                 );
+                if (ctx.mounted) {
+                  Navigator.pop(ctx);
+                }
                 if (mounted) {
-                  navigator.pop();
                   setState(() {});
                 }
               }

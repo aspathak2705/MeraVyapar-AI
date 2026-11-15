@@ -47,9 +47,19 @@ def get_relevant_market_signals_stateless(
     clean_query = query.strip() if query else "wholesale commodity inflation India"
 
     try:
-        # Search via approved SerpApi engine: google
+        # Search via approved SerpApi engines: primary search with fallback to news
+        engine_used = SerpApiEngine.SEARCH.value
         result: SerpApiResult = client.search(clean_query, num=10)
         items = result.normalized_items
+
+        if not items:
+            try:
+                news_result = client.news(clean_query)
+                if news_result.normalized_items:
+                    items = news_result.normalized_items
+                    engine_used = news_result.engine
+            except Exception as news_err:
+                logger.warning("SerpApi news fallback query failed: %s", str(news_err))
 
         records: List[tuple[int, dict]] = []
         now = datetime.now(timezone.utc)
@@ -103,7 +113,7 @@ def get_relevant_market_signals_stateless(
                 "relevance_status": MarketRelevanceStatus.POTENTIALLY_RELEVANT.value,
                 "reason_codes": ["COMMODITY_PRICE_MONITORING"],
                 "explanation": f"Observed from SerpApi query '{clean_query}'. Relevant to wholesale purchase costs.",
-                "context_snapshot": {"engine": result.engine, "query": clean_query},
+                "context_snapshot": {"engine": engine_used, "query": clean_query},
                 "detected_at": now.isoformat(),
                 "status": "ACTIVE",
                 "market_event": ev,

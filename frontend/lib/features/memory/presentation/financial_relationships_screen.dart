@@ -4,11 +4,13 @@ import '../domain/counterparty_model.dart';
 class FinancialRelationshipsScreen extends StatelessWidget {
   final List<CounterpartyModel> counterparties;
   final Function(CounterpartyModel cp) onCounterpartyTap;
+  final VoidCallback? onBack;
 
   const FinancialRelationshipsScreen({
     super.key,
     required this.counterparties,
     required this.onCounterpartyTap,
+    this.onBack,
   });
 
   @override
@@ -16,6 +18,13 @@ class FinancialRelationshipsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Financial Relationships'),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: 'Back',
+                onPressed: onBack,
+              )
+            : null,
       ),
       body: SafeArea(
         child: counterparties.isEmpty

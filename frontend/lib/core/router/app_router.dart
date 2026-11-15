@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../api/api_client.dart';
 import '../config/env.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_icons.dart';
@@ -123,12 +125,28 @@ class _AppRouterState extends ConsumerState<AppRouter> {
   final Map<String, dynamic> _routeArgs = {};
   bool _isAssistantLoading = false;
   FinancialQueryResultModel? _lastAssistantResult;
+  Timer? _renderKeepAliveTimer;
 
   @override
   void initState() {
     super.initState();
     _initLocalSession();
     _setupCaptureListeners();
+    _startRenderKeepAlive();
+  }
+
+  void _startRenderKeepAlive() {
+    // Free Render instances spin down after inactivity (~15 min).
+    // Send lightweight health check probe every 50 seconds to keep gateway warm while merchant active.
+    _renderKeepAliveTimer?.cancel();
+    _renderKeepAliveTimer = Timer.periodic(const Duration(seconds: 50), (_) async {
+      try {
+        final client = ApiClient();
+        await client.get('/health');
+      } catch (_) {
+        // Silently swallow keep-alive failures
+      }
+    });
   }
 
   void _setupCaptureListeners() {
@@ -282,6 +300,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
   @override
   void dispose() {
+    _renderKeepAliveTimer?.cancel();
     _pinController.dispose();
     _nameController.dispose();
     super.dispose();
@@ -661,6 +680,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
             final cps = snapshot.data ?? [];
             return FinancialRelationshipsScreen(
               counterparties: cps,
+              onBack: _popRoute,
               onCounterpartyTap: (cp) =>
                   _navigateTo('/relationships/detail', {'cp': cp}),
             );
@@ -681,6 +701,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
             return PaymentPromisesScreen(
               promises: promises.cast(),
               counterparties: counterparties.cast(),
+              onBack: _popRoute,
               onCreatePromise: (pData) async {
                 await memRepo.createPaymentPromise(
                   merchantId: merchantId,
@@ -898,7 +919,6 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   return;
                 }
 
-                final navigator = Navigator.of(context);
                 await txRepo.createTransaction(
                   merchantId: merchantId,
                   amount: amtText,
@@ -913,8 +933,13 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   sourceType: 'MANUAL',
                 );
 
+                if (ctx.mounted) {
+                  Navigator.pop(ctx);
+                }
                 if (mounted) {
-                  navigator.pop();
+                  ref.invalidate(financialPositionMetricsProvider);
+                  ref.invalidate(cashFlowForecastProvider);
+                  ref.invalidate(topCounterpartiesProvider);
                   setState(() {});
                 }
               },
@@ -1329,6 +1354,9 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                                 content: Text(
                                     'Successfully imported $count transactions into private ledger')),
                           );
+                          ref.invalidate(financialPositionMetricsProvider);
+                          ref.invalidate(cashFlowForecastProvider);
+                          ref.invalidate(topCounterpartiesProvider);
                           setState(() {});
                         }
                       },
