@@ -4,11 +4,13 @@ import '../domain/counterparty_model.dart';
 class CounterpartyDetailScreen extends StatelessWidget {
   final CounterpartyModel counterparty;
   final List<FinancialRelationshipEventModel> timeline;
+  final VoidCallback? onBack;
 
   const CounterpartyDetailScreen({
     super.key,
     required this.counterparty,
     required this.timeline,
+    this.onBack,
   });
 
   String _formatDate(DateTime dt) {
@@ -22,6 +24,12 @@ class CounterpartyDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(counterparty.displayName),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: onBack,
+              )
+            : null,
       ),
       body: SafeArea(
         child: SingleChildScrollView(

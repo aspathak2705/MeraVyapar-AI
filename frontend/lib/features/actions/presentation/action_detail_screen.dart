@@ -7,12 +7,14 @@ class ActionDetailScreen extends StatefulWidget {
   final LocalActionRepository actionRepository;
   final String actionId;
   final String authToken;
+  final VoidCallback? onBack;
 
   const ActionDetailScreen({
     Key? key,
     required this.actionRepository,
     required this.actionId,
     required this.authToken,
+    this.onBack,
   }) : super(key: key);
 
   @override
@@ -52,9 +54,13 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
       );
       _loadData();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
-      setState(() => _isProcessing = false);
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
     }
   }
 
@@ -67,9 +73,13 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
       );
       _loadData();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
-      setState(() => _isProcessing = false);
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
     }
   }
 
@@ -82,9 +92,13 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
       );
       _loadData();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
-      setState(() => _isProcessing = false);
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
     }
   }
 
@@ -93,6 +107,12 @@ class _ActionDetailScreenState extends State<ActionDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Action Details & Audit'),
+        leading: widget.onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: widget.onBack,
+              )
+            : null,
       ),
       body: FutureBuilder<CommunicationAction>(
         future: _actionFuture,

@@ -38,6 +38,12 @@ class CanonicalTransactionsScreen extends StatelessWidget {
           onPressed: onBack ?? () => Navigator.of(context).maybePop(),
         ),
         actions: [
+          if (onImportStatement != null)
+            IconButton(
+              icon: const Icon(Icons.file_upload_outlined),
+              tooltip: l10n?.importStatement ?? 'Import Statement',
+              onPressed: onImportStatement,
+            ),
           IconButton(
             icon: const Icon(AppIcons.refresh),
             tooltip: l10n?.runReconciliationPass ?? 'Run Reconciliation Pass',
@@ -82,10 +88,29 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                               style: const TextStyle(fontSize: 13, height: 1.4),
                             ),
                             const SizedBox(height: 24),
-                            ElevatedButton.icon(
-                              icon: const Icon(AppIcons.refresh),
-                              label: Text(l10n?.runReconciliationPass ?? 'Run Reconciliation Pass'),
-                              onPressed: onRunReconciliation,
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              alignment: WrapAlignment.center,
+                              children: [
+                                if (onAddTransaction != null)
+                                  ElevatedButton.icon(
+                                    icon: const Icon(Icons.add),
+                                    label: Text(l10n?.addEntry ?? 'Add Entry'),
+                                    onPressed: onAddTransaction,
+                                  ),
+                                if (onImportStatement != null)
+                                  OutlinedButton.icon(
+                                    icon: const Icon(Icons.file_upload_outlined),
+                                    label: Text(l10n?.importStatement ?? 'Import Statement'),
+                                    onPressed: onImportStatement,
+                                  ),
+                                TextButton.icon(
+                                  icon: const Icon(AppIcons.refresh),
+                                  label: Text(l10n?.runReconciliationPass ?? 'Run Reconciliation'),
+                                  onPressed: onRunReconciliation,
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -178,6 +203,13 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                     );
                   },
                 ),
+      floatingActionButton: onAddTransaction != null
+          ? FloatingActionButton(
+              tooltip: l10n?.addEntry ?? 'Add Entry',
+              onPressed: onAddTransaction,
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

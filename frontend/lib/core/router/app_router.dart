@@ -26,6 +26,7 @@ import '../../features/home/presentation/home_shell_screen.dart';
 import '../../features/transactions/presentation/canonical_transactions_screen.dart';
 import '../../features/transactions/presentation/canonical_transaction_detail_screen.dart';
 import '../../features/memory/presentation/financial_relationships_screen.dart';
+import '../../features/memory/presentation/counterparty_detail_screen.dart';
 import '../../features/memory/presentation/payment_promises_screen.dart';
 import '../../features/events/presentation/receivables_screen.dart';
 import '../../features/events/presentation/receivable_detail_screen.dart';
@@ -749,6 +750,13 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           },
         );
 
+      case '/relationships/detail':
+        return CounterpartyDetailScreen(
+          counterparty: _routeArgs['cp'],
+          timeline: const [],
+          onBack: _popRoute,
+        );
+
       case '/promises':
         final memRepo = ref.read(localMemoryRepositoryProvider);
         return FutureBuilder(
@@ -869,6 +877,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           actionRepository: localActionRepo,
           actionId: _routeArgs['action_id'] ?? '',
           authToken: merchantId,
+          onBack: _popRoute,
         );
 
       case '/settings/permissions':
