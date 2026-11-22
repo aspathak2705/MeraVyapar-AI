@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/presentation/fintech_widgets.dart';
 import '../../../core/localization/language_selector_button.dart';
+import '../../../core/money/money.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../intelligence/domain/local_financial_intelligence_engine.dart';
 import '../../intelligence/presentation/unified_financial_intelligence_screen.dart';
@@ -127,12 +128,12 @@ class HomeShellScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 1. Primary Financial Overview Card (PhonePe-inspired Purple Hero Surface)
-              _buildFinancialHeroCard(context, isDark, positionAsync),
+              _buildFinancialHeroCard(context, isDark, positionAsync, l10n),
 
               const SizedBox(height: 16),
 
               // Prominent Direct Quick Actions (Statement Import & Direct Manual Entry)
-              _buildProminentQuickActions(context, isDark),
+              _buildProminentQuickActions(context, isDark, l10n),
 
               const SizedBox(height: 24),
 
@@ -223,8 +224,9 @@ class HomeShellScreen extends ConsumerWidget {
   Widget _buildFinancialHeroCard(
     BuildContext context,
     bool isDark,
-    AsyncValue<FinancialPositionMetrics> positionAsync,
-  ) {
+    AsyncValue<FinancialPositionMetrics> positionAsync, [
+    AppLocalizations? l10n,
+  ]) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -235,7 +237,7 @@ class HomeShellScreen extends ConsumerWidget {
             ? []
             : [
                 BoxShadow(
-                  color: AppColors.primaryPurple.withOpacity(0.2),
+                  color: AppColors.primaryPurple.withValues(alpha: 0.2),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
@@ -251,13 +253,13 @@ class HomeShellScreen extends ConsumerWidget {
         error: (err, _) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Net Cash Movement',
-              style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500),
+            Text(
+              l10n?.netCashMovement ?? 'Net Cash Movement',
+              style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 6),
             const Text(
-              '₹0.00',
+              '₹0',
               style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
@@ -271,9 +273,9 @@ class HomeShellScreen extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Net Cash Movement',
-                    style: TextStyle(
+                  Text(
+                    l10n?.netCashMovement ?? 'Net Cash Movement',
+                    style: const TextStyle(
                       color: Color(0xFFE9D8FD),
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -282,7 +284,7 @@ class HomeShellScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
+                      color: Colors.white.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -294,7 +296,7 @@ class HomeShellScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 6),
               Text(
-                '₹${metrics.netCashMovementInr.toStringAsFixed(2)}',
+                Money.formatRupees(metrics.netCashMovementInr, showDecimals: false),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 32,
@@ -305,7 +307,7 @@ class HomeShellScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               Container(
                 height: 1,
-                color: Colors.white.withOpacity(0.15),
+                color: Colors.white.withValues(alpha: 0.15),
               ),
               const SizedBox(height: 14),
               Row(
@@ -314,10 +316,10 @@ class HomeShellScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Inflows', style: TextStyle(color: Color(0xFFE9D8FD), fontSize: 11)),
+                        Text(l10n?.totalMoneyIn ?? 'Inflows', style: const TextStyle(color: Color(0xFFE9D8FD), fontSize: 11)),
                         const SizedBox(height: 2),
                         Text(
-                          '₹${metrics.totalInflowsInr.toStringAsFixed(2)}',
+                          Money.formatRupees(metrics.totalInflowsInr, showDecimals: false),
                           style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
                         ),
                       ],
@@ -327,10 +329,10 @@ class HomeShellScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Outflows', style: TextStyle(color: Color(0xFFE9D8FD), fontSize: 11)),
+                        Text(l10n?.totalMoneyOut ?? 'Outflows', style: const TextStyle(color: Color(0xFFE9D8FD), fontSize: 11)),
                         const SizedBox(height: 2),
                         Text(
-                          '₹${metrics.totalOutflowsInr.toStringAsFixed(2)}',
+                          Money.formatRupees(metrics.totalOutflowsInr, showDecimals: false),
                           style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700),
                         ),
                       ],
@@ -340,10 +342,10 @@ class HomeShellScreen extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Receivables', style: TextStyle(color: Color(0xFFE9D8FD), fontSize: 11)),
+                        Text(l10n?.receivables ?? 'Receivables', style: const TextStyle(color: Color(0xFFE9D8FD), fontSize: 11)),
                         const SizedBox(height: 2),
                         Text(
-                          '₹${metrics.totalReceivablesInr.toStringAsFixed(2)}',
+                          Money.formatRupees(metrics.totalReceivablesInr, showDecimals: false),
                           style: const TextStyle(
                             color: Color(0xFFFDE047),
                             fontSize: 15,
@@ -478,7 +480,7 @@ class HomeShellScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProminentQuickActions(BuildContext context, bool isDark) {
+  Widget _buildProminentQuickActions(BuildContext context, bool isDark, [AppLocalizations? l10n]) {
     return Row(
       children: [
         // 1. Import Statement (PDF/CSV)
@@ -506,7 +508,7 @@ class HomeShellScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Import Statement',
+                    l10n?.importStatement ?? 'Import Statement',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,
@@ -554,7 +556,7 @@ class HomeShellScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '+ Add Income',
+                    l10n != null ? '+ ${l10n.moneyIn}' : '+ Add Income',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,
@@ -602,7 +604,7 @@ class HomeShellScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    '- Add Expense',
+                    l10n != null ? '- ${l10n.moneyOut}' : '- Add Expense',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,

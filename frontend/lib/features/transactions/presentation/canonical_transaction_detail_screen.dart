@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/money/money.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/canonical_transaction_model.dart';
 
 class CanonicalTransactionDetailScreen extends StatelessWidget {
@@ -13,12 +15,28 @@ class CanonicalTransactionDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isMoneyIn = transaction.transactionType == 'MONEY_IN';
     final status = transaction.reconciliationStatus;
+    final formattedAmt = transaction.amount != null
+        ? '${isMoneyIn ? "+" : "-"} ${Money.formatInr(Money.parseInrToPaise(transaction.amount!))}'
+        : null;
+
+    final isReconciled = status == 'RECONCILED';
+    final statusText = isReconciled
+        ? (l10n?.reconciledStatus ?? 'Reconciled')
+        : (status == 'REQUIRES_REVIEW' ? (l10n?.needsReviewStatus ?? 'Needs Review') : (l10n?.unresolvedStatus ?? status));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transaction Detail & Provenance'),
+        title: Text(l10n?.transactionDetailProvenance ?? 'Transaction Detail & Provenance'),
+        leading: onBack != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                tooltip: l10n?.back ?? 'Back',
+                onPressed: onBack,
+              )
+            : null,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -42,7 +60,7 @@ class CanonicalTransactionDetailScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            transaction.counterpartyName ?? 'Canonical Record',
+                            transaction.counterpartyName ?? (l10n?.counterparty ?? 'Canonical Record'),
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -52,17 +70,17 @@ class CanonicalTransactionDetailScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: status == 'RECONCILED'
+                              color: isReconciled
                                   ? const Color(0xFFDCFCE7)
                                   : const Color(0xFFFEF3C7),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              status,
+                              statusText,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: status == 'RECONCILED'
+                                color: isReconciled
                                     ? const Color(0xFF166534)
                                     : const Color(0xFFD97706),
                               ),
@@ -71,9 +89,9 @@ class CanonicalTransactionDetailScreen extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      if (transaction.amount != null)
+                      if (formattedAmt != null)
                         Text(
-                          '${isMoneyIn ? "+" : "-"} ₹${transaction.amount} ${transaction.currency}',
+                          formattedAmt,
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -81,10 +99,10 @@ class CanonicalTransactionDetailScreen extends StatelessWidget {
                           ),
                         ),
                       const SizedBox(height: 8),
-                      Text('Payment Mode: ${transaction.paymentMode}', style: const TextStyle(color: Color(0xFF64748B))),
+                      Text('${l10n?.paymentMethod ?? 'Payment Mode'}: ${transaction.paymentMode}', style: const TextStyle(color: Color(0xFF64748B))),
                       if (transaction.transactionReference != null)
-                        Text('Reference: ${transaction.transactionReference}', style: const TextStyle(color: Color(0xFF64748B))),
-                      if (transaction.isSimulated || transaction.sourceProvider == 'SIMULATED_RAZORPAY') ...[
+                        Text('${l10n?.reference ?? 'Reference'}: ${transaction.transactionReference}', style: const TextStyle(color: Color(0xFF64748B))),
+                      if (txIsDemo(transaction)) ...[
                         const SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.all(10),
@@ -99,7 +117,7 @@ class CanonicalTransactionDetailScreen extends StatelessWidget {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'DEMO EVENT: Simulated payment event processed through reconciliation pipeline.',
+                                  l10n?.simulatedDemoNotice ?? 'DEMO EVENT: Simulated payment event processed through reconciliation pipeline.',
                                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.amber.shade900),
                                 ),
                               ),
@@ -112,9 +130,9 @@ class CanonicalTransactionDetailScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Evidence Provenance Chain',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+              Text(
+                l10n?.evidenceProvenanceChain ?? 'Evidence Provenance Chain',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -146,5 +164,9 @@ class CanonicalTransactionDetailScreen extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool txIsDemo(CanonicalTransactionModel tx) {
+    return tx.isSimulated || tx.sourceProvider == 'SIMULATED_RAZORPAY';
   }
 }

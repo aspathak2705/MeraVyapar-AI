@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/grounded_insight_model.dart';
 
 class MerchantAssistantScreen extends StatefulWidget {
@@ -51,11 +52,12 @@ class _MerchantAssistantScreenState extends State<MerchantAssistantScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final result = widget.lastResult;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Merchant Financial Assistant'),
+        title: Text(l10n?.merchantAssistant ?? 'Merchant Financial Assistant'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

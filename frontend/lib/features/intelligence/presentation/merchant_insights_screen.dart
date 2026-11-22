@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/intelligence_repository.dart';
 import '../domain/merchant_insight_model.dart';
 import 'merchant_insight_card.dart';
@@ -54,12 +55,15 @@ class _MerchantInsightsScreenState extends State<MerchantInsightsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Financial Insights'),
+        title: Text(l10n?.insights ?? 'Financial Insights'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
+            tooltip: l10n?.runReconciliationPass ?? 'Refresh',
             onPressed: _loadInsights,
           ),
         ],

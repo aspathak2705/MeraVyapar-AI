@@ -52,6 +52,7 @@ import '../../features/capture/domain/local_evidence_capture_service.dart';
 import '../../core/database/local_database_service.dart';
 import '../../core/money/money.dart';
 import '../../features/intelligence/domain/local_financial_intelligence_engine.dart';
+import '../../l10n/app_localizations.dart';
 
 // --- Local Repository Providers ---
 // Re-export single canonical localAuthRepositoryProvider from local_auth_repository.dart
@@ -932,6 +933,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
     LocalCanonicalTransactionRepository txRepo, {
     String defaultType = 'CREDIT',
   }) {
+    final l10n = AppLocalizations.of(context);
     final amtCtrl = TextEditingController();
     final partyCtrl = TextEditingController();
     final descCtrl = TextEditingController();
@@ -942,15 +944,21 @@ class _AppRouterState extends ConsumerState<AppRouter> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Add Manual Entry'),
+          title: Text(l10n?.manualEntry ?? 'Add Manual Entry'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SegmentedButton<String>(
-                  segments: const [
-                    ButtonSegment(value: 'CREDIT', label: Text('Income (+)')),
-                    ButtonSegment(value: 'DEBIT', label: Text('Expense (-)')),
+                  segments: [
+                    ButtonSegment(
+                      value: 'CREDIT',
+                      label: Text(l10n != null ? '${l10n.moneyIn} (+)' : 'Income (+)'),
+                    ),
+                    ButtonSegment(
+                      value: 'DEBIT',
+                      label: Text(l10n != null ? '${l10n.moneyOut} (-)' : 'Expense (-)'),
+                    ),
                   ],
                   selected: {txType},
                   onSelectionChanged: (val) {
@@ -962,8 +970,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   controller: amtCtrl,
                   keyboardType:
                       const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                    labelText: 'Amount (₹)',
+                  decoration: InputDecoration(
+                    labelText: '${l10n?.amount ?? 'Amount'} (₹)',
                     hintText: 'e.g. 500.00',
                     prefixText: '₹ ',
                   ),
@@ -971,22 +979,22 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: partyCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Counterparty / Customer / Vendor',
+                  decoration: InputDecoration(
+                    labelText: l10n?.counterparty ?? 'Counterparty / Customer / Vendor',
                     hintText: 'e.g. Ramesh Kirana',
                   ),
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: paymentMode,
-                  decoration: const InputDecoration(labelText: 'Payment Mode'),
-                  items: const [
-                    DropdownMenuItem(value: 'CASH', child: Text('Cash')),
-                    DropdownMenuItem(value: 'UPI', child: Text('UPI / QR')),
+                  decoration: InputDecoration(labelText: l10n?.paymentMode ?? 'Payment Mode'),
+                  items: [
+                    DropdownMenuItem(value: 'CASH', child: Text(l10n?.cash ?? 'Cash')),
+                    DropdownMenuItem(value: 'UPI', child: Text(l10n?.upi ?? 'UPI / QR')),
                     DropdownMenuItem(
                         value: 'BANK_TRANSFER',
-                        child: Text('Bank Transfer / NEFT')),
-                    DropdownMenuItem(value: 'CHEQUE', child: Text('Cheque')),
+                        child: Text(l10n?.bankTransfer ?? 'Bank Transfer / NEFT')),
+                    DropdownMenuItem(value: 'CHEQUE', child: Text(l10n?.cheque ?? 'Cheque')),
                   ],
                   onChanged: (val) {
                     if (val != null) setDialogState(() => paymentMode = val);
@@ -995,8 +1003,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: descCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Notes / Description (Optional)',
+                  decoration: InputDecoration(
+                    labelText: '${l10n?.description ?? 'Notes / Description'} (Optional)',
                     hintText: 'e.g. Wholesale flour payment',
                   ),
                 ),
@@ -1006,7 +1014,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel'),
+              child: Text(l10n?.cancel ?? 'Cancel'),
             ),
             FilledButton(
               onPressed: () async {
@@ -1041,7 +1049,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   setState(() {});
                 }
               },
-              child: const Text('Save Entry'),
+              child: Text(l10n?.save ?? 'Save Entry'),
             ),
           ],
         ),
@@ -1349,7 +1357,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                                   fontWeight: FontWeight.bold, fontSize: 13)),
                           const SizedBox(height: 4),
                           Text(
-                            'Detected: ${extractedRecords.length} records | Total Credit: +₹${(totalCreditPaise / 100.0).toStringAsFixed(2)} | Total Debit: -₹${(totalDebitPaise / 100.0).toStringAsFixed(2)}',
+                            'Detected: ${extractedRecords.length} records | Total Credit: +${Money.formatInr(totalCreditPaise)} | Total Debit: -${Money.formatInr(totalDebitPaise)}',
                             style: const TextStyle(
                                 fontSize: 11, color: Color(0xFF475569)),
                           ),

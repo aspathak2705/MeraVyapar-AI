@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/merchant_market_relevance_model.dart';
 import '../../onboarding/domain/merchant_business_profile.dart';
 
@@ -175,13 +176,15 @@ class _RelevantMarketSignalsScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('External Market Signals'),
+        title: Text(l10n?.externalMarketSignals ?? 'External Market Signals'),
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
+                tooltip: l10n?.back ?? 'Back',
                 onPressed: widget.onBack,
               )
             : null,
@@ -189,12 +192,12 @@ class _RelevantMarketSignalsScreenState
           if (widget.onOpenLocalSuppliers != null)
             IconButton(
               icon: const Icon(Icons.location_on_outlined),
-              tooltip: 'Local Suppliers Map',
+              tooltip: l10n?.localSuppliers ?? 'Local Suppliers Map',
               onPressed: widget.onOpenLocalSuppliers,
             ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh Signals',
+            tooltip: l10n?.runReconciliationPass ?? 'Refresh Signals',
             onPressed: () => _search(_activeQuery.isNotEmpty
                 ? _activeQuery
                 : _buildProfileDerivedQuery()),
@@ -213,7 +216,7 @@ class _RelevantMarketSignalsScreenState
                 onChanged: (_) => setState(() {}),
                 onSubmitted: (val) => _search(val),
                 decoration: InputDecoration(
-                  hintText:
+                  hintText: l10n?.searchMarketCommodities ??
                       'Search markets, commodities, suppliers or trends...',
                   hintStyle:
                       const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),

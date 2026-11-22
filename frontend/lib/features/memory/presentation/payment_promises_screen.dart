@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/money/money.dart';
+import '../../../../core/localization/app_date_formatter.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../domain/payment_promise_model.dart';
 import '../domain/counterparty_model.dart';
 
@@ -37,11 +40,8 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
     super.dispose();
   }
 
-  String _formatDate(DateTime dt) {
-    return dt.toIso8601String().substring(0, 10);
-  }
-
   void _showCreatePromiseModal() {
+    final l10n = AppLocalizations.of(context);
     final descController = TextEditingController();
     final amtController = TextEditingController();
     String direction = 'EXPECTED_INCOMING';
@@ -64,27 +64,42 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Record Explicit Payment Promise', style: Theme.of(modalCtx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+                Text(
+                  l10n?.recordPaymentPromise ?? 'Record Explicit Payment Promise',
+                  style: Theme.of(modalCtx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: descController,
-                  decoration: const InputDecoration(labelText: 'Description', hintText: 'e.g. Expected invoice payment'),
+                  decoration: InputDecoration(
+                    labelText: l10n?.description ?? 'Description',
+                    hintText: 'e.g. Expected invoice payment',
+                  ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: amtController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(labelText: 'Promised Amount (₹)', prefixText: '₹ '),
+                  decoration: InputDecoration(
+                    labelText: l10n?.promisedAmount ?? 'Promised Amount (₹)',
+                    prefixText: '₹ ',
+                  ),
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: direction,
-                  items: const [
-                    DropdownMenuItem(value: 'EXPECTED_INCOMING', child: Text('Expected Payment Incoming (Receivable)')),
-                    DropdownMenuItem(value: 'EXPECTED_OUTGOING', child: Text('Expected Payment Outgoing (Payable)')),
+                  items: [
+                    DropdownMenuItem(
+                      value: 'EXPECTED_INCOMING',
+                      child: Text(l10n?.expectedIncoming ?? 'Expected Payment Incoming (Receivable)'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'EXPECTED_OUTGOING',
+                      child: Text(l10n?.expectedOutgoing ?? 'Expected Payment Outgoing (Payable)'),
+                    ),
                   ],
                   onChanged: (val) => setModalState(() => direction = val!),
-                  decoration: const InputDecoration(labelText: 'Direction'),
+                  decoration: InputDecoration(labelText: l10n?.direction ?? 'Direction'),
                 ),
                 const SizedBox(height: 12),
                 if (widget.counterparties.isNotEmpty)
@@ -94,13 +109,13 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
                         .map((cp) => DropdownMenuItem(value: cp.id, child: Text(cp.displayName)))
                         .toList(),
                     onChanged: (val) => setModalState(() => selectedCounterpartyId = val),
-                    decoration: const InputDecoration(labelText: 'Link Counterparty (Optional)'),
+                    decoration: InputDecoration(labelText: l10n?.linkCounterparty ?? 'Link Counterparty (Optional)'),
                   ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
                     if (descController.text.isEmpty || amtController.text.isEmpty) return;
-                    String cpName = 'Declared Counterparty';
+                    String cpName = l10n?.counterparty ?? 'Declared Counterparty';
                     if (selectedCounterpartyId != null) {
                       final matched = widget.counterparties.where((c) => c.id == selectedCounterpartyId);
                       if (matched.isNotEmpty) {
@@ -121,7 +136,7 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
                     });
                     Navigator.of(modalCtx).pop();
                   },
-                  child: const Text('Save Payment Promise'),
+                  child: Text(l10n?.savePromise ?? 'Save Payment Promise'),
                 ),
               ],
             ),
@@ -133,6 +148,7 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final openPromises = widget.promises.where((p) => p.status == 'OPEN').toList();
     final fulfilledPromises = widget.promises.where((p) => p.status == 'FULFILLED').toList();
     final overduePromises = widget.promises.where((p) => p.status == 'OVERDUE').toList();
@@ -140,44 +156,49 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payment Promises Memory'),
+        title: Text(l10n?.paymentPromisesTitle ?? 'Payment Promises Memory'),
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
+                tooltip: l10n?.back ?? 'Back',
                 onPressed: widget.onBack,
               )
             : null,
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: 'Open'),
-            Tab(text: 'Fulfilled'),
-            Tab(text: 'Overdue'),
-            Tab(text: 'Cancelled'),
+          tabs: [
+            Tab(text: l10n?.openStatus ?? 'Open'),
+            Tab(text: l10n?.fulfilledStatus ?? 'Fulfilled'),
+            Tab(text: l10n?.overdueStatus ?? 'Overdue'),
+            Tab(text: l10n?.cancelledStatus ?? 'Cancelled'),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showCreatePromiseModal,
         icon: const Icon(Icons.add),
-        label: const Text('Record Promise'),
+        label: Text(l10n?.recordPromise ?? 'Record Promise'),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildPromiseList(openPromises, allowFulfill: true),
-          _buildPromiseList(fulfilledPromises),
-          _buildPromiseList(overduePromises),
-          _buildPromiseList(cancelledPromises),
+          _buildPromiseList(openPromises, l10n, allowFulfill: true),
+          _buildPromiseList(fulfilledPromises, l10n),
+          _buildPromiseList(overduePromises, l10n),
+          _buildPromiseList(cancelledPromises, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildPromiseList(List<PaymentPromiseModel> list, {bool allowFulfill = false}) {
+  Widget _buildPromiseList(List<PaymentPromiseModel> list, AppLocalizations? l10n, {bool allowFulfill = false}) {
     if (list.isEmpty) {
-      return const Center(child: Text('No payment promises in this section.', style: TextStyle(color: Color(0xFF64748B))));
+      return Center(
+        child: Text(
+          l10n?.noPromisesInSection ?? 'No payment promises in this section.',
+          style: const TextStyle(color: Color(0xFF64748B)),
+        ),
+      );
     }
 
     return ListView.separated(
@@ -187,6 +208,8 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
       itemBuilder: (context, index) {
         final p = list[index];
         final isIncoming = p.promiseDirection == 'EXPECTED_INCOMING';
+        final formattedAmt = Money.formatInr(Money.parseInrToPaise(p.promisedAmount));
+        final formattedDate = AppDateFormatter.formatDateWithContext(context, p.dueAt);
 
         return Card(
           child: ListTile(
@@ -195,13 +218,13 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
               color: isIncoming ? const Color(0xFF166534) : const Color(0xFF991B1B),
             ),
             title: Text(p.description, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text('Due: ${_formatDate(p.dueAt)} • Source: ${p.source}'),
+            subtitle: Text('${l10n?.due ?? 'Due'}: $formattedDate • ${l10n?.source ?? 'Source'}: ${p.source}'),
             trailing: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '₹${p.promisedAmount}',
+                  formattedAmt,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -211,7 +234,10 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
                 if (allowFulfill)
                   InkWell(
                     onTap: () => widget.onFulfillPromise(p.id),
-                    child: const Text('Fulfill', style: TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold)),
+                    child: Text(
+                      l10n?.fulfill ?? 'Fulfill',
+                      style: const TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold),
+                    ),
                   ),
               ],
             ),

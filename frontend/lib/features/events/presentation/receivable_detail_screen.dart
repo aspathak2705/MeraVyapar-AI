@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/money/money.dart';
+import '../../../../core/localization/app_date_formatter.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../domain/receivable_model.dart';
 
 class ReceivableDetailScreen extends StatelessWidget {
@@ -15,21 +18,20 @@ class ReceivableDetailScreen extends StatelessWidget {
     this.onBack,
   });
 
-  String _formatDate(DateTime dt) {
-    return dt.toIso8601String().substring(0, 10);
-  }
-
   @override
   Widget build(BuildContext context) {
-    final cpName = receivable.counterpartyName ?? 'Counterparty';
+    final l10n = AppLocalizations.of(context);
+    final cpName = receivable.counterpartyName ?? (l10n?.counterparty ?? 'Counterparty');
+    final formattedAmt = Money.formatInr(Money.parseInrToPaise(receivable.amount));
+    final formattedDate = AppDateFormatter.formatDateWithContext(context, receivable.dueAt);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Receivable Detail'),
+        title: Text(l10n?.receivableDetailTitle ?? 'Receivable Detail'),
         leading: onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
+                tooltip: l10n?.back ?? 'Back',
                 onPressed: onBack,
               )
             : null,
@@ -52,21 +54,21 @@ class ReceivableDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Expected Amount: ₹${receivable.amount}',
+                        '${l10n?.expectedAmount ?? 'Expected Amount'}: $formattedAmt',
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF166534)),
                       ),
                       const SizedBox(height: 8),
-                      Text('Due Date: ${_formatDate(receivable.dueAt)}'),
-                      Text('State: ${receivable.state}'),
-                      Text('Priority Bucket: ${receivable.priority}'),
+                      Text('${l10n?.dueDate ?? 'Due Date'}: $formattedDate'),
+                      Text('${l10n?.state ?? 'State'}: ${receivable.state}'),
+                      Text('${l10n?.priorityBucket ?? 'Priority Bucket'}: ${receivable.priority}'),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
-                'Prioritization Reasons & Provenance',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+              Text(
+                l10n?.prioritizationReasons ?? 'Prioritization Reasons & Provenance',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
               ),
               const SizedBox(height: 12),
               Card(
@@ -75,9 +77,9 @@ class ReceivableDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Source Promise ID: ${receivable.sourcePaymentPromiseId}'),
+                      Text('${l10n?.sourcePromiseId ?? 'Source Promise ID'}: ${receivable.sourcePaymentPromiseId}'),
                       const SizedBox(height: 8),
-                      const Text('Reason Codes:', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text(l10n?.reasonCodes ?? 'Reason Codes:', style: const TextStyle(fontWeight: FontWeight.bold)),
                       ...receivable.reasonCodes.map((rc) => Text('• $rc')),
                     ],
                   ),
@@ -87,7 +89,7 @@ class ReceivableDetailScreen extends StatelessWidget {
               if (onCreateReminderDraft != null) ...[
                 ElevatedButton.icon(
                   icon: const Icon(Icons.send_outlined),
-                  label: const Text('Create Payment Reminder Draft'),
+                  label: Text(l10n?.createPaymentReminderDraft ?? 'Create Payment Reminder Draft'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF047857),
                     minimumSize: const Size.fromHeight(48),
@@ -98,7 +100,7 @@ class ReceivableDetailScreen extends StatelessWidget {
               ],
               OutlinedButton.icon(
                 icon: const Icon(Icons.rate_review),
-                label: const Text('Review Follow-Up Context'),
+                label: Text(l10n?.reviewFollowUpContext ?? 'Review Follow-Up Context'),
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size.fromHeight(48),
                 ),

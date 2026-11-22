@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/local_business_profile_repository.dart';
 import '../domain/merchant_business_profile.dart';
 import '../../auth/data/local_auth_repository.dart';
@@ -118,12 +119,15 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Merchant Business Profile'),
+        title: Text(l10n?.setupBusinessTitle ?? 'Merchant Business Profile'),
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
+                tooltip: l10n?.back ?? 'Back',
                 onPressed: widget.onBack,
               )
             : null,
@@ -150,18 +154,21 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
                             const SizedBox(height: 12),
                             TextFormField(
                               controller: _nameController,
-                              decoration: const InputDecoration(labelText: 'Trade / Business Name'),
-                              validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+                              decoration: InputDecoration(labelText: l10n?.businessName ?? 'Trade / Business Name'),
+                              validator: (v) => v == null || v.trim().isEmpty ? (l10n?.businessCategory ?? 'Required') : null,
                             ),
                             const SizedBox(height: 12),
                             TextFormField(
                               controller: _categoryController,
-                              decoration: const InputDecoration(labelText: 'Primary Business Category', hintText: 'e.g. Kirana, Hardware, Textiles'),
+                              decoration: InputDecoration(
+                                labelText: l10n?.businessCategory ?? 'Primary Business Category',
+                                hintText: 'e.g. Kirana, Hardware, Textiles',
+                              ),
                             ),
                             const SizedBox(height: 12),
                             DropdownButtonFormField<String>(
                               initialValue: _businessType,
-                              decoration: const InputDecoration(labelText: 'Business Model'),
+                              decoration: InputDecoration(labelText: l10n?.businessType ?? 'Business Model'),
                               items: const [
                                 DropdownMenuItem(value: 'RETAIL', child: Text('Retailer / Storefront')),
                                 DropdownMenuItem(value: 'WHOLESALE', child: Text('Wholesaler / Trader')),
@@ -191,14 +198,14 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
                                 Expanded(
                                   child: TextFormField(
                                     controller: _cityController,
-                                    decoration: const InputDecoration(labelText: 'City / District'),
+                                    decoration: InputDecoration(labelText: l10n?.city ?? 'City / District'),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: TextFormField(
                                     controller: _stateController,
-                                    decoration: const InputDecoration(labelText: 'State'),
+                                    decoration: InputDecoration(labelText: l10n?.state ?? 'State'),
                                   ),
                                 ),
                               ],
@@ -206,12 +213,18 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
                             const SizedBox(height: 12),
                             TextFormField(
                               controller: _productsController,
-                              decoration: const InputDecoration(labelText: 'Major Products & Items Sold', hintText: 'e.g. Rice, edible oil, spices'),
+                              decoration: InputDecoration(
+                                labelText: l10n?.productsAndServices ?? 'Major Products & Items Sold',
+                                hintText: 'e.g. Rice, edible oil, spices',
+                              ),
                             ),
                             const SizedBox(height: 12),
                             TextFormField(
                               controller: _procurementController,
-                              decoration: const InputDecoration(labelText: 'Main Procurement Commodities', hintText: 'e.g. Grains, Cement, Steel, Fabrics'),
+                              decoration: InputDecoration(
+                                labelText: l10n?.mainProcurementCategories ?? 'Main Procurement Commodities',
+                                hintText: 'e.g. Grains, Cement, Steel, Fabrics',
+                              ),
                             ),
                           ],
                         ),
@@ -232,7 +245,7 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
                             DropdownButtonFormField<String>(
                               initialValue: _customerType,
                               isExpanded: true,
-                              decoration: const InputDecoration(labelText: 'Target Customers'),
+                              decoration: InputDecoration(labelText: l10n?.customerType ?? 'Target Customers'),
                               items: const [
                                 DropdownMenuItem(value: 'B2C', child: Text('Consumer Walk-ins (B2C)', overflow: TextOverflow.ellipsis)),
                                 DropdownMenuItem(value: 'B2B', child: Text('Business Clients / Contractors (B2B)', overflow: TextOverflow.ellipsis)),
@@ -244,7 +257,7 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
                             DropdownButtonFormField<String>(
                               initialValue: _turnoverRange,
                               isExpanded: true,
-                              decoration: const InputDecoration(labelText: 'Annual Turnover Range'),
+                              decoration: InputDecoration(labelText: l10n?.turnoverRange ?? 'Annual Turnover Range'),
                               items: const [
                                 DropdownMenuItem(value: '< 10L', child: Text('Under ₹10 Lakhs', overflow: TextOverflow.ellipsis)),
                                 DropdownMenuItem(value: '10L - 40L', child: Text('₹10 Lakhs to ₹40 Lakhs', overflow: TextOverflow.ellipsis)),
@@ -256,7 +269,10 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
                             const SizedBox(height: 12),
                             TextFormField(
                               controller: _goalsController,
-                              decoration: const InputDecoration(labelText: 'Key Business Focus / Goal', hintText: 'e.g. Reduce wholesale cost, track customer udhaar'),
+                              decoration: InputDecoration(
+                                labelText: l10n?.businessGoals ?? 'Key Business Focus / Goal',
+                                hintText: 'e.g. Reduce wholesale cost, track customer udhaar',
+                              ),
                             ),
                           ],
                         ),
@@ -269,7 +285,7 @@ class _BusinessProfileScreenState extends ConsumerState<BusinessProfileScreen> {
                         icon: _isSaving
                             ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                             : const Icon(Icons.check_circle_outline),
-                        label: const Text('Save Business Profile', style: TextStyle(fontWeight: FontWeight.bold)),
+                        label: Text(l10n?.saveProfile ?? 'Save Business Profile', style: const TextStyle(fontWeight: FontWeight.bold)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryPurple,
                           foregroundColor: Colors.white,

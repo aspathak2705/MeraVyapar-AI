@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../../core/config/env.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../capture/data/device_evidence_capture.dart';
 
 class PermissionSettingsScreen extends StatefulWidget {
@@ -37,19 +38,22 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Device Permissions & Privacy'),
+        title: Text(l10n?.permissionSettings ?? 'Device Permissions & Privacy'),
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
+                tooltip: l10n?.back ?? 'Back',
                 onPressed: widget.onBack,
               )
             : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh Status',
+            tooltip: l10n?.runReconciliationPass ?? 'Refresh Status',
             onPressed: _refreshStatuses,
           ),
         ],

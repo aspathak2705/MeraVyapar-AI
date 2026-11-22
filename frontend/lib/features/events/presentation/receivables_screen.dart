@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/money/money.dart';
+import '../../../../core/localization/app_date_formatter.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../domain/receivable_model.dart';
 
 class ReceivablesScreen extends StatelessWidget {
@@ -13,23 +16,24 @@ class ReceivablesScreen extends StatelessWidget {
     this.onBack,
   });
 
-  String _formatDate(DateTime dt) {
-    return dt.toIso8601String().substring(0, 10);
+  String _formatDate(BuildContext context, DateTime dt) {
+    return AppDateFormatter.formatDateWithContext(context, dt);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final highPriority = receivables.where((r) => r.priority == 'HIGH').toList();
     final mediumPriority = receivables.where((r) => r.priority == 'MEDIUM').toList();
     final lowPriority = receivables.where((r) => r.priority == 'LOW').toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Prioritized Receivables'),
+        title: Text(l10n?.receivablesTracker ?? 'Prioritized Receivables'),
         leading: onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
+                tooltip: l10n?.back ?? 'Back',
                 onPressed: onBack,
               )
             : null,
@@ -41,18 +45,18 @@ class ReceivablesScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(24.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.monetization_on_outlined, size: 64, color: Color(0xFF94A3B8)),
-                      SizedBox(height: 16),
+                    children: [
+                      const Icon(Icons.monetization_on_outlined, size: 64, color: Color(0xFF94A3B8)),
+                      const SizedBox(height: 16),
                       Text(
-                        'No Outstanding Receivables',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                        l10n?.noReceivablesPending ?? 'No Outstanding Receivables',
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        'Receivables originate strictly from explicit incoming payment promises. None are currently pending.',
+                        l10n?.noReceivablesDesc ?? 'Receivables originate strictly from explicit incoming payment promises. None are currently pending.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xFF64748B), height: 1.4),
+                        style: const TextStyle(color: Color(0xFF64748B), height: 1.4),
                       ),
                     ],
                   ),
@@ -64,18 +68,18 @@ class ReceivablesScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (highPriority.isNotEmpty) ...[
-                      _buildSectionHeader('HIGH PRIORITY', const Color(0xFF991B1B)),
-                      ...highPriority.map((r) => _buildReceivableCard(r)),
+                      _buildSectionHeader(l10n?.highPriority ?? 'HIGH PRIORITY', const Color(0xFF991B1B)),
+                      ...highPriority.map((r) => _buildReceivableCard(context, r, l10n)),
                       const SizedBox(height: 16),
                     ],
                     if (mediumPriority.isNotEmpty) ...[
-                      _buildSectionHeader('MEDIUM PRIORITY', const Color(0xFFD97706)),
-                      ...mediumPriority.map((r) => _buildReceivableCard(r)),
+                      _buildSectionHeader(l10n?.mediumPriority ?? 'MEDIUM PRIORITY', const Color(0xFFD97706)),
+                      ...mediumPriority.map((r) => _buildReceivableCard(context, r, l10n)),
                       const SizedBox(height: 16),
                     ],
                     if (lowPriority.isNotEmpty) ...[
-                      _buildSectionHeader('LOW PRIORITY', const Color(0xFF1E40AF)),
-                      ...lowPriority.map((r) => _buildReceivableCard(r)),
+                      _buildSectionHeader(l10n?.lowPriority ?? 'LOW PRIORITY', const Color(0xFF1E40AF)),
+                      ...lowPriority.map((r) => _buildReceivableCard(context, r, l10n)),
                     ],
                   ],
                 ),
@@ -94,9 +98,10 @@ class ReceivablesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildReceivableCard(ReceivableModel r) {
-    final cpName = r.counterpartyName ?? 'Counterparty';
+  Widget _buildReceivableCard(BuildContext context, ReceivableModel r, AppLocalizations? l10n) {
+    final cpName = r.counterpartyName ?? (l10n?.counterparty ?? 'Counterparty');
     final isOverdue = r.state == 'OVERDUE';
+    final formattedAmt = Money.formatInr(Money.parseInrToPaise(r.amount));
 
     return Card(
       child: ListTile(
@@ -106,9 +111,9 @@ class ReceivablesScreen extends StatelessWidget {
           color: isOverdue ? const Color(0xFF991B1B) : const Color(0xFF166534),
         ),
         title: Text(cpName, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('Due: ${_formatDate(r.dueAt)} • State: ${r.state}'),
+        subtitle: Text('${l10n?.due ?? 'Due'}: ${_formatDate(context, r.dueAt)} • ${l10n?.state ?? 'State'}: ${r.state}'),
         trailing: Text(
-          '₹${r.amount}',
+          formattedAmt,
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,

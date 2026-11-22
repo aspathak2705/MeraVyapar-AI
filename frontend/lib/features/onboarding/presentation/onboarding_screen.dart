@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final Function(Map<String, String> profileData) onSubmit;
@@ -46,9 +47,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Setup Business Profile'),
+        title: Text(l10n?.setupBusinessTitle ?? 'Setup Business Profile'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -59,7 +62,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Merchant Details',
+                  l10n?.businessName ?? 'Merchant Details',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -72,17 +75,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 const SizedBox(height: 24),
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Business Name *',
+                  decoration: InputDecoration(
+                    labelText: '${l10n?.businessName ?? 'Business Name'} *',
                     hintText: 'e.g. Ramesh Kirana Store',
                   ),
-                  validator: (val) => val == null || val.trim().isEmpty ? 'Required' : null,
+                  validator: (val) => val == null || val.trim().isEmpty ? (l10n?.businessName ?? 'Required') : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: _typeController,
-                  decoration: const InputDecoration(
-                    labelText: 'Business Type',
+                  decoration: InputDecoration(
+                    labelText: l10n?.businessType ?? 'Business Type',
                     hintText: 'e.g. Grocery / Retail / Wholesale',
                   ),
                 ),
@@ -90,8 +93,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Phone Number',
+                  decoration: InputDecoration(
+                    labelText: l10n?.phoneNumber ?? 'Phone Number',
                     hintText: 'e.g. +91 9876543210',
                   ),
                 ),
@@ -101,8 +104,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _cityController,
-                        decoration: const InputDecoration(
-                          labelText: 'City',
+                        decoration: InputDecoration(
+                          labelText: l10n?.city ?? 'City',
                         ),
                       ),
                     ),
@@ -110,8 +113,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Expanded(
                       child: TextFormField(
                         controller: _stateController,
-                        decoration: const InputDecoration(
-                          labelText: 'State',
+                        decoration: InputDecoration(
+                          labelText: l10n?.state ?? 'State',
                         ),
                       ),
                     ),
@@ -126,7 +129,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           width: 20,
                           child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                         )
-                      : const Text('Complete Profile & Proceed'),
+                      : Text(l10n?.verifyAndProceed ?? 'Complete Profile & Proceed'),
                 ),
               ],
             ),

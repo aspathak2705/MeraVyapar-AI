@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/local_procurement_repository.dart';
 import '../domain/procurement_models.dart';
 import '../domain/quotation_comparison_engine.dart';
@@ -39,12 +40,13 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final repo = ref.watch(localProcurementRepositoryProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Procurement & KharidSaathi'),
+        title: Text(l10n?.procurementAndKharidSaathi ?? 'Procurement & KharidSaathi'),
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back_rounded),
@@ -56,25 +58,25 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
           isScrollable: true,
           labelColor: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
           indicatorColor: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
-          tabs: const [
-            Tab(text: 'Purchase Requests'),
-            Tab(text: 'Suppliers'),
-            Tab(text: 'Quotations & Comparison'),
-            Tab(text: 'Supplier Obligations'),
+          tabs: [
+            Tab(text: l10n?.purchaseRequests ?? 'Purchase Requests'),
+            Tab(text: l10n?.suppliersTitle ?? 'Suppliers'),
+            Tab(text: l10n?.quotationsAndComparison ?? 'Quotations & Comparison'),
+            Tab(text: l10n?.supplierObligations ?? 'Supplier Obligations'),
           ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildPurchaseRequestsTab(repo, isDark),
+          _buildPurchaseRequestsTab(repo, isDark, l10n),
           _buildSuppliersTab(repo, isDark),
           _buildQuotationsTab(repo, isDark),
           _buildObligationsTab(repo, isDark),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Add Entry',
+        tooltip: l10n?.addEntry ?? 'Add Entry',
         backgroundColor: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
         onPressed: () => _handleFabAction(context, repo),
         child: const Icon(Icons.add_rounded, color: Colors.white),
@@ -82,7 +84,7 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
     );
   }
 
-  Widget _buildPurchaseRequestsTab(LocalProcurementRepository repo, bool isDark) {
+  Widget _buildPurchaseRequestsTab(LocalProcurementRepository repo, bool isDark, AppLocalizations? l10n) {
     return FutureBuilder<List<PurchaseRequestModel>>(
       future: repo.getPurchaseRequests(merchantId: widget.merchantId),
       builder: (context, snapshot) {
@@ -97,9 +99,9 @@ class _ProcurementDashboardScreenState extends ConsumerState<ProcurementDashboar
               children: [
                 Icon(Icons.inventory_2_outlined, size: 56, color: Colors.grey.shade400),
                 const SizedBox(height: 12),
-                const Text('No purchase requests yet', style: TextStyle(fontWeight: FontWeight.w600)),
+                Text(l10n?.noPurchaseRequestsYet ?? 'No purchase requests yet', style: const TextStyle(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 6),
-                const Text('Use voice: "चाहिए 10 बोरी सीमेंट" or tap + to create one.', style: TextStyle(color: Colors.grey)),
+                Text(l10n?.noPurchaseRequestsDesc ?? 'Use voice: "चाहिए 10 बोरी सीमेंट" or tap + to create one.', style: const TextStyle(color: Colors.grey)),
               ],
             ),
           );

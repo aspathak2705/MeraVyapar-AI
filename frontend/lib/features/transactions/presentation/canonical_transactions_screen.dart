@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../core/money/money.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/canonical_transaction_model.dart';
 
 class CanonicalTransactionsScreen extends StatelessWidget {
@@ -25,18 +27,20 @@ class CanonicalTransactionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Passbook & Transactions'),
+        title: Text(l10n?.passbookAndTransactions ?? 'Passbook & Transactions'),
         leading: IconButton(
           icon: const Icon(AppIcons.arrowBack),
-          tooltip: 'Back',
+          tooltip: l10n?.back ?? 'Back',
           onPressed: onBack ?? () => Navigator.of(context).maybePop(),
         ),
         actions: [
           IconButton(
             icon: const Icon(AppIcons.refresh),
-            tooltip: 'Run Reconciliation Pass',
+            tooltip: l10n?.runReconciliationPass ?? 'Run Reconciliation Pass',
             onPressed: onRunReconciliation,
           ),
         ],
@@ -67,20 +71,20 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 16),
-                            const Text(
-                              'No Canonical Transactions Yet',
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            Text(
+                              l10n?.noCanonicalTransactions ?? 'No Canonical Transactions Yet',
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 8),
-                            const Text(
-                              'Add financial evidence or reconcile captured receipts to build your private canonical ledger.',
+                            Text(
+                              l10n?.noCanonicalTransactionsDesc ?? 'Add financial evidence or reconcile captured receipts to build your private canonical ledger.',
                               textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 13, height: 1.4),
+                              style: const TextStyle(fontSize: 13, height: 1.4),
                             ),
                             const SizedBox(height: 24),
                             ElevatedButton.icon(
                               icon: const Icon(AppIcons.refresh),
-                              label: const Text('Run Reconciliation Pass'),
+                              label: Text(l10n?.runReconciliationPass ?? 'Run Reconciliation Pass'),
                               onPressed: onRunReconciliation,
                             ),
                           ],
@@ -99,14 +103,18 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                     final status = tx.reconciliationStatus;
 
                     Color statusColor = AppColors.lightTextMuted;
-                    String statusText = 'Unresolved';
+                    String statusText = l10n?.unresolvedStatus ?? 'Unresolved';
                     if (status == 'RECONCILED') {
                       statusColor = AppColors.success;
-                      statusText = '✓ Reconciled';
+                      statusText = '✓ ${l10n?.reconciledStatus ?? 'Reconciled'}';
                     } else if (status == 'REQUIRES_REVIEW') {
                       statusColor = AppColors.warning;
-                      statusText = 'Needs Review';
+                      statusText = l10n?.needsReviewStatus ?? 'Needs Review';
                     }
+
+                    final formattedAmt = tx.amount != null
+                        ? '${isCredit ? "+" : "-"} ${Money.formatInr(Money.parseInrToPaise(tx.amount!))}'
+                        : null;
 
                     return Card(
                       child: ListTile(
@@ -151,13 +159,13 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                         subtitle: Padding(
                           padding: const EdgeInsets.only(top: 4.0),
                           child: Text(
-                            'Method: ${tx.paymentMode} • Status: $statusText',
+                            '${l10n?.paymentMethod ?? 'Method'}: ${tx.paymentMode} • ${l10n?.state ?? 'Status'}: $statusText',
                             style: TextStyle(fontSize: 12, color: statusColor),
                           ),
                         ),
-                        trailing: tx.amount != null
+                        trailing: formattedAmt != null
                             ? Text(
-                                '${isCredit ? "+" : "-"} ₹${tx.amount}',
+                                formattedAmt,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 15,

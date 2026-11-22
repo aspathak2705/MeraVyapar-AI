@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../domain/communication_action_model.dart';
 import '../data/local_action_repository.dart';
 
@@ -9,12 +10,12 @@ class ReminderDraftScreen extends StatefulWidget {
   final VoidCallback? onBack;
 
   const ReminderDraftScreen({
-    Key? key,
+    super.key,
     required this.actionRepository,
     required this.promiseId,
     required this.authToken,
     this.onBack,
-  }) : super(key: key);
+  });
 
   @override
   State<ReminderDraftScreen> createState() => _ReminderDraftScreenState();
@@ -25,7 +26,7 @@ class _ReminderDraftScreenState extends State<ReminderDraftScreen> {
   CommunicationAction? _action;
   bool _isLoading = true;
   bool _isSaving = false;
-  String _channel = 'WHATSAPP';
+  final String _channel = 'WHATSAPP';
   String? _error;
 
   @override
@@ -70,9 +71,11 @@ class _ReminderDraftScreenState extends State<ReminderDraftScreen> {
         _action = updated;
         _isSaving = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Draft updated & marked ready for review!')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Draft updated & marked ready for review!')),
+        );
+      }
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -96,10 +99,12 @@ class _ReminderDraftScreenState extends State<ReminderDraftScreen> {
         _action = confirmed;
         _isSaving = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Action explicitly confirmed by merchant!')),
-      );
-      Navigator.pop(context, true);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Action explicitly confirmed by merchant!')),
+        );
+        Navigator.pop(context, true);
+      }
     } catch (e) {
       setState(() {
         _error = e.toString();
@@ -110,13 +115,15 @@ class _ReminderDraftScreenState extends State<ReminderDraftScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payment Reminder Draft'),
+        title: Text(l10n?.reminderDraftTitle ?? 'Payment Reminder Draft'),
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
+                tooltip: l10n?.back ?? 'Back',
                 onPressed: widget.onBack,
               )
             : null,
@@ -131,7 +138,7 @@ class _ReminderDraftScreenState extends State<ReminderDraftScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        'Status: ${_action?.status.toDisplayString()}',
+                        '${l10n?.state ?? 'Status'}: ${_action?.status.toDisplayString()}',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       const SizedBox(height: 12),

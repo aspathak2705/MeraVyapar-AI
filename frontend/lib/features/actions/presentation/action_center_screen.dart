@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../domain/communication_action_model.dart';
 import '../data/local_action_repository.dart';
 import 'action_detail_screen.dart';
@@ -9,11 +10,11 @@ class ActionCenterScreen extends StatefulWidget {
   final VoidCallback? onBack;
 
   const ActionCenterScreen({
-    Key? key,
+    super.key,
     required this.actionRepository,
     required this.authToken,
     this.onBack,
-  }) : super(key: key);
+  });
 
   @override
   State<ActionCenterScreen> createState() => _ActionCenterScreenState();
@@ -36,19 +37,22 @@ class _ActionCenterScreenState extends State<ActionCenterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Merchant Action Center'),
+        title: Text(l10n?.actionCenterTitle ?? 'Merchant Action Center'),
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
+                tooltip: l10n?.back ?? 'Back',
                 onPressed: widget.onBack,
               )
             : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
+            tooltip: l10n?.runReconciliationPass ?? 'Refresh',
             onPressed: _refreshActions,
           ),
         ],
@@ -67,8 +71,8 @@ class _ActionCenterScreenState extends State<ActionCenterScreen> {
 
           final actions = snapshot.data ?? [];
           if (actions.isEmpty) {
-            return const Center(
-              child: Text('No communication actions created yet.'),
+            return Center(
+              child: Text(l10n?.noActionsPending ?? 'No communication actions created yet.'),
             );
           }
 
@@ -80,7 +84,7 @@ class _ActionCenterScreenState extends State<ActionCenterScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   title: Text('${action.actionType.toServerString()} (${action.channel.toServerString()})'),
-                  subtitle: Text('Status: ${action.status.toDisplayString()}\n${action.finalContent ?? action.draftContent}'),
+                  subtitle: Text('${l10n?.state ?? 'Status'}: ${action.status.toDisplayString()}\n${action.finalContent ?? action.draftContent}'),
                   isThreeLine: true,
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../l10n/app_localizations.dart';
 
 class AuthScreen extends StatefulWidget {
   final Function(String email, String password, bool isSignUp) onSubmit;
@@ -41,6 +42,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -63,7 +66,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Merchant Financial Intelligence Foundation',
+                      l10n?.authSubtitle ?? 'Merchant Financial Intelligence Foundation',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: const Color(0xFF64748B),
