@@ -13,6 +13,8 @@ class CanonicalTransactionsScreen extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onAddTransaction;
   final VoidCallback? onImportStatement;
+  final VoidCallback? onLoadDemoData;
+  final VoidCallback? onClearDemoData;
 
   const CanonicalTransactionsScreen({
     super.key,
@@ -23,11 +25,16 @@ class CanonicalTransactionsScreen extends StatelessWidget {
     this.onBack,
     this.onAddTransaction,
     this.onImportStatement,
+    this.onLoadDemoData,
+    this.onClearDemoData,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final demoCount = transactions
+        .where((t) => t.isSimulated || t.sourceType == 'SYNTHETIC_DEMO')
+        .length;
 
     return Scaffold(
       appBar: AppBar(
@@ -48,6 +55,39 @@ class CanonicalTransactionsScreen extends StatelessWidget {
             icon: const Icon(AppIcons.refresh),
             tooltip: l10n?.runReconciliationPass ?? 'Run Reconciliation Pass',
             onPressed: onRunReconciliation,
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'Demo Data Options',
+            onSelected: (val) {
+              if (val == 'load') onLoadDemoData?.call();
+              if (val == 'clear') onClearDemoData?.call();
+            },
+            itemBuilder: (ctx) => [
+              const PopupMenuItem(
+                value: 'load',
+                child: Row(
+                  children: [
+                    Icon(Icons.science_outlined, size: 18),
+                    SizedBox(width: 8),
+                    Text('Load 30-Day Demo Data'),
+                  ],
+                ),
+              ),
+              if (demoCount > 0)
+                const PopupMenuItem(
+                  value: 'clear',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_sweep_outlined,
+                          size: 18, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Clear Demo Data',
+                          style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+            ],
           ),
         ],
       ),
@@ -105,6 +145,12 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                                     label: Text(l10n?.importStatement ?? 'Import Statement'),
                                     onPressed: onImportStatement,
                                   ),
+                                if (onLoadDemoData != null)
+                                  OutlinedButton.icon(
+                                    icon: const Icon(Icons.science_outlined),
+                                    label: const Text('Load 30-Day Demo Data'),
+                                    onPressed: onLoadDemoData,
+                                  ),
                                 TextButton.icon(
                                   icon: const Icon(AppIcons.refresh),
                                   label: Text(l10n?.runReconciliationPass ?? 'Run Reconciliation'),
@@ -118,90 +164,180 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                     ),
                   ),
                 )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: transactions.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final tx = transactions[index];
-                    final isCredit = tx.transactionType == 'MONEY_IN' || tx.transactionType == 'CREDIT';
-                    final status = tx.reconciliationStatus;
-
-                    Color statusColor = AppColors.lightTextMuted;
-                    String statusText = l10n?.unresolvedStatus ?? 'Unresolved';
-                    if (status == 'RECONCILED') {
-                      statusColor = AppColors.success;
-                      statusText = '✓ ${l10n?.reconciledStatus ?? 'Reconciled'}';
-                    } else if (status == 'REQUIRES_REVIEW') {
-                      statusColor = AppColors.warning;
-                      statusText = l10n?.needsReviewStatus ?? 'Needs Review';
-                    }
-
-                    final formattedAmt = tx.amount != null
-                        ? '${isCredit ? "+" : "-"} ${Money.formatInr(Money.parseInrToPaise(tx.amount!))}'
-                        : null;
-
-                    return Card(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        onTap: () => onTransactionTap(tx),
-                        leading: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: isCredit ? AppColors.successLight : AppColors.errorLight,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            isCredit ? AppIcons.inflow : AppIcons.outflow,
-                            color: isCredit ? AppColors.success : AppColors.error,
-                            size: 20,
-                          ),
+              : Column(
+                  children: [
+                    if (demoCount > 0)
+                      Container(
+                        margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                              color: Colors.amber.shade400, width: 1),
                         ),
-                        title: Row(
+                        child: Row(
                           children: [
+                            Icon(Icons.science_rounded,
+                                size: 20, color: Colors.amber.shade800),
+                            const SizedBox(width: 10),
                             Expanded(
-                              child: Text(
-                                tx.counterpartyName ?? tx.description ?? 'Canonical Transaction',
-                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Synthetic Demo Data Active ($demoCount Records)',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.amber.shade900,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '30-day realistic financial records for Ramesh Store. Real merchant data remains untouched.',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Colors.amber.shade800,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            if (tx.isSimulated || tx.sourceProvider == 'SIMULATED_RAZORPAY') ...[
-                              const SizedBox(width: 6),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(4),
+                            if (onClearDemoData != null)
+                              TextButton(
+                                onPressed: onClearDemoData,
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
                                 ),
-                                child: const Text(
-                                  'DEMO',
-                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.orange),
-                                ),
+                                child: const Text('Clear',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.red)),
                               ),
-                            ],
                           ],
                         ),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            '${l10n?.paymentMethod ?? 'Method'}: ${tx.paymentMode} • ${l10n?.state ?? 'Status'}: $statusText',
-                            style: TextStyle(fontSize: 12, color: statusColor),
-                          ),
-                        ),
-                        trailing: formattedAmt != null
-                            ? Text(
-                                formattedAmt,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 15,
-                                  letterSpacing: -0.3,
-                                  color: isCredit ? AppColors.success : AppColors.error,
-                                ),
-                              )
-                            : null,
                       ),
-                    );
-                  },
+                    Expanded(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: transactions.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          final tx = transactions[index];
+                          final isCredit = tx.transactionType == 'MONEY_IN' ||
+                              tx.transactionType == 'CREDIT';
+                          final status = tx.reconciliationStatus;
+
+                          Color statusColor = AppColors.lightTextMuted;
+                          String statusText =
+                              l10n?.unresolvedStatus ?? 'Unresolved';
+                          if (status == 'RECONCILED') {
+                            statusColor = AppColors.success;
+                            statusText =
+                                '✓ ${l10n?.reconciledStatus ?? 'Reconciled'}';
+                          } else if (status == 'REQUIRES_REVIEW') {
+                            statusColor = AppColors.warning;
+                            statusText =
+                                l10n?.needsReviewStatus ?? 'Needs Review';
+                          }
+
+                          final formattedAmt = tx.amount != null
+                              ? '${isCredit ? "+" : "-"} ${Money.formatInr(Money.parseInrToPaise(tx.amount!))}'
+                              : null;
+
+                          return Card(
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              onTap: () => onTransactionTap(tx),
+                              leading: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: isCredit
+                                      ? AppColors.successLight
+                                      : AppColors.errorLight,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  isCredit ? AppIcons.inflow : AppIcons.outflow,
+                                  color: isCredit
+                                      ? AppColors.success
+                                      : AppColors.error,
+                                  size: 20,
+                                ),
+                              ),
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      tx.counterpartyName ??
+                                          tx.description ??
+                                          'Canonical Transaction',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14),
+                                    ),
+                                  ),
+                                  if (tx.isSimulated ||
+                                      tx.sourceProvider ==
+                                          'SIMULATED_RAZORPAY' ||
+                                      tx.sourceType == 'SYNTHETIC_DEMO') ...[
+                                    const SizedBox(width: 6),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.amber.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                            color: Colors.amber.shade700,
+                                            width: 0.8),
+                                      ),
+                                      child: const Text(
+                                        'DEMO',
+                                        style: TextStyle(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.orange),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 4.0),
+                                child: Text(
+                                  '${l10n?.paymentMethod ?? 'Method'}: ${tx.paymentMode} • ${l10n?.state ?? 'Status'}: $statusText',
+                                  style: TextStyle(
+                                      fontSize: 12, color: statusColor),
+                                ),
+                              ),
+                              trailing: formattedAmt != null
+                                  ? Text(
+                                      formattedAmt,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 15,
+                                        letterSpacing: -0.3,
+                                        color: isCredit
+                                            ? AppColors.success
+                                            : AppColors.error,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
       floatingActionButton: onAddTransaction != null
           ? FloatingActionButton(

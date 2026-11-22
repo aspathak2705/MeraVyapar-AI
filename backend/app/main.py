@@ -61,4 +61,15 @@ async def generic_exception_handler(request: Request, exc: Exception):
         headers={"X-Request-ID": request_id}
     )
 
+@app.get("/")
+def main_root():
+    return {
+        "status": "online",
+        "service": settings.PROJECT_NAME,
+        "docs": "/docs",
+    }
+
+
+# Mount routes under both /api/v1 and root
 app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(api_router)

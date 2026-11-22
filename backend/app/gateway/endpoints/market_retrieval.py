@@ -99,13 +99,20 @@ def get_relevant_market_signals_stateless(
             items = result.normalized_items
         elif selected_engine == SerpApiEngine.MAPS.value:
             query_arg = clean_query if clean_maps_type != "place" or (query and isinstance(query, str) and query.strip()) else None
-            result: SerpApiResult = client.maps(
-                query_arg,
-                maps_type=clean_maps_type,
-                place_id=clean_place_id,
-                location=clean_city or None,
-            )
-            items = result.normalized_items
+            try:
+                result: SerpApiResult = client.maps(
+                    query_arg,
+                    maps_type=clean_maps_type,
+                    place_id=clean_place_id,
+                    location=clean_city or None,
+                )
+                items = result.normalized_items
+            except Exception as maps_err:
+                logger.warning("SerpApi Maps query failed, falling back to Google Search: %s", str(maps_err))
+                fallback_query = f"{query_arg or clean_query} {clean_city or ''}".strip()
+                result = client.search(fallback_query, num=10)
+                items = result.normalized_items
+                engine_used = SerpApiEngine.SEARCH.value
         else:
             engine_used = SerpApiEngine.SEARCH.value
             result: SerpApiResult = client.search(clean_query, num=10)

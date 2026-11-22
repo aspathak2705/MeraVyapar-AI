@@ -185,6 +185,7 @@ class SerpApiClient:
         hl: Optional[str] = "en",
         gl: Optional[str] = "in",
         direct_link: bool = True,
+        num: Optional[int] = None,
         bypass_cache: bool = False,
     ) -> SerpApiResult:
         q = self._validate_common_query(query)
@@ -196,6 +197,8 @@ class SerpApiClient:
         }
         if location:
             params["location"] = location
+        if num:
+            params["num"] = num
         return self._execute_query(SerpApiEngine.SHOPPING, params, bypass_cache=bypass_cache)
 
     # 4. Google News API
@@ -204,6 +207,7 @@ class SerpApiClient:
         query: str,
         gl: Optional[str] = "in",
         hl: Optional[str] = "en",
+        num: Optional[int] = None,
         bypass_cache: bool = False,
     ) -> SerpApiResult:
         q = self._validate_common_query(query)
@@ -212,6 +216,8 @@ class SerpApiClient:
             "gl": gl or "in",
             "hl": hl or "en",
         }
+        if num:
+            params["num"] = num
         return self._execute_query(SerpApiEngine.NEWS, params, bypass_cache=bypass_cache)
 
     # 5. Google Maps API (Local Business Discovery & Place Details)
@@ -222,6 +228,7 @@ class SerpApiClient:
         place_id: Optional[str] = None,
         location: Optional[str] = None,
         ll: Optional[str] = None,
+        z: Optional[str] = None,
         hl: Optional[str] = "en",
         gl: Optional[str] = "in",
         bypass_cache: bool = False,
@@ -245,7 +252,12 @@ class SerpApiClient:
 
         if location:
             params["location"] = location
+            # SerpApi requires z (zoom) or m parameter when location is passed without ll
+            if not ll and not z:
+                params["z"] = "14"
         if ll:
             params["ll"] = ll
+        elif z:
+            params["z"] = z
 
         return self._execute_query(SerpApiEngine.MAPS, params, bypass_cache=bypass_cache)

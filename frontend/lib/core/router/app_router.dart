@@ -25,6 +25,7 @@ import '../../features/actions/data/action_repository.dart';
 import '../../features/home/presentation/home_shell_screen.dart';
 import '../../features/transactions/presentation/canonical_transactions_screen.dart';
 import '../../features/transactions/presentation/canonical_transaction_detail_screen.dart';
+import '../../features/transactions/domain/synthetic_demo_dataset_service.dart';
 import '../../features/memory/presentation/financial_relationships_screen.dart';
 import '../../features/memory/presentation/counterparty_detail_screen.dart';
 import '../../features/memory/presentation/payment_promises_screen.dart';
@@ -729,6 +730,42 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   _showManualEntryDialog(context, merchantId, txRepo),
               onImportStatement: () =>
                   _showStatementImportDialog(context, merchantId, txRepo),
+              onLoadDemoData: () async {
+                final result =
+                    await SyntheticDemoDatasetService.seed30DayDemoData(
+                  merchantId: merchantId,
+                  txRepo: txRepo,
+                );
+                ref.invalidate(financialPositionMetricsProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Loaded ${result.totalInserted} synthetic demo records for ${result.sampleMerchantName}. Real merchant records untouched.',
+                      ),
+                      backgroundColor: Colors.teal.shade800,
+                    ),
+                  );
+                  setState(() {});
+                }
+              },
+              onClearDemoData: () async {
+                final cleared = await SyntheticDemoDatasetService.clearDemoData(
+                  merchantId: merchantId,
+                  txRepo: txRepo,
+                );
+                ref.invalidate(financialPositionMetricsProvider);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Cleared $cleared synthetic demo records. Real merchant data remains untouched.',
+                      ),
+                    ),
+                  );
+                  setState(() {});
+                }
+              },
             );
           },
         );

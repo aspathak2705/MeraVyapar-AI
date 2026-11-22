@@ -69,5 +69,16 @@ async def generic_exception_handler(request: Request, exc: Exception):
     )
 
 
-# Mount strictly stateless gateway routes
+@app.get("/")
+def gateway_root():
+    return {
+        "status": "online",
+        "service": "MeraVyapar AI Stateless Cloud Gateway",
+        "version": "1.0.0",
+        "docs": "/docs",
+    }
+
+
+# Mount strictly stateless gateway routes under both /api/v1 and root (handles clients with or without /api/v1 base URL)
 app.include_router(gateway_api_router, prefix=settings.API_V1_STR)
+app.include_router(gateway_api_router)

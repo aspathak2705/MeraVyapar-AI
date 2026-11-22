@@ -197,6 +197,7 @@ class HomeShellScreen extends ConsumerWidget {
           ? AppColors.darkSecondaryBackground
           : AppColors.lightSecondaryBackground,
       appBar: AppBar(
+        titleSpacing: 12,
         title: Row(
           children: [
             Container(
@@ -215,32 +216,39 @@ class HomeShellScreen extends ConsumerWidget {
                 size: 20,
               ),
             ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n?.appTitle ?? 'MeraVyapar',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.3,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.lightTextPrimary,
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    l10n?.appTitle ?? 'MeraVyapar',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.3,
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.lightTextPrimary,
+                    ),
                   ),
-                ),
-                Text(
-                  l10n?.privateDeviceLedger ?? 'Private Device Ledger',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: isDark
-                        ? AppColors.darkTextMuted
-                        : AppColors.lightTextMuted,
+                  Text(
+                    l10n?.privateDeviceLedger ?? 'Private Device Ledger',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: isDark
+                          ? AppColors.darkTextMuted
+                          : AppColors.lightTextMuted,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
@@ -251,19 +259,29 @@ class HomeShellScreen extends ConsumerWidget {
           IconButton(
             icon: const Icon(Icons.storefront_rounded, size: 20),
             tooltip: l10n?.businessProfile ?? 'Business Profile',
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            visualDensity: VisualDensity.compact,
             onPressed: () => onNavigateToRoute?.call('/settings/profile'),
           ),
           // Permissions / Privacy Settings Button
           IconButton(
             icon: const Icon(Icons.security_rounded, size: 20),
             tooltip: l10n?.devicePermissions ?? 'Device Permissions & Privacy',
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            visualDensity: VisualDensity.compact,
             onPressed: () => onNavigateToRoute?.call('/settings/permissions'),
           ),
           IconButton(
             icon: const Icon(AppIcons.lock, size: 20),
             tooltip: l10n?.lockWorkspace ?? 'Lock Workspace',
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            visualDensity: VisualDensity.compact,
             onPressed: onSignOut,
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: SafeArea(
