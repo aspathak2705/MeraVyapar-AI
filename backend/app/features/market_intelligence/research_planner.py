@@ -16,7 +16,7 @@ def sanitize_research_term(term: Optional[str]) -> str:
     Strips private financial markers, customer PII, account numbers, and token patterns
     from candidate query search terms.
     """
-    if not term:
+    if not term or not isinstance(term, str):
         return ""
     cleaned = term
     cleaned = ACCOUNT_REGEX.sub("", cleaned)

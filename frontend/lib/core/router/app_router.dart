@@ -49,6 +49,7 @@ import '../../features/capture/data/device_evidence_capture.dart';
 import '../../features/capture/domain/local_evidence_capture_service.dart';
 import '../../core/database/local_database_service.dart';
 import '../../core/money/money.dart';
+import '../../features/intelligence/domain/local_financial_intelligence_engine.dart';
 
 // --- Local Repository Providers ---
 // Re-export single canonical localAuthRepositoryProvider from local_auth_repository.dart
@@ -591,8 +592,43 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                 _isAssistantLoading = true;
               });
               try {
+                // Compute deterministic aggregates from local SQLite financial records
+                final localFinEngine = LocalFinancialIntelligenceEngine();
+                final pos = await localFinEngine.calculatePosition(merchantId: merchantId);
+                final profileRepo = ref.read(localBusinessProfileRepositoryProvider);
+                final authRepo = ref.read(localAuthRepositoryProvider);
+                final profile = await profileRepo.getProfile(
+                  merchantId: merchantId,
+                  fallbackName: authRepo.currentSession?.displayName,
+                );
+
+                final sanitizedContext = <String, dynamic>{
+                  'business_name': profile.businessName,
+                  'business_type': profile.businessType,
+                  'business_category': profile.businessCategory,
+                  'city': profile.city,
+                  'state': profile.state,
+                  'computed_metrics': {
+                    'total_inflows_paise': pos.totalInflowsPaise,
+                    'total_outflows_paise': pos.totalOutflowsPaise,
+                    'net_cash_movement_paise': pos.netCashMovementPaise,
+                    'total_receivables_paise': pos.totalReceivablesPaise,
+                    'total_overdue_receivables_paise': pos.totalOverdueReceivablesPaise,
+                    'total_payables_paise': pos.totalPayablesPaise,
+                    'open_promise_count': pos.openPromiseCount,
+                    'overdue_promise_count': pos.overduePromiseCount,
+                    'total_inflows_rupees': pos.totalInflowsPaise / 100,
+                    'total_outflows_rupees': pos.totalOutflowsPaise / 100,
+                    'net_cash_movement_rupees': pos.netCashMovementPaise / 100,
+                    'total_receivables_rupees': pos.totalReceivablesPaise / 100,
+                    'total_overdue_receivables_rupees': pos.totalOverdueReceivablesPaise / 100,
+                    'total_payables_rupees': pos.totalPayablesPaise / 100,
+                  },
+                };
+
                 final result = await intelligenceRepo.queryIntelligence(
                   question: question,
+                  sanitizedContext: sanitizedContext,
                 );
                 if (mounted) {
                   setState(() {
@@ -741,8 +777,26 @@ class _AppRouterState extends ConsumerState<AppRouter> {
             return RelevantMarketSignalsScreen(
               initialSignals: const [],
               merchantProfile: profile,
-              onFetchSignals: ({String? query}) =>
-                  marketRepo.getRelevantSignals(query: query),
+              onFetchSignals: ({
+                String? query,
+                String? category,
+                String? businessType,
+                String? city,
+                String? state,
+                String? engine,
+                String? mapsType,
+                String? placeId,
+              }) =>
+                  marketRepo.getRelevantSignals(
+                    query: query,
+                    category: category,
+                    businessType: businessType,
+                    city: city,
+                    state: state,
+                    engine: engine,
+                    mapsType: mapsType,
+                    placeId: placeId,
+                  ),
               onBack: _popRoute,
               onSignalTap: (sig) =>
                   _navigateTo('/market/detail', {'signal': sig}),

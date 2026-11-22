@@ -16,12 +16,14 @@ class IntelligenceRepository {
   Future<FinancialQueryResultModel> queryIntelligence({
     required String question,
     String? focusEntityId,
+    Map<String, dynamic>? sanitizedContext,
   }) async {
     final res = await _apiClient.post(
       '/financial-intelligence/query',
       body: {
         'question': question,
         if (focusEntityId != null) 'focus_entity_id': focusEntityId,
+        if (sanitizedContext != null) 'sanitized_context': sanitizedContext,
       },
     );
     return FinancialQueryResultModel.fromJson(res['data']);

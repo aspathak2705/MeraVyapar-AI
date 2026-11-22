@@ -191,6 +191,11 @@ class SerpApiNormalizer:
             return items
 
         local_results = raw.get("local_results")
+        if not local_results and isinstance(raw.get("place_results"), dict):
+            local_results = [raw["place_results"]]
+        elif not local_results and isinstance(raw.get("place_results"), list):
+            local_results = raw.get("place_results")
+
         if isinstance(local_results, list):
             for res in local_results:
                 if not isinstance(res, dict):
@@ -205,7 +210,11 @@ class SerpApiNormalizer:
                     rating=SerpApiNormalizer._safe_float(res.get("rating")),
                     reviews=SerpApiNormalizer._safe_int(res.get("reviews")),
                     location=str(res.get("address")) if res.get("address") else None,
-                    metrics={"gps_coordinates": res.get("gps_coordinates"), "phone": res.get("phone")},
+                    metrics={
+                        "gps_coordinates": res.get("gps_coordinates"),
+                        "phone": res.get("phone"),
+                        "website": res.get("website"),
+                    },
                     raw_payload=res
                 ))
         return items

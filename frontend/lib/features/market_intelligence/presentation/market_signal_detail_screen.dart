@@ -98,7 +98,9 @@ class MarketSignalDetailScreen extends StatelessWidget {
                       if (ev?.source?.sourceUrl != null && ev!.source!.sourceUrl.isNotEmpty)
                         Text('URL: ${ev.source!.sourceUrl}'),
                       if (ev?.occurredAt != null)
-                        Text('Published Date: ${_formatDate(ev!.occurredAt)}'),
+                        Text('Published Date: ${_formatDate(ev!.occurredAt!)}'),
+                      if (ev?.occurredAt == null && ev?.rawOccurredAt != null && ev!.rawOccurredAt!.isNotEmpty)
+                        Text('Published Date: ${ev.rawOccurredAt}'),
                     ],
                   ),
                 ),

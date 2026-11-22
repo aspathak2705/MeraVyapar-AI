@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from uuid import UUID
 from datetime import datetime
 from typing import Optional, List, Dict, Any
@@ -17,8 +17,13 @@ class MarketSourceResponse(BaseModel):
     retrieved_at: datetime
     content_hash: str
     created_at: datetime
+    price: Optional[str] = None
+    rating: Optional[float] = None
+    reviews: Optional[int] = None
+    location: Optional[str] = None
+    metrics: Dict[str, Any] = Field(default_factory=dict)
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="allow")
 
 
 class MarketEventResponse(BaseModel):
@@ -36,8 +41,13 @@ class MarketEventResponse(BaseModel):
     source: Optional[MarketSourceResponse] = None
     reason_codes: List[str] = []
     created_at: datetime
+    price: Optional[str] = None
+    rating: Optional[float] = None
+    reviews: Optional[int] = None
+    location: Optional[str] = None
+    metrics: Dict[str, Any] = Field(default_factory=dict)
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="allow")
 
 
 class MerchantMarketRelevanceResponse(BaseModel):
@@ -52,7 +62,7 @@ class MerchantMarketRelevanceResponse(BaseModel):
     status: str
     market_event: Optional[MarketEventResponse] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, extra="allow")
 
 
 class MarketIngestRequest(BaseModel):

@@ -213,3 +213,39 @@ class SerpApiClient:
             "hl": hl or "en",
         }
         return self._execute_query(SerpApiEngine.NEWS, params, bypass_cache=bypass_cache)
+
+    # 5. Google Maps API (Local Business Discovery & Place Details)
+    def maps(
+        self,
+        query: Optional[str] = None,
+        maps_type: str = "search",
+        place_id: Optional[str] = None,
+        location: Optional[str] = None,
+        ll: Optional[str] = None,
+        hl: Optional[str] = "en",
+        gl: Optional[str] = "in",
+        bypass_cache: bool = False,
+    ) -> SerpApiResult:
+        params: Dict[str, Any] = {
+            "type": maps_type or "search",
+            "hl": hl or "en",
+            "gl": gl or "in",
+        }
+        if maps_type == "place" and place_id:
+            if place_id.startswith("0x") or "data_id" in place_id:
+                params["data_id"] = place_id
+            else:
+                params["place_id"] = place_id
+            if query:
+                params["q"] = self._validate_common_query(query)
+        else:
+            if not query:
+                raise SerpApiRequestValidationError("Google Maps search requires a non-empty query string.")
+            params["q"] = self._validate_common_query(query)
+
+        if location:
+            params["location"] = location
+        if ll:
+            params["ll"] = ll
+
+        return self._execute_query(SerpApiEngine.MAPS, params, bypass_cache=bypass_cache)

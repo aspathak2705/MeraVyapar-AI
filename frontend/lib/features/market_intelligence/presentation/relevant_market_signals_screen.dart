@@ -16,8 +16,16 @@ enum MarketSignalsState {
 class RelevantMarketSignalsScreen extends StatefulWidget {
   final List<MerchantMarketRelevanceModel> initialSignals;
   final Function(MerchantMarketRelevanceModel signal) onSignalTap;
-  final Future<List<MerchantMarketRelevanceModel>> Function({String? query})
-      onFetchSignals;
+  final Future<List<MerchantMarketRelevanceModel>> Function({
+    String? query,
+    String? category,
+    String? businessType,
+    String? city,
+    String? state,
+    String? engine,
+    String? mapsType,
+    String? placeId,
+  }) onFetchSignals;
   final MerchantBusinessProfile? merchantProfile;
   final VoidCallback? onBack;
 
@@ -42,6 +50,7 @@ class _RelevantMarketSignalsScreenState
   MarketSignalsState _state = MarketSignalsState.initial;
   String? _errorMessage;
   String _activeQuery = '';
+  String _selectedEngine = 'google';
 
   @override
   void initState() {
@@ -59,6 +68,16 @@ class _RelevantMarketSignalsScreenState
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  String _sanitizeSearchInput(String input) {
+    var cleaned = input;
+    cleaned = cleaned.replaceAll(RegExp(r'\b\d{9,18}\b'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'\b(\+?91[\-\s]?)?[6789]\d{9}\b'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'\b[\w\.\-]+@[\w\-]+\b'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'\b[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\b'), '');
+    cleaned = cleaned.replaceAll(RegExp(r'[₹$€£]\s*[\d,]+(\.\d{1,2})?'), '');
+    return cleaned.replaceAll(RegExp(r'\s+'), ' ').trim();
   }
 
   String _buildProfileDerivedQuery() {
@@ -103,16 +122,23 @@ class _RelevantMarketSignalsScreenState
   }
 
   Future<void> _search(String query) async {
-    final trimmed = query.trim();
+    final sanitized = _sanitizeSearchInput(query);
     setState(() {
       _state = MarketSignalsState.loading;
       _errorMessage = null;
-      _activeQuery = trimmed;
+      _activeQuery = sanitized;
     });
 
     try {
+      final profile = widget.merchantProfile;
       final results = await widget.onFetchSignals(
-          query: trimmed.isNotEmpty ? trimmed : null);
+        query: sanitized.isNotEmpty ? sanitized : null,
+        category: profile?.businessCategory,
+        businessType: profile?.businessType,
+        city: profile?.city,
+        state: profile?.state,
+        engine: _selectedEngine,
+      );
       if (mounted) {
         setState(() {
           _signals = results;
@@ -240,6 +266,8 @@ class _RelevantMarketSignalsScreenState
                 ),
               ),
 
+            const SizedBox(height: 6),
+            _buildEngineFilterChips(),
             const SizedBox(height: 4),
 
             // Body Content based on explicit state
@@ -248,6 +276,58 @@ class _RelevantMarketSignalsScreenState
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildEngineFilterChips() {
+    final engines = [
+      {'label': 'All Markets', 'engine': 'google', 'icon': Icons.public},
+      {'label': 'Wholesale Goods', 'engine': 'google_shopping', 'icon': Icons.shopping_bag_outlined},
+      {'label': 'Commodity News', 'engine': 'google_news', 'icon': Icons.newspaper},
+      {'label': 'Suppliers & Markets', 'engine': 'google_maps', 'icon': Icons.location_on_outlined},
+    ];
+
+    return SizedBox(
+      height: 38,
+      child: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        scrollDirection: Axis.horizontal,
+        itemCount: engines.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final item = engines[index];
+          final engineKey = item['engine'] as String;
+          final isSelected = _selectedEngine == engineKey;
+          return ChoiceChip(
+            avatar: Icon(
+              item['icon'] as IconData,
+              size: 14,
+              color: isSelected ? Colors.white : const Color(0xFF64748B),
+            ),
+            label: Text(
+              item['label'] as String,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? Colors.white : const Color(0xFF334155),
+              ),
+            ),
+            selected: isSelected,
+            selectedColor: AppColors.primaryPurple,
+            backgroundColor: const Color(0xFFF1F5F9),
+            onSelected: (selected) {
+              if (selected && _selectedEngine != engineKey) {
+                setState(() {
+                  _selectedEngine = engineKey;
+                });
+                _search(_searchController.text.isNotEmpty
+                    ? _searchController.text
+                    : _buildProfileDerivedQuery());
+              }
+            },
+          );
+        },
       ),
     );
   }
@@ -507,6 +587,77 @@ class _RelevantMarketSignalsScreenState
                             color: Color(0xFF334155),
                             height: 1.4),
                       ),
+                      if (ev?.price != null || ev?.rating != null || ev?.location != null) ...[
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            if (ev?.price != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFDCFCE7),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  ev!.price!,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF166534),
+                                  ),
+                                ),
+                              ),
+                            if (ev?.rating != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFEF3C7),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.star, size: 12, color: Color(0xFFD97706)),
+                                    const SizedBox(width: 2),
+                                    Text(
+                                      '${ev!.rating}${ev.reviews != null ? ' (${ev.reviews})' : ''}',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF92400E),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            if (ev?.location != null)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF1F5F9),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.location_on, size: 12, color: Color(0xFF64748B)),
+                                    const SizedBox(width: 2),
+                                    Flexible(
+                                      child: Text(
+                                        ev!.location!,
+                                        style: const TextStyle(fontSize: 11, color: Color(0xFF475569)),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
                       const SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.all(8),
