@@ -1,13 +1,77 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../config/env.dart';
 import '../errors/failure.dart';
 
 class ApiClient {
-  static const Duration defaultTimeout = Duration(seconds: 15);
-  final http.Client _client;
+  static const Duration defaultTimeout = Duration(seconds: 45);
+  http.Client _client;
 
   ApiClient({http.Client? client}) : _client = client ?? http.Client();
+
+  Map<String, String> _buildHeaders(Map<String, String>? extraHeaders) {
+    return {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Connection': 'close',
+      if (extraHeaders != null) ...extraHeaders,
+    };
+  }
+
+  Future<http.Response> _executeWithRetry(
+    Future<http.Response> Function(http.Client client) call,
+    Duration timeout,
+  ) async {
+    try {
+      return await call(_client).timeout(timeout);
+    } catch (e) {
+      final isConnectionClosed = e is http.ClientException &&
+          (e.message.toLowerCase().contains('connection closed') ||
+              e.message.toLowerCase().contains('connection reset') ||
+              e.message.toLowerCase().contains('broken pipe'));
+      final isSocketDrop = e is SocketException;
+
+      if (isConnectionClosed || isSocketDrop) {
+        // Re-instantiate client to dump stale pooled socket and retry once
+        _client.close();
+        _client = http.Client();
+        try {
+          return await call(_client).timeout(timeout);
+        } on http.ClientException catch (_) {
+          throw const Failure(
+            'Connection closed by server. Gateway may be waking up, please tap Retry.',
+            code: 'CONNECTION_CLOSED',
+          );
+        } on SocketException catch (_) {
+          throw const Failure(
+            'Network socket disconnected. Please check internet connection and retry.',
+            code: 'SOCKET_DISCONNECTED',
+          );
+        } on TimeoutException {
+          throw Failure(
+            'Gateway request timed out (${timeout.inSeconds}s). Please retry.',
+            code: 'GATEWAY_TIMEOUT',
+          );
+        }
+      }
+
+      if (e is TimeoutException) {
+        throw Failure(
+          'Gateway request timed out (${timeout.inSeconds}s). Cloud instance may be cold-starting; please retry.',
+          code: 'GATEWAY_TIMEOUT',
+        );
+      }
+
+      if (e is http.ClientException) {
+        throw Failure('Network connection error: ${e.message}', code: 'NETWORK_ERROR');
+      }
+
+      if (e is Failure) rethrow;
+      throw Failure('Request failed: $e', code: 'REQUEST_ERROR');
+    }
+  }
 
   Future<Map<String, dynamic>> get(
     String path, {
@@ -15,23 +79,13 @@ class ApiClient {
     Duration timeout = defaultTimeout,
   }) async {
     final url = Uri.parse('${Env.apiBaseUrl}$path');
+    final combinedHeaders = _buildHeaders(headers);
 
-    try {
-      final response = await _client.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          if (headers != null) ...headers,
-        },
-      ).timeout(timeout);
-
-      return _handleResponse(response);
-    } on http.ClientException catch (e) {
-      throw Failure('Network connection error: ${e.message}', code: 'NETWORK_ERROR');
-    } catch (e) {
-      if (e is Failure) rethrow;
-      throw Failure('Request failed: $e', code: 'REQUEST_ERROR');
-    }
+    final response = await _executeWithRetry(
+      (client) => client.get(url, headers: combinedHeaders),
+      timeout,
+    );
+    return _handleResponse(response);
   }
 
   Future<Map<String, dynamic>> post(
@@ -41,24 +95,14 @@ class ApiClient {
     Duration timeout = defaultTimeout,
   }) async {
     final url = Uri.parse('${Env.apiBaseUrl}$path');
+    final combinedHeaders = _buildHeaders(headers);
+    final payload = body != null ? jsonEncode(body) : null;
 
-    try {
-      final response = await _client.post(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          if (headers != null) ...headers,
-        },
-        body: body != null ? jsonEncode(body) : null,
-      ).timeout(timeout);
-
-      return _handleResponse(response);
-    } on http.ClientException catch (e) {
-      throw Failure('Network connection error: ${e.message}', code: 'NETWORK_ERROR');
-    } catch (e) {
-      if (e is Failure) rethrow;
-      throw Failure('Request failed: $e', code: 'REQUEST_ERROR');
-    }
+    final response = await _executeWithRetry(
+      (client) => client.post(url, headers: combinedHeaders, body: payload),
+      timeout,
+    );
+    return _handleResponse(response);
   }
 
   Future<Map<String, dynamic>> put(
@@ -68,24 +112,14 @@ class ApiClient {
     Duration timeout = defaultTimeout,
   }) async {
     final url = Uri.parse('${Env.apiBaseUrl}$path');
+    final combinedHeaders = _buildHeaders(headers);
+    final payload = jsonEncode(body);
 
-    try {
-      final response = await _client.put(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          if (headers != null) ...headers,
-        },
-        body: jsonEncode(body),
-      ).timeout(timeout);
-
-      return _handleResponse(response);
-    } on http.ClientException catch (e) {
-      throw Failure('Network connection error: ${e.message}', code: 'NETWORK_ERROR');
-    } catch (e) {
-      if (e is Failure) rethrow;
-      throw Failure('Request failed: $e', code: 'REQUEST_ERROR');
-    }
+    final response = await _executeWithRetry(
+      (client) => client.put(url, headers: combinedHeaders, body: payload),
+      timeout,
+    );
+    return _handleResponse(response);
   }
 
   Map<String, dynamic> _handleResponse(http.Response response) {

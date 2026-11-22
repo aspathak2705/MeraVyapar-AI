@@ -233,48 +233,98 @@ class _LocalSupplierDiscoveryScreenState
             ),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      flex: 6,
-                      child: TextField(
-                        controller: _queryController,
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.search, size: 20),
-                          hintText: l10n?.searchMarkets ?? 'Search suppliers, wholesalers...',
-                          isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isNarrow = constraints.maxWidth < 400;
+                    if (isNarrow) {
+                      return Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextField(
+                                  controller: _queryController,
+                                  decoration: InputDecoration(
+                                    prefixIcon: const Icon(Icons.search, size: 20),
+                                    hintText: l10n?.searchMarkets ?? 'Search suppliers, wholesalers...',
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  onSubmitted: (_) => _searchSuppliers(),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              IconButton.filled(
+                                style: IconButton.styleFrom(
+                                  backgroundColor: AppColors.primaryPurple,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                icon: const Icon(Icons.arrow_forward, size: 20),
+                                onPressed: _searchSuppliers,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          TextField(
+                            controller: _locationController,
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.location_on, size: 18, color: AppColors.primaryPurple),
+                              hintText: '${l10n?.city ?? "City"} / ${l10n?.state ?? "State"}',
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onSubmitted: (_) => _searchSuppliers(),
+                          ),
+                        ],
+                      );
+                    }
+                    return Row(
+                      children: [
+                        Expanded(
+                          flex: 6,
+                          child: TextField(
+                            controller: _queryController,
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.search, size: 20),
+                              hintText: l10n?.searchMarkets ?? 'Search suppliers, wholesalers...',
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onSubmitted: (_) => _searchSuppliers(),
+                          ),
                         ),
-                        onSubmitted: (_) => _searchSuppliers(),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      flex: 4,
-                      child: TextField(
-                        controller: _locationController,
-                        decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.location_on, size: 18, color: AppColors.primaryPurple),
-                          hintText: '${l10n?.city ?? "City"} / ${l10n?.state ?? "State"}',
-                          isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 4,
+                          child: TextField(
+                            controller: _locationController,
+                            decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.location_on, size: 18, color: AppColors.primaryPurple),
+                              hintText: '${l10n?.city ?? "City"} / ${l10n?.state ?? "State"}',
+                              isDense: true,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            onSubmitted: (_) => _searchSuppliers(),
+                          ),
                         ),
-                        onSubmitted: (_) => _searchSuppliers(),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton.filled(
-                      style: IconButton.styleFrom(
-                        backgroundColor: AppColors.primaryPurple,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                      icon: const Icon(Icons.arrow_forward, size: 20),
-                      onPressed: _searchSuppliers,
-                    ),
-                  ],
+                        const SizedBox(width: 8),
+                        IconButton.filled(
+                          style: IconButton.styleFrom(
+                            backgroundColor: AppColors.primaryPurple,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                          icon: const Icon(Icons.arrow_forward, size: 20),
+                          onPressed: _searchSuppliers,
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 10),
 
@@ -282,17 +332,22 @@ class _LocalSupplierDiscoveryScreenState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      _isLoading
-                          ? (l10n?.loading ?? 'Searching nearby...')
-                          : '${_discoveredBusinesses.length} ${l10n?.suppliersTitle ?? "suppliers"}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                    Expanded(
+                      child: Text(
+                        _isLoading
+                            ? (l10n?.loading ?? 'Searching nearby...')
+                            : '${_discoveredBusinesses.length} ${l10n?.suppliersTitle ?? "suppliers"}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.grey.shade400 : Colors.grey.shade700,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    const SizedBox(width: 6),
                     SegmentedButton<DiscoveryViewMode>(
+                      showSelectedIcon: false,
                       segments: [
                         ButtonSegment(
                           value: DiscoveryViewMode.split,
@@ -415,7 +470,7 @@ class _LocalSupplierDiscoveryScreenState
               onBusinessSelected: (b) {
                 setState(() => _selectedBusiness = b);
               },
-              height: 240,
+              height: (MediaQuery.of(context).size.height * 0.28).clamp(160.0, 240.0),
             ),
             Expanded(child: _buildBusinessList(isDark)),
           ],

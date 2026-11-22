@@ -277,9 +277,9 @@ class _RelevantMarketSignalsScreenState
                 ),
               ),
 
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             _buildEngineFilterChips(),
-            const SizedBox(height: 4),
+            const SizedBox(height: 8),
 
             // Body Content based on explicit state
             Expanded(
@@ -301,7 +301,7 @@ class _RelevantMarketSignalsScreenState
     ];
 
     return SizedBox(
-      height: 38,
+      height: 44,
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
@@ -387,7 +387,9 @@ class _RelevantMarketSignalsScreenState
                 OutlinedButton.icon(
                   icon: const Icon(Icons.refresh),
                   label: Text(l10n?.retry ?? 'Retry Connection'),
-                  onPressed: () => _search(_activeQuery),
+                  onPressed: () => _search(_activeQuery.isNotEmpty
+                      ? _activeQuery
+                      : _buildProfileDerivedQuery()),
                 ),
               ],
             ),
@@ -421,7 +423,9 @@ class _RelevantMarketSignalsScreenState
                 ElevatedButton.icon(
                   icon: const Icon(Icons.refresh),
                   label: Text(l10n?.tryAgain ?? 'Try Again'),
-                  onPressed: () => _search(_activeQuery),
+                  onPressed: () => _search(_activeQuery.isNotEmpty
+                      ? _activeQuery
+                      : _buildProfileDerivedQuery()),
                 ),
               ],
             ),
@@ -494,7 +498,9 @@ class _RelevantMarketSignalsScreenState
                 ElevatedButton.icon(
                   icon: const Icon(Icons.refresh),
                   label: const Text('Retry Request'),
-                  onPressed: () => _search(_activeQuery),
+                  onPressed: () => _search(_activeQuery.isNotEmpty
+                      ? _activeQuery
+                      : _buildProfileDerivedQuery()),
                 ),
               ],
             ),

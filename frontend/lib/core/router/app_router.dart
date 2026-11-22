@@ -126,6 +126,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
   final Map<String, dynamic> _routeArgs = {};
   bool _isAssistantLoading = false;
   FinancialQueryResultModel? _lastAssistantResult;
+  String? _assistantErrorMessage;
   Timer? _renderKeepAliveTimer;
 
   @override
@@ -177,11 +178,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
       await captureService.ingestEvidenceAndExtract(
         merchantId: activeMerchantId,
-        filename: 'notif_${timestamp}.txt',
+        filename: 'notif_$timestamp.txt',
         mimeType: 'text/plain',
         fileSizeBytes: fullText.length,
         sha256Hash: sha256Hash,
-        storageRelativePath: 'evidence/notif_${timestamp}.txt',
+        storageRelativePath: 'evidence/notif_$timestamp.txt',
         sourceType: 'NOTIFICATION',
         rawText: fullText,
       );
@@ -596,9 +597,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
             lastResult: _lastAssistantResult,
             initialQuery: _routeArgs['initial_question'],
             marketSignalTitle: _routeArgs['market_signal_title'],
+            errorMessage: _assistantErrorMessage,
             onQuerySubmit: (question) async {
               setState(() {
                 _isAssistantLoading = true;
+                _assistantErrorMessage = null;
               });
               try {
                 // Compute deterministic aggregates from local SQLite financial records
@@ -661,17 +664,18 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                 if (mounted) {
                   setState(() {
                     _lastAssistantResult = result;
+                    _assistantErrorMessage = null;
                     _isAssistantLoading = false;
                   });
                 }
               } catch (e) {
                 if (mounted) {
                   setState(() {
+                    _assistantErrorMessage = e.toString()
+                        .replaceFirst('Exception: ', '')
+                        .replaceFirst('Failure: ', '');
                     _isAssistantLoading = false;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('AI Assistant Error: $e')),
-                  );
                 }
               }
             },

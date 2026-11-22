@@ -336,25 +336,24 @@ class HomeShellScreen extends ConsumerWidget {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
+        type: BottomNavigationBarType.fixed,
         onTap: (idx) {
           switch (idx) {
             case 0:
               break;
             case 1:
-              (onOpenFinancialIntelligence ??
-                  () => onNavigateToRoute?.call('/intelligence'))();
-              break;
-            case 2:
               (onViewReconciledTransactions ??
                   () => onNavigateToRoute?.call('/transactions'))();
               break;
+            case 2:
+              (onOpenFinancialIntelligence ??
+                  () => onNavigateToRoute?.call('/intelligence'))();
+              break;
             case 3:
-              (onOpenReceivables ??
-                  () => onNavigateToRoute?.call('/receivables'))();
+              onNavigateToRoute?.call('/procurement');
               break;
             case 4:
-              (onOpenActionCenter ??
-                  () => onNavigateToRoute?.call('/actions'))();
+              onNavigateToRoute?.call('/reports');
               break;
           }
         },
@@ -365,24 +364,28 @@ class HomeShellScreen extends ConsumerWidget {
             label: l10n?.home ?? 'Home',
           ),
           BottomNavigationBarItem(
+            icon: const Icon(AppIcons.transactionsOutlined),
+            activeIcon: const Icon(AppIcons.transactions),
+            label: l10n?.transactions ?? 'Money',
+          ),
+          BottomNavigationBarItem(
             icon: const Icon(AppIcons.analyticsOutlined),
             activeIcon: const Icon(AppIcons.analytics),
             label: l10n?.insights ?? 'Intelligence',
           ),
           BottomNavigationBarItem(
-            icon: const Icon(AppIcons.transactionsOutlined),
-            activeIcon: const Icon(AppIcons.transactions),
-            label: l10n?.transactions ?? 'Passbook',
+            icon: const Icon(Icons.shopping_bag_outlined),
+            activeIcon: const Icon(Icons.shopping_bag_rounded),
+            label: (l10n != null && l10n.procurementTitle.contains(' '))
+                ? l10n.procurementTitle.split(' ').last
+                : (l10n?.procurementTitle ?? 'Procurement'),
           ),
           BottomNavigationBarItem(
-            icon: const Icon(AppIcons.receivables),
-            activeIcon: const Icon(AppIcons.receivables),
-            label: l10n?.receivables ?? 'Receivables',
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(AppIcons.actionsOutlined),
-            activeIcon: const Icon(AppIcons.actions),
-            label: l10n?.actions ?? 'Actions',
+            icon: const Icon(Icons.summarize_outlined),
+            activeIcon: const Icon(Icons.summarize_rounded),
+            label: (l10n != null && l10n.reportLanguage.contains(' '))
+                ? l10n.reportLanguage.split(' ').first
+                : (l10n?.reportType ?? 'Reports'),
           ),
         ],
       ),
@@ -1765,22 +1768,6 @@ class HomeShellScreen extends ConsumerWidget {
               children: [
                 MerchantActionTile(
                   label: l10n != null
-                      ? l10n.insights.replaceAll(' ', '\n')
-                      : 'Financial\nIntelligence',
-                  icon: AppIcons.analytics,
-                  onTap: () => (onOpenFinancialIntelligence ??
-                      () => onNavigateToRoute?.call('/intelligence'))(),
-                ),
-                MerchantActionTile(
-                  label: l10n != null
-                      ? l10n.receivablesTracker.replaceAll(' ', '\n')
-                      : 'Receivables\nTracker',
-                  icon: AppIcons.receivables,
-                  onTap: () => (onOpenReceivables ??
-                      () => onNavigateToRoute?.call('/receivables'))(),
-                ),
-                MerchantActionTile(
-                  label: l10n != null
                       ? l10n.passbookLedger.replaceAll(' ', '\n')
                       : 'Passbook\nLedger',
                   icon: AppIcons.transactions,
@@ -1789,24 +1776,11 @@ class HomeShellScreen extends ConsumerWidget {
                 ),
                 MerchantActionTile(
                   label: l10n != null
-                      ? l10n.actionCenterTitle.replaceAll(' ', '\n')
-                      : 'Action\nCenter',
-                  icon: AppIcons.actions,
-                  onTap: () => (onOpenActionCenter ??
-                      () => onNavigateToRoute?.call('/actions'))(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 18),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                MerchantActionTile(
-                  label: l10n != null
-                      ? l10n.procurementTitle.replaceAll(' ', '\n')
-                      : 'KharidSaathi\nProcurement',
-                  icon: Icons.shopping_cart_checkout_rounded,
-                  onTap: () => onNavigateToRoute?.call('/procurement'),
+                      ? l10n.receivablesTracker.replaceAll(' ', '\n')
+                      : 'Receivables\nTracker',
+                  icon: AppIcons.receivables,
+                  onTap: () => (onOpenReceivables ??
+                      () => onNavigateToRoute?.call('/receivables'))(),
                 ),
                 MerchantActionTile(
                   label: l10n != null
@@ -1823,6 +1797,37 @@ class HomeShellScreen extends ConsumerWidget {
                   icon: AppIcons.counterparties,
                   onTap: () => (onOpenRelationships ??
                       () => onNavigateToRoute?.call('/relationships'))(),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                MerchantActionTile(
+                  label: l10n != null
+                      ? l10n.insights.replaceAll(' ', '\n')
+                      : 'Financial\nIntelligence',
+                  icon: AppIcons.analytics,
+                  onTap: () => (onOpenFinancialIntelligence ??
+                      () => onNavigateToRoute?.call('/intelligence'))(),
+                ),
+                MerchantActionTile(
+                  label: l10n != null
+                      ? (l10n.marketIntelligenceTitle.contains(' ')
+                          ? '${l10n.marketIntelligenceTitle.split(' ').first}\nMarket'
+                          : l10n.marketIntelligenceTitle)
+                      : 'Market\nSignals',
+                  icon: Icons.travel_explore_rounded,
+                  onTap: () => (onOpenMarketSignals ??
+                      () => onNavigateToRoute?.call('/market'))(),
+                ),
+                MerchantActionTile(
+                  label: l10n != null
+                      ? l10n.procurementTitle.replaceAll(' ', '\n')
+                      : 'KharidSaathi\nProcurement',
+                  icon: Icons.shopping_cart_checkout_rounded,
+                  onTap: () => onNavigateToRoute?.call('/procurement'),
                 ),
                 MerchantActionTile(
                   label: l10n != null

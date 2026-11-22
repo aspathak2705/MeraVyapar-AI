@@ -53,92 +53,108 @@ class _PaymentPromisesScreenState extends State<PaymentPromisesScreen> with Sing
       isScrollControlled: true,
       builder: (ctx) => StatefulBuilder(
         builder: (modalCtx, setModalState) => SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-              top: 24,
-              left: 24,
-              right: 24,
-              bottom: MediaQuery.of(modalCtx).viewInsets.bottom + 24,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(modalCtx).size.height * 0.85,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  l10n?.recordPaymentPromise ?? 'Record Explicit Payment Promise',
-                  style: Theme.of(modalCtx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: descController,
-                  decoration: InputDecoration(
-                    labelText: l10n?.description ?? 'Description',
-                    hintText: 'e.g. Expected invoice payment',
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                top: 24,
+                left: 24,
+                right: 24,
+                bottom: MediaQuery.of(modalCtx).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    l10n?.recordPaymentPromise ?? 'Record Explicit Payment Promise',
+                    style: Theme.of(modalCtx).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                   ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: amtController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: InputDecoration(
-                    labelText: l10n?.promisedAmount ?? 'Promised Amount (₹)',
-                    prefixText: '₹ ',
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: descController,
+                    decoration: InputDecoration(
+                      labelText: l10n?.description ?? 'Description',
+                      hintText: 'e.g. Expected invoice payment',
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  initialValue: direction,
-                  items: [
-                    DropdownMenuItem(
-                      value: 'EXPECTED_INCOMING',
-                      child: Text(l10n?.expectedIncoming ?? 'Expected Payment Incoming (Receivable)'),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: amtController,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: InputDecoration(
+                      labelText: l10n?.promisedAmount ?? 'Promised Amount (₹)',
+                      prefixText: '₹ ',
                     ),
-                    DropdownMenuItem(
-                      value: 'EXPECTED_OUTGOING',
-                      child: Text(l10n?.expectedOutgoing ?? 'Expected Payment Outgoing (Payable)'),
-                    ),
-                  ],
-                  onChanged: (val) => setModalState(() => direction = val!),
-                  decoration: InputDecoration(labelText: l10n?.direction ?? 'Direction'),
-                ),
-                const SizedBox(height: 12),
-                if (widget.counterparties.isNotEmpty)
+                  ),
+                  const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
-                    initialValue: selectedCounterpartyId,
-                    items: widget.counterparties
-                        .map((cp) => DropdownMenuItem(value: cp.id, child: Text(cp.displayName)))
-                        .toList(),
-                    onChanged: (val) => setModalState(() => selectedCounterpartyId = val),
-                    decoration: InputDecoration(labelText: l10n?.linkCounterparty ?? 'Link Counterparty (Optional)'),
+                    initialValue: direction,
+                    isExpanded: true,
+                    items: [
+                      DropdownMenuItem(
+                        value: 'EXPECTED_INCOMING',
+                        child: Text(
+                          l10n?.expectedIncoming ?? 'Expected Payment Incoming (Receivable)',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'EXPECTED_OUTGOING',
+                        child: Text(
+                          l10n?.expectedOutgoing ?? 'Expected Payment Outgoing (Payable)',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                    onChanged: (val) => setModalState(() => direction = val!),
+                    decoration: InputDecoration(labelText: l10n?.direction ?? 'Direction'),
                   ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    if (descController.text.isEmpty || amtController.text.isEmpty) return;
-                    String cpName = l10n?.counterparty ?? 'Declared Counterparty';
-                    if (selectedCounterpartyId != null) {
-                      final matched = widget.counterparties.where((c) => c.id == selectedCounterpartyId);
-                      if (matched.isNotEmpty) {
-                        cpName = matched.first.displayName;
+                  const SizedBox(height: 12),
+                  if (widget.counterparties.isNotEmpty)
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedCounterpartyId,
+                      isExpanded: true,
+                      items: widget.counterparties
+                          .map((cp) => DropdownMenuItem(
+                                value: cp.id,
+                                child: Text(cp.displayName, overflow: TextOverflow.ellipsis),
+                              ))
+                          .toList(),
+                      onChanged: (val) => setModalState(() => selectedCounterpartyId = val),
+                      decoration: InputDecoration(labelText: l10n?.linkCounterparty ?? 'Link Counterparty (Optional)'),
+                    ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (descController.text.isEmpty || amtController.text.isEmpty) return;
+                      String cpName = l10n?.counterparty ?? 'Declared Counterparty';
+                      if (selectedCounterpartyId != null) {
+                        final matched = widget.counterparties.where((c) => c.id == selectedCounterpartyId);
+                        if (matched.isNotEmpty) {
+                          cpName = matched.first.displayName;
+                        }
                       }
-                    }
-                    widget.onCreatePromise({
-                      if (selectedCounterpartyId != null) 'counterparty_id': selectedCounterpartyId!,
-                      'counterparty_name': cpName,
-                      'description': descController.text,
-                      'notes': descController.text,
-                      'promised_amount': amtController.text,
-                      'amount': amtController.text,
-                      'promise_direction': direction,
-                      'direction': direction,
-                      'due_at': selectedDate.toIso8601String(),
-                      'due_date': selectedDate.toIso8601String(),
-                    });
-                    Navigator.of(modalCtx).pop();
-                  },
-                  child: Text(l10n?.savePromise ?? 'Save Payment Promise'),
-                ),
-              ],
+                      widget.onCreatePromise({
+                        if (selectedCounterpartyId != null) 'counterparty_id': selectedCounterpartyId!,
+                        'counterparty_name': cpName,
+                        'description': descController.text,
+                        'notes': descController.text,
+                        'promised_amount': amtController.text,
+                        'amount': amtController.text,
+                        'promise_direction': direction,
+                        'direction': direction,
+                        'due_at': selectedDate.toIso8601String(),
+                        'due_date': selectedDate.toIso8601String(),
+                      });
+                      Navigator.of(modalCtx).pop();
+                    },
+                    child: Text(l10n?.savePromise ?? 'Save Payment Promise'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

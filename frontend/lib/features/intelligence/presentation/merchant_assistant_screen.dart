@@ -8,6 +8,7 @@ class MerchantAssistantScreen extends StatefulWidget {
   final FinancialQueryResultModel? lastResult;
   final String? initialQuery;
   final String? marketSignalTitle;
+  final String? errorMessage;
 
   const MerchantAssistantScreen({
     super.key,
@@ -16,6 +17,7 @@ class MerchantAssistantScreen extends StatefulWidget {
     this.lastResult,
     this.initialQuery,
     this.marketSignalTitle,
+    this.errorMessage,
   });
 
   @override
@@ -26,11 +28,11 @@ class _MerchantAssistantScreenState extends State<MerchantAssistantScreen> {
   late final TextEditingController _queryController;
 
   final List<String> _suggestedPrompts = [
-    'What needs my attention?',
-    'Why is this payment overdue?',
+    'What needs attention?',
+    'Why is payment overdue?',
     'Show pending receivables',
-    'How does this market signal impact my payables and cashflow?',
-    'Tell me about my customer relationships',
+    'Market cashflow impact',
+    'Customer relationships',
   ];
 
   @override
@@ -136,6 +138,49 @@ class _MerchantAssistantScreenState extends State<MerchantAssistantScreen> {
                 }).toList(),
               ),
               const SizedBox(height: 24),
+              if (widget.errorMessage != null && !widget.isLoading) ...[
+                Card(
+                  color: const Color(0xFFFEF2F2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: const BorderSide(color: Color(0xFFFECACA)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.error_outline, color: Color(0xFFDC2626), size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              l10n?.networkErrorTitle ?? 'Assistant Request Failed',
+                              style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF991B1B), fontSize: 15),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.errorMessage!,
+                          style: const TextStyle(color: Color(0xFF7F1D1D), fontSize: 13, height: 1.4),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            if (_queryController.text.trim().isNotEmpty) {
+                              _submitQuery(_queryController.text);
+                            }
+                          },
+                          icon: const Icon(Icons.refresh, size: 16),
+                          label: Text(l10n?.tryAgain ?? 'Try Again'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               if (widget.isLoading) ...[
                 const Center(
                   child: Padding(
