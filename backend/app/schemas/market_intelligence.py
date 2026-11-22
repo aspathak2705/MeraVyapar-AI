@@ -22,6 +22,9 @@ class MarketSourceResponse(BaseModel):
     reviews: Optional[int] = None
     location: Optional[str] = None
     metrics: Dict[str, Any] = Field(default_factory=dict)
+    engine: Optional[str] = None
+    evidence_nature: Optional[str] = None
+    verification_status: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True, extra="allow")
 
@@ -46,6 +49,8 @@ class MarketEventResponse(BaseModel):
     reviews: Optional[int] = None
     location: Optional[str] = None
     metrics: Dict[str, Any] = Field(default_factory=dict)
+    engine: Optional[str] = None
+    evidence_nature: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True, extra="allow")
 

@@ -10,6 +10,7 @@ from app.schemas.financial_context import (
     FinancialQueryResponse,
     FinancialContextPackage,
     GroundedInsightResponse,
+    InsightSourceReference,
 )
 from app.schemas.common import APIResponse
 from app.features.financial_context.services.intent_router import DeterministicIntentRouter
@@ -59,6 +60,17 @@ def query_financial_intelligence_stateless(
         except Exception:
             pass
 
+    market_signals = raw_ctx.get("market_signals", [])
+    provenance_sources = []
+    for sig in market_signals:
+        sig_id = str(sig.get("id") or sig.get("market_event_id") or uuid4())
+        sig_title = str(sig.get("title") or sig.get("source_name") or "Market Evidence")
+        provenance_sources.append(InsightSourceReference(
+            entity_type="MARKET_SIGNAL",
+            entity_id=sig_id,
+            label=sig_title,
+        ))
+
     context_pkg = FinancialContextPackage(
         context_version="2.0",
         merchant_id=merchant_uuid,
@@ -69,9 +81,11 @@ def query_financial_intelligence_stateless(
         receivables=raw_ctx.get("receivables", []),
         counterparties=raw_ctx.get("counterparties", []),
         computed_metrics=raw_ctx.get("computed_metrics", {"status": "device_local_snapshot"}),
+        market_signals=market_signals,
         cashflow_context=raw_ctx.get("cashflow_context"),
         receivable_behavior_context=raw_ctx.get("receivable_behavior_context"),
-        provenance_sources=[],
+        reference_context=raw_ctx.get("reference_context"),
+        provenance_sources=provenance_sources,
     )
 
     provider = get_intelligence_provider()

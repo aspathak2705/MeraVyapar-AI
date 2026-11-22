@@ -68,6 +68,9 @@ class MarketSourceModel {
   final double? rating;
   final int? reviews;
   final String? location;
+  final String? engine;
+  final String? evidenceNature;
+  final String? verificationStatus;
 
   const MarketSourceModel({
     required this.id,
@@ -81,6 +84,9 @@ class MarketSourceModel {
     this.rating,
     this.reviews,
     this.location,
+    this.engine,
+    this.evidenceNature,
+    this.verificationStatus,
   });
 
   factory MarketSourceModel.fromJson(Map<String, dynamic> json) {
@@ -97,6 +103,9 @@ class MarketSourceModel {
       rating: json['rating'] != null ? (json['rating'] as num).toDouble() : null,
       reviews: json['reviews'] != null ? (json['reviews'] as num).toInt() : null,
       location: json['location']?.toString(),
+      engine: json['engine']?.toString(),
+      evidenceNature: json['evidence_nature']?.toString(),
+      verificationStatus: json['verification_status']?.toString(),
     );
   }
 }
@@ -116,6 +125,8 @@ class MarketEventModel {
   final double? rating;
   final int? reviews;
   final String? location;
+  final String? engine;
+  final String? evidenceNature;
 
   const MarketEventModel({
     required this.id,
@@ -132,6 +143,8 @@ class MarketEventModel {
     this.rating,
     this.reviews,
     this.location,
+    this.engine,
+    this.evidenceNature,
   });
 
   factory MarketEventModel.fromJson(Map<String, dynamic> json) {
@@ -156,6 +169,8 @@ class MarketEventModel {
           ? (json['reviews'] as num).toInt()
           : (json['source']?['reviews'] != null ? (json['source']['reviews'] as num).toInt() : null),
       location: json['location']?.toString() ?? (json['source'] != null ? json['source']['location']?.toString() : null),
+      engine: json['engine']?.toString() ?? (json['source'] != null ? json['source']['engine']?.toString() : null),
+      evidenceNature: json['evidence_nature']?.toString() ?? (json['source'] != null ? json['source']['evidence_nature']?.toString() : null),
     );
   }
 }

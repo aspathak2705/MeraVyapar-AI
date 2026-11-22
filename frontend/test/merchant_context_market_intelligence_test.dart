@@ -17,6 +17,8 @@ void main() {
         'rating': 4.5,
         'reviews': 80,
         'location': 'Pune Market Yard',
+        'engine': 'google_shopping',
+        'evidence_nature': 'OBSERVED_ONLINE_LISTING',
         'source': {
           'id': 'src-123',
           'provider_name': 'SerpApi',
@@ -28,6 +30,9 @@ void main() {
           'rating': 4.5,
           'reviews': 80,
           'location': 'Pune Market Yard',
+          'engine': 'google_shopping',
+          'evidence_nature': 'OBSERVED_ONLINE_LISTING',
+          'verification_status': 'OBSERVED_ONLINE_LISTING_PRICE',
         },
       };
 
@@ -39,8 +44,11 @@ void main() {
       expect(event.rating, equals(4.5));
       expect(event.reviews, equals(80));
       expect(event.location, equals('Pune Market Yard'));
+      expect(event.engine, equals('google_shopping'));
+      expect(event.evidenceNature, equals('OBSERVED_ONLINE_LISTING'));
       expect(event.source?.sourceName, equals('Google Shopping'));
       expect(event.source?.price, equals('₹2,100'));
+      expect(event.source?.verificationStatus, equals('OBSERVED_ONLINE_LISTING_PRICE'));
     });
 
     test('handles relative date strings and unsupported formats deterministically', () {

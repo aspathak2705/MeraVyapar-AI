@@ -40,6 +40,7 @@ class FinancialContextPackage(BaseModel):
     receivables: List[Dict[str, Any]] = []
     counterparties: List[Dict[str, Any]] = []
     computed_metrics: Dict[str, Any] = {}
+    market_signals: List[Dict[str, Any]] = Field(default_factory=list)
     cashflow_context: Optional[Dict[str, Any]] = None
     receivable_behavior_context: Optional[Dict[str, Any]] = None
     reference_context: Optional[Dict[str, Any]] = None

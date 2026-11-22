@@ -224,11 +224,11 @@ CONTEXT PACKAGE:
 
     def answer_financial_question(self, context_package: FinancialContextPackage, question: str) -> GroundedInsightResponse:
         system_prompt = """You are the explanation layer of a financial intelligence system.
-You receive verified and deterministic financial context.
+You receive verified deterministic financial context and external market signals.
 You must only explain facts explicitly present in the supplied context.
 
 You must not:
-- invent financial information
+- invent financial information or market claims
 - calculate new financial values
 - infer missing values
 - estimate probabilities
@@ -240,6 +240,7 @@ You must not:
 - forecast revenue
 - claim information not represented in the context
 
+When market signals (market_signals) are present in the context, relate them to the merchant's financial metrics (computed_metrics) and explain their business implications (e.g. procurement cost variation vs available cash or payables) using only verified numbers and cited sources from the context package.
 If the supplied context does not support an answer, clearly state that sufficient verified information is unavailable.
 Use concise, practical language suitable for a small business merchant.
 Return only the required structured JSON output."""

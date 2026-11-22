@@ -5,12 +5,16 @@ class MerchantAssistantScreen extends StatefulWidget {
   final Function(String question) onQuerySubmit;
   final bool isLoading;
   final FinancialQueryResultModel? lastResult;
+  final String? initialQuery;
+  final String? marketSignalTitle;
 
   const MerchantAssistantScreen({
     super.key,
     required this.onQuerySubmit,
     this.isLoading = false,
     this.lastResult,
+    this.initialQuery,
+    this.marketSignalTitle,
   });
 
   @override
@@ -18,14 +22,21 @@ class MerchantAssistantScreen extends StatefulWidget {
 }
 
 class _MerchantAssistantScreenState extends State<MerchantAssistantScreen> {
-  final _queryController = TextEditingController();
+  late final TextEditingController _queryController;
 
   final List<String> _suggestedPrompts = [
     'What needs my attention?',
     'Why is this payment overdue?',
     'Show pending receivables',
+    'How does this market signal impact my payables and cashflow?',
     'Tell me about my customer relationships',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _queryController = TextEditingController(text: widget.initialQuery ?? '');
+  }
 
   @override
   void dispose() {
@@ -62,6 +73,40 @@ class _MerchantAssistantScreenState extends State<MerchantAssistantScreen> {
                 style: TextStyle(color: Color(0xFF64748B), fontSize: 14),
               ),
               const SizedBox(height: 16),
+              if (widget.marketSignalTitle != null && widget.marketSignalTitle!.isNotEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFBFDBFE)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.hub_outlined, color: Color(0xFF2563EB), size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Active Market Evidence Attached',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF1D4ED8)),
+                            ),
+                            Text(
+                              widget.marketSignalTitle!,
+                              style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
               TextField(
                 controller: _queryController,
                 decoration: InputDecoration(

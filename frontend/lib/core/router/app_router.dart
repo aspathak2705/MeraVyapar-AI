@@ -587,6 +587,8 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           body: MerchantAssistantScreen(
             isLoading: _isAssistantLoading,
             lastResult: _lastAssistantResult,
+            initialQuery: _routeArgs['initial_question'],
+            marketSignalTitle: _routeArgs['market_signal_title'],
             onQuerySubmit: (question) async {
               setState(() {
                 _isAssistantLoading = true;
@@ -602,12 +604,29 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   fallbackName: authRepo.currentSession?.displayName,
                 );
 
+                final attachedSignal = _routeArgs['signal'] as MerchantMarketRelevanceModel?;
+                final marketSignalsList = <Map<String, dynamic>>[];
+                if (attachedSignal != null) {
+                  marketSignalsList.add({
+                    'id': attachedSignal.id,
+                    'title': attachedSignal.marketEvent?.title,
+                    'summary': attachedSignal.marketEvent?.summary,
+                    'price': attachedSignal.marketEvent?.price,
+                    'rating': attachedSignal.marketEvent?.rating,
+                    'location': attachedSignal.marketEvent?.location,
+                    'source_name': attachedSignal.marketEvent?.source?.sourceName,
+                    'source_url': attachedSignal.marketEvent?.source?.sourceUrl,
+                    'relevance_explanation': attachedSignal.explanation,
+                  });
+                }
+
                 final sanitizedContext = <String, dynamic>{
                   'business_name': profile.businessName,
                   'business_type': profile.businessType,
                   'business_category': profile.businessCategory,
                   'city': profile.city,
                   'state': profile.state,
+                  'market_signals': marketSignalsList,
                   'computed_metrics': {
                     'total_inflows_paise': pos.totalInflowsPaise,
                     'total_outflows_paise': pos.totalOutflowsPaise,
@@ -808,6 +827,14 @@ class _AppRouterState extends ConsumerState<AppRouter> {
         return MarketSignalDetailScreen(
           signal: _routeArgs['signal'],
           onBack: _popRoute,
+          onAnalyzeWithFinancials: (sig) {
+            final evTitle = sig.marketEvent?.title ?? 'Market Signal';
+            _navigateTo('/assistant', {
+              'signal': sig,
+              'initial_question': 'How does "$evTitle" impact my business cashflow and payables?',
+              'market_signal_title': evTitle,
+            });
+          },
         );
 
       case '/actions':

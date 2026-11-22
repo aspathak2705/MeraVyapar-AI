@@ -147,15 +147,21 @@ class SerpApiNormalizer:
                     continue
                 title = res.get("title") or "Shopping Item"
                 price = res.get("price") or res.get("extracted_price")
+                seller = res.get("seller") or res.get("source")
                 items.append(ExternalEvidenceItem(
                     title=str(title)[:255],
                     snippet=str(res.get("snippet")) if res.get("snippet") is not None else None,
                     url=str(res.get("link")) if res.get("link") else None,
-                    source_name=str(res.get("source")) if res.get("source") else None,
+                    source_name=str(seller) if seller else "Google Shopping",
                     published_date=str(res.get("date")) if res.get("date") else None,
                     price=str(price) if price is not None else None,
                     rating=SerpApiNormalizer._safe_float(res.get("rating")),
                     reviews=SerpApiNormalizer._safe_int(res.get("reviews")),
+                    metrics={
+                        "seller": seller,
+                        "delivery": res.get("delivery"),
+                        "extracted_price": res.get("extracted_price"),
+                    },
                     raw_payload=res
                 ))
         return items

@@ -59,13 +59,27 @@ def get_relevant_market_signals_stateless(
     clean_city = sanitize_research_term(city)
     clean_state = sanitize_research_term(state)
 
+    selected_engine = (engine if isinstance(engine, str) else "google") or "google"
+    selected_engine = selected_engine.strip().lower()
+    engine_used = selected_engine
+
+    clean_maps_type = (maps_type if isinstance(maps_type, str) else "search") or "search"
+    clean_place_id = place_id if isinstance(place_id, str) else None
+
     if not clean_query:
         query_parts = []
         if clean_biz_type:
             query_parts.append(clean_biz_type)
         elif clean_category:
             query_parts.append(clean_category)
-        query_parts.append("wholesale")
+
+        if selected_engine == SerpApiEngine.SHOPPING.value:
+            query_parts.append("wholesale")
+        elif selected_engine == SerpApiEngine.NEWS.value:
+            query_parts.append("commodity market price supply")
+        else:
+            query_parts.append("wholesale suppliers distributors")
+
         if clean_city:
             query_parts.append(clean_city)
         elif clean_state:
@@ -75,13 +89,6 @@ def get_relevant_market_signals_stateless(
         clean_query = " ".join([p for p in query_parts if p]).strip()
         if not clean_query:
             clean_query = "wholesale commodity inflation India"
-
-    selected_engine = (engine if isinstance(engine, str) else "google") or "google"
-    selected_engine = selected_engine.strip().lower()
-    engine_used = selected_engine
-
-    clean_maps_type = (maps_type if isinstance(maps_type, str) else "search") or "search"
-    clean_place_id = place_id if isinstance(place_id, str) else None
 
     try:
         if selected_engine == SerpApiEngine.SHOPPING.value:
@@ -122,12 +129,27 @@ def get_relevant_market_signals_stateless(
             if len(term) > 2 and term.lower() not in {'india', 'market', 'retail', 'wholesale', 'price', 'rates'}
         }
 
-        # Event type categorization per engine
+        # Event type & evidence nature per engine
         default_event_type = MarketEventType.COMMODITY_PRICE_MOVEMENT.value
+        evidence_nature = "DISCOVERED_BUSINESS"
+        verification_status = "UNVERIFIED_ONLINE_DISCOVERY"
+        explanation = f"Discovered online supplier/business for '{clean_query}'. Note: Unverified web discovery, not an established trade quotation."
+
         if engine_used == SerpApiEngine.SHOPPING.value:
             default_event_type = MarketEventType.COMMODITY_PRICE_MOVEMENT.value
+            evidence_nature = "OBSERVED_ONLINE_LISTING"
+            verification_status = "OBSERVED_ONLINE_LISTING_PRICE"
+            explanation = f"Observed retail listing price from '{clean_query}'. Note: Online listing price, not a verified trade wholesale quote."
+        elif engine_used == SerpApiEngine.NEWS.value:
+            default_event_type = MarketEventType.COMMODITY_PRICE_MOVEMENT.value
+            evidence_nature = "MARKET_NEWS_REPORT"
+            verification_status = "EXTERNAL_MEDIA_REPORT"
+            explanation = f"External market news regarding '{clean_query}'. Published by external media source."
         elif engine_used == SerpApiEngine.MAPS.value:
             default_event_type = MarketEventType.SUPPLY_CHAIN_EVENT.value
+            evidence_nature = "LOCAL_MARKET_LOCATION"
+            verification_status = "UNVERIFIED_LOCAL_POI"
+            explanation = f"Local market/supplier location from Google Maps for '{clean_query}'."
 
         for idx, item in enumerate(items[:10]):
             event_id = uuid4()
@@ -162,6 +184,9 @@ def get_relevant_market_signals_stateless(
                 "reviews": item_reviews,
                 "location": item_location,
                 "metrics": item_metrics,
+                "engine": engine_used,
+                "evidence_nature": evidence_nature,
+                "verification_status": verification_status,
             }
 
             ev = {
@@ -184,6 +209,8 @@ def get_relevant_market_signals_stateless(
                 "reviews": item_reviews,
                 "location": item_location,
                 "metrics": item_metrics,
+                "engine": engine_used,
+                "evidence_nature": evidence_nature,
             }
 
             rel = {
@@ -192,7 +219,7 @@ def get_relevant_market_signals_stateless(
                 "market_event_id": str(event_id),
                 "relevance_status": MarketRelevanceStatus.POTENTIALLY_RELEVANT.value,
                 "reason_codes": ["COMMODITY_PRICE_MONITORING"],
-                "explanation": f"Observed from SerpApi ({engine_used}) query '{clean_query}'. Relevant to procurement and pricing.",
+                "explanation": explanation,
                 "context_snapshot": {
                     "engine": engine_used,
                     "query": clean_query,
@@ -203,6 +230,7 @@ def get_relevant_market_signals_stateless(
                     "price": item_price,
                     "rating": item_rating,
                     "location": item_location,
+                    "evidence_nature": evidence_nature,
                 },
                 "detected_at": now.isoformat(),
                 "status": "ACTIVE",

@@ -524,15 +524,35 @@ class _RelevantMarketSignalsScreenState
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFE0F2FE),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Icon(Icons.public,
-                                color: Color(0xFF0284C7), size: 20),
-                          ),
+                          Builder(builder: (context) {
+                            IconData badgeIcon = Icons.search;
+                            Color iconColor = const Color(0xFF2563EB);
+                            Color bgColor = const Color(0xFFEFF6FF);
+
+                            final eng = ev?.engine ?? src?.engine ?? '';
+                            if (eng == 'google_shopping' || ev?.price != null) {
+                              badgeIcon = Icons.shopping_bag_outlined;
+                              iconColor = const Color(0xFF16A34A);
+                              bgColor = const Color(0xFFDCFCE7);
+                            } else if (eng == 'google_news') {
+                              badgeIcon = Icons.newspaper;
+                              iconColor = const Color(0xFFD97706);
+                              bgColor = const Color(0xFFFEF3C7);
+                            } else if (eng == 'google_maps') {
+                              badgeIcon = Icons.location_on_outlined;
+                              iconColor = const Color(0xFF9333EA);
+                              bgColor = const Color(0xFFF3E8FF);
+                            }
+
+                            return Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: bgColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Icon(badgeIcon, color: iconColor, size: 20),
+                            );
+                          }),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -553,6 +573,29 @@ class _RelevantMarketSignalsScreenState
                                         color: Color(0xFF64748B),
                                         fontWeight: FontWeight.w500),
                                   ),
+                                  const SizedBox(height: 2),
+                                  Builder(builder: (context) {
+                                    final eng = ev?.engine ?? src.engine ?? '';
+                                    String label = 'Discovered Business • Unverified Supplier';
+                                    Color labelColor = const Color(0xFF1D4ED8);
+                                    if (eng == 'google_shopping' || ev?.price != null) {
+                                      label = 'Observed Listing Price • Not Trade Quote';
+                                      labelColor = const Color(0xFF15803D);
+                                    } else if (eng == 'google_news') {
+                                      label = 'External News Report';
+                                      labelColor = const Color(0xFFB45309);
+                                    } else if (eng == 'google_maps') {
+                                      label = 'Local Market Location';
+                                      labelColor = const Color(0xFF7E22CE);
+                                    }
+                                    return Text(
+                                      label,
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                          color: labelColor),
+                                    );
+                                  }),
                                 ],
                               ],
                             ),
