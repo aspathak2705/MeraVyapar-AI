@@ -1,0 +1,18 @@
+{
+  "@@locale": "hi",
+  "appTitle": "मेरा व्यापार AI",
+  "privateDeviceLedger": "निजी डिवाइस बहीखाता",
+  "language": "भाषा",
+  "english": "English",
+  "hindi": "हिंदी",
+  "marathi": "मराठी",
+  "home": "होम",
+  "actions": "कार्य",
+  "insights": "अंतर्दृष्टि",
+  "transactions": "लेन-देन",
+  "receivables": "उधारी वसूली",
+  "financialServices": "वित्तीय सेवाएं",
+  "intelligenceAndInsights": "व्यापारिक समझ व अंतर्दृष्टि",
+  "localSuppliers": "स्थानीय आपूर्तिकर्ता",
+  "supplierShortlist": "सप्लायर शॉर्टलिस्ट"
+}

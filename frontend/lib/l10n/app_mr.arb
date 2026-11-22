@@ -1,0 +1,18 @@
+{
+  "@@locale": "mr",
+  "appTitle": "माझा व्यापार AI",
+  "privateDeviceLedger": "खाजगी डिव्हाइस खातेवही",
+  "language": "भाषा",
+  "english": "English",
+  "hindi": "हिंदी",
+  "marathi": "मराठी",
+  "home": "मुख्यपृष्ठ",
+  "actions": "कृती",
+  "insights": "माहिती व अंदाज",
+  "transactions": "व्यवहार",
+  "receivables": "येणे बाकी",
+  "financialServices": "वित्तीय सेवा",
+  "intelligenceAndInsights": "व्यापार अंदाज व विश्लेषण",
+  "localSuppliers": "स्थानिक पुरवठादार",
+  "supplierShortlist": "शॉर्टलिस्ट पुरवठादार"
+}

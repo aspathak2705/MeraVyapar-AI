@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
-import '../../../core/theme/theme_mode_provider.dart';
 import '../../../core/presentation/fintech_widgets.dart';
+import '../../../core/localization/language_selector_button.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../intelligence/domain/local_financial_intelligence_engine.dart';
 import '../../intelligence/presentation/unified_financial_intelligence_screen.dart';
 
@@ -51,8 +52,9 @@ class HomeShellScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const isDark = false;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final positionAsync = ref.watch(financialPositionMetricsProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkSecondaryBackground : AppColors.lightSecondaryBackground,
@@ -76,7 +78,7 @@ class HomeShellScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'MeraVyapar',
+                  l10n?.appTitle ?? 'MeraVyapar',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
@@ -85,7 +87,7 @@ class HomeShellScreen extends ConsumerWidget {
                   ),
                 ),
                 Text(
-                  'Private Device Ledger',
+                  l10n?.privateDeviceLedger ?? 'Private Device Ledger',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
@@ -97,6 +99,8 @@ class HomeShellScreen extends ConsumerWidget {
           ],
         ),
         actions: [
+          // Language Selector Button
+          const LanguageSelectorButton(),
           // Business Profile Settings Button
           IconButton(
             icon: const Icon(Icons.storefront_rounded, size: 20),
@@ -134,7 +138,7 @@ class HomeShellScreen extends ConsumerWidget {
 
               // 2. Quick Action Grid
               Text(
-                'Financial Services',
+                l10n?.financialServices ?? 'Financial Services',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -143,13 +147,13 @@ class HomeShellScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 14),
-              _buildQuickActionGrid(context, isDark),
+              _buildQuickActionGrid(context, isDark, l10n),
 
               const SizedBox(height: 24),
 
               // 3. Merchant Intelligence & Actions
               Text(
-                'Intelligence & Insights',
+                l10n?.intelligenceAndInsights ?? 'Intelligence & Insights',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
@@ -185,31 +189,31 @@ class HomeShellScreen extends ConsumerWidget {
               break;
           }
         },
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(AppIcons.homeOutlined),
-            activeIcon: Icon(AppIcons.home),
-            label: 'Home',
+            icon: const Icon(AppIcons.homeOutlined),
+            activeIcon: const Icon(AppIcons.home),
+            label: l10n?.home ?? 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(AppIcons.analyticsOutlined),
-            activeIcon: Icon(AppIcons.analytics),
-            label: 'Intelligence',
+            icon: const Icon(AppIcons.analyticsOutlined),
+            activeIcon: const Icon(AppIcons.analytics),
+            label: l10n?.insights ?? 'Intelligence',
           ),
           BottomNavigationBarItem(
-            icon: Icon(AppIcons.transactionsOutlined),
-            activeIcon: Icon(AppIcons.transactions),
-            label: 'Passbook',
+            icon: const Icon(AppIcons.transactionsOutlined),
+            activeIcon: const Icon(AppIcons.transactions),
+            label: l10n?.transactions ?? 'Passbook',
           ),
           BottomNavigationBarItem(
-            icon: Icon(AppIcons.receivables),
-            activeIcon: Icon(AppIcons.receivables),
-            label: 'Receivables',
+            icon: const Icon(AppIcons.receivables),
+            activeIcon: const Icon(AppIcons.receivables),
+            label: l10n?.receivables ?? 'Receivables',
           ),
           BottomNavigationBarItem(
-            icon: Icon(AppIcons.actionsOutlined),
-            activeIcon: Icon(AppIcons.actions),
-            label: 'Actions',
+            icon: const Icon(AppIcons.actionsOutlined),
+            activeIcon: const Icon(AppIcons.actions),
+            label: l10n?.actions ?? 'Actions',
           ),
         ],
       ),
@@ -358,7 +362,7 @@ class HomeShellScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildQuickActionGrid(BuildContext context, bool isDark) {
+  Widget _buildQuickActionGrid(BuildContext context, bool isDark, [AppLocalizations? l10n]) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
@@ -420,13 +424,13 @@ class HomeShellScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 MerchantActionTile(
-                  label: 'Local\nSuppliers',
+                  label: l10n != null ? l10n.localSuppliers.replaceAll(' ', '\n') : 'Local\nSuppliers',
                   icon: Icons.location_on_rounded,
                   color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
                   onTap: () => onNavigateToRoute?.call('/market/suppliers'),
                 ),
                 MerchantActionTile(
-                  label: 'Supplier\nShortlist',
+                  label: l10n != null ? l10n.supplierShortlist.replaceAll(' ', '\n') : 'Supplier\nShortlist',
                   icon: Icons.bookmark_rounded,
                   color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
                   onTap: () => onNavigateToRoute?.call('/market/shortlist'),

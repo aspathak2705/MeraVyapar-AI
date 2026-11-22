@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+  "appTitle": "MeraVyapar AI",
+  "privateDeviceLedger": "Private Device Ledger",
+  "language": "Language",
+  "english": "English",
+  "hindi": "हिंदी",
+  "marathi": "मराठी",
+  "home": "Home",
+  "actions": "Actions",
+  "insights": "Insights",
+  "transactions": "Transactions",
+  "receivables": "Receivables",
+  "financialServices": "Financial Services",
+  "intelligenceAndInsights": "Intelligence & Insights",
+  "localSuppliers": "Local Suppliers",
+  "supplierShortlist": "Supplier Shortlist"
+}
