@@ -219,5 +219,17 @@
   "source": "Source",
   "externalMarketSignals": "External Market Signals",
   "searchMarketCommodities": "Search markets, commodities, suppliers or trends...",
-  "reference": "Reference"
+  "reference": "Reference",
+  "intelligentReportsTitle": "Financial Reports & History",
+  "generateReport": "Generate Report",
+  "reportLanguage": "Report Language",
+  "reportType": "Report Type",
+  "dailyFinancialDigest": "Daily Financial Digest",
+  "cashFlowHealthReport": "Cash Flow Health Report",
+  "creditRecoveryReport": "Credit Recovery & Receivables",
+  "noReportsYet": "No Reports Generated Yet",
+  "noReportsDesc": "Generate localized intelligence reports from your private device records.",
+  "reportDetails": "Report Details",
+  "deleteReport": "Delete Report",
+  "generatingReport": "Generating report with Nemotron AI..."
 }

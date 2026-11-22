@@ -219,5 +219,17 @@
   "source": "स्रोत",
   "externalMarketSignals": "बाह्य बाजार संकेत",
   "searchMarketCommodities": "बाजार, वस्तुएं, सप्लायर या रुझान खोजें...",
-  "reference": "संदर्भ"
+  "reference": "संदर्भ",
+  "intelligentReportsTitle": "वित्तीय रिपोर्ट और इतिहास",
+  "generateReport": "रिपोर्ट तैयार करें",
+  "reportLanguage": "रिपोर्ट भाषा",
+  "reportType": "रिपोर्ट प्रकार",
+  "dailyFinancialDigest": "दैनिक वित्तीय सारांश",
+  "cashFlowHealthReport": "रोकड़ प्रवाह स्वास्थ्य रिपोर्ट",
+  "creditRecoveryReport": "उधारी वसूली एवं प्राप्य",
+  "noReportsYet": "अभी तक कोई रिपोर्ट नहीं बनाई गई",
+  "noReportsDesc": "अपने निजी डिवाइस रिकॉर्ड से स्थानीयकृत रिपोर्ट तैयार करें।",
+  "reportDetails": "रिपोर्ट विवरण",
+  "deleteReport": "रिपोर्ट हटाएं",
+  "generatingReport": "नेमोट्रॉन एआई के साथ रिपोर्ट तैयार हो रही है..."
 }

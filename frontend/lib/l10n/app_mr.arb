@@ -219,5 +219,17 @@
   "source": "स्रोत",
   "externalMarketSignals": "बाह्य बाजार सिग्नल",
   "searchMarketCommodities": "बाजार, वस्तू, पुरवठादार किंवा ट्रेंड शोधा...",
-  "reference": "संदर्भ"
+  "reference": "संदर्भ",
+  "intelligentReportsTitle": "आर्थिक अहवाल आणि इतिहास",
+  "generateReport": "अहवाल तयार करा",
+  "reportLanguage": "अहवाल भाषा",
+  "reportType": "अहवाल प्रकार",
+  "dailyFinancialDigest": "दैनिक आर्थिक सारांश",
+  "cashFlowHealthReport": "रोख प्रवाह आरोग्य अहवाल",
+  "creditRecoveryReport": "येणे वसुली आणि बाकी",
+  "noReportsYet": "अद्याप कोणताही अहवाल तयार केलेला नाही",
+  "noReportsDesc": "आपल्या खाजगी डिव्हाइस नोंदींमधून स्थानिक अहवाल तयार करा.",
+  "reportDetails": "अहवाल तपशील",
+  "deleteReport": "अहवाल हटवा",
+  "generatingReport": "नेमोट्रॉन एआय सह अहवाल तयार होत आहे..."
 }

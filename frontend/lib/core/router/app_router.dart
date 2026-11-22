@@ -43,6 +43,7 @@ import '../../features/actions/presentation/reminder_draft_screen.dart';
 import '../../features/intelligence/presentation/unified_financial_intelligence_screen.dart';
 import '../../features/capture/presentation/permission_settings_screen.dart';
 import '../../features/procurement/presentation/procurement_dashboard_screen.dart';
+import '../../features/intelligence/presentation/intelligent_reports_screen.dart';
 import '../../features/onboarding/presentation/business_profile_screen.dart';
 import '../../features/onboarding/data/local_business_profile_repository.dart';
 import '../../features/onboarding/domain/merchant_business_profile.dart';
@@ -52,6 +53,7 @@ import '../../features/capture/domain/local_evidence_capture_service.dart';
 import '../../core/database/local_database_service.dart';
 import '../../core/money/money.dart';
 import '../../features/intelligence/domain/local_financial_intelligence_engine.dart';
+import '../localization/locale_provider.dart';
 import '../../l10n/app_localizations.dart';
 
 // --- Local Repository Providers ---
@@ -577,6 +579,12 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onNavigate: _navigateTo,
         );
 
+      case '/reports':
+        return IntelligentReportsScreen(
+          merchantId: merchantId,
+          onBack: _popRoute,
+        );
+
       case '/assistant':
         final intelligenceRepo = ref.read(intelligenceRepositoryProvider);
         return Scaffold(
@@ -648,9 +656,11 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                   },
                 };
 
+                final appLocale = ref.read(localeProvider);
                 final result = await intelligenceRepo.queryIntelligence(
                   question: question,
                   sanitizedContext: sanitizedContext,
+                  targetLanguage: appLocale.languageCode,
                 );
                 if (mounted) {
                   setState(() {

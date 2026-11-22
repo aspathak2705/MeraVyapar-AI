@@ -10,9 +10,9 @@ class FinancialIntelligenceProvider(ABC):
         pass
 
     @abstractmethod
-    def generate_event_explanation(self, context_package: FinancialContextPackage) -> GroundedInsightResponse:
+    def generate_event_explanation(self, context_package: FinancialContextPackage, target_language: str = "en") -> GroundedInsightResponse:
         pass
 
     @abstractmethod
-    def answer_financial_question(self, context_package: FinancialContextPackage, question: str) -> GroundedInsightResponse:
+    def answer_financial_question(self, context_package: FinancialContextPackage, question: str, target_language: str = "en") -> GroundedInsightResponse:
         pass

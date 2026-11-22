@@ -88,8 +88,16 @@ def query_financial_intelligence_stateless(
         provenance_sources=provenance_sources,
     )
 
+    target_lang = (payload.target_language or "en").lower().strip()
+    if target_lang not in ("en", "hi", "mr"):
+        target_lang = "en"
+
     provider = get_intelligence_provider()
-    insight: GroundedInsightResponse = provider.answer_financial_question(context_pkg, payload.question)
+    insight: GroundedInsightResponse = provider.answer_financial_question(
+        context_pkg,
+        payload.question,
+        target_language=target_lang,
+    )
 
     query_res = FinancialQueryResponse(
         intent_category=intent_cat,

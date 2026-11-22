@@ -32,12 +32,56 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
     def is_available(self) -> bool:
         return bool(self.api_key and self.api_key.strip())
 
-    def _make_error_response(self, status: str, summary: str, limitation: str) -> GroundedInsightResponse:
+    DEVANAGARI_DIGITS = {
+        '०': '0', '१': '1', '२': '2', '३': '3', '४': '4',
+        '५': '5', '६': '6', '७': '7', '८': '8', '९': '9'
+    }
+
+    def _normalize_digits(self, text: str) -> str:
+        for dev, arab in self.DEVANAGARI_DIGITS.items():
+            text = text.replace(dev, arab)
+        return text
+
+    def _build_language_instruction(self, target_language: str) -> str:
+        lang = (target_language or "en").lower().strip()
+        if lang == "hi":
+            return """LANGUAGE DIRECTIVE:
+You MUST generate all descriptive human-readable text (summary, why_it_matters, key_facts labels, suggested_actions, limitations) in natural, fluent, authentic Hindi (हिंदी).
+Maintain all numeric figures, currency symbols (₹), and source reference IDs exactly as provided without modification.
+Always format numbers using standard Arabic digits (0-9) e.g. ₹25,000, 1500."""
+        elif lang == "mr":
+            return """LANGUAGE DIRECTIVE:
+You MUST generate all descriptive human-readable text (summary, why_it_matters, key_facts labels, suggested_actions, limitations) in natural, fluent, authentic Marathi (मराठी).
+Maintain all numeric figures, currency symbols (₹), and source reference IDs exactly as provided without modification.
+Always format numbers using standard Arabic digits (0-9) e.g. ₹25,000, 1500."""
+        else:
+            return """LANGUAGE DIRECTIVE:
+Generate all descriptive text in clear, practical, merchant-friendly English."""
+
+    def _make_error_response(self, status: str, summary: str, limitation: str, target_language: str = "en") -> GroundedInsightResponse:
+        why = "Deterministic financial facts, memory graph, and attention events remain fully operational."
+        actions = ["Review available events and payment promises directly in the workspace."]
+        lang = (target_language or "en").lower().strip()
+        if lang == "hi":
+            why = "स्थानीय वित्तीय तथ्य, मेमोरी ग्राफ़ और इवेंट्स पूरी तरह सक्रिय हैं।"
+            actions = ["कार्यक्षेत्र में उपलब्ध घटनाओं और भुगतान वादों की सीधे समीक्षा करें।"]
+            if status == "LLM_INTELLIGENCE_UNAVAILABLE":
+                summary = "वर्तमान वातावरण में एआई इंटेलिजेंस सेवा कॉन्फ़िगर नहीं है।"
+            elif status == "LLM_RATE_LIMITED":
+                summary = "वित्तीय एआई सेवा व्यस्त है। कृपया थोड़ी देर बाद पुनः प्रयास करें।"
+        elif lang == "mr":
+            why = "स्थानिक आर्थिक तथ्य, मेमरी आलेख आणि इव्हेंट्स पूर्णपणे कार्यरत आहेत."
+            actions = ["कार्यक्षेत्रात उपलब्ध घटना आणि पेमेंट वचनांचे थेट पुनरावलोकन करा."]
+            if status == "LLM_INTELLIGENCE_UNAVAILABLE":
+                summary = "सध्याच्या वातावरणात एआय इंटेलिजन्स सेवा कॉन्फिगर केलेली नाही."
+            elif status == "LLM_RATE_LIMITED":
+                summary = "आर्थिक एआय सेवा व्यस्त आहे. कृपया थोड्या वेळाने पुन्हा प्रयत्न करा."
+
         return GroundedInsightResponse(
             summary=summary,
-            why_it_matters="Deterministic financial facts, memory graph, and attention events remain fully operational.",
+            why_it_matters=why,
             key_facts=[],
-            suggested_actions=["Review available events and payment promises directly in the workspace."],
+            suggested_actions=actions,
             limitations=[limitation],
             source_references=[],
             is_ai_generated=False,
@@ -57,7 +101,7 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
         insight.source_references = sanitized_refs if sanitized_refs else context_package.provenance_sources
         return insight
 
-    def _validate_amounts(self, insight: GroundedInsightResponse, context_package: FinancialContextPackage) -> GroundedInsightResponse:
+    def _validate_amounts(self, insight: GroundedInsightResponse, context_package: FinancialContextPackage, target_language: str = "en") -> GroundedInsightResponse:
         """
         Extract numerical monetary amounts from context and ensure model doesn't invent new numbers in key_facts or summary.
         If a fabricated amount is detected, invalidate the response completely (LLM_RESPONSE_INVALID).
@@ -72,7 +116,8 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
         all_text_to_check = [insight.summary, insight.why_it_matters] + [kf.value for kf in insight.key_facts]
 
         for text in all_text_to_check:
-            clean_text = re.sub(r'(?<=\d),(?=\d)', '', text or "")
+            clean_text = self._normalize_digits(text or "")
+            clean_text = re.sub(r'(?<=\d),(?=\d)', '', clean_text)
             found_numbers = set(re.findall(r'\b\d+(?:\.\d+)?\b', clean_text))
             fabricated = [num for num in found_numbers if num not in context_numbers and float(num) > 0]
             if fabricated:
@@ -80,7 +125,8 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
                 return self._make_error_response(
                     status="LLM_RESPONSE_INVALID",
                     summary="AI response contained unverified numerical amounts.",
-                    limitation="Model generated monetary amounts not present in verified context."
+                    limitation="Model generated monetary amounts not present in verified context.",
+                    target_language=target_language,
                 )
 
         return insight
@@ -95,12 +141,13 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
             cleaned = cleaned.split("```")[1].split("```")[0].strip()
         return cleaned
 
-    def _call_openrouter_completion(self, system_prompt: str, user_prompt: str) -> GroundedInsightResponse:
+    def _call_openrouter_completion(self, system_prompt: str, user_prompt: str, target_language: str = "en") -> GroundedInsightResponse:
         if not self.is_available or not self.client:
             return self._make_error_response(
                 status="LLM_INTELLIGENCE_UNAVAILABLE",
                 summary="AI Intelligence service is not configured in current environment.",
-                limitation="OPENROUTER_API_KEY is missing."
+                limitation="OPENROUTER_API_KEY is missing.",
+                target_language=target_language,
             )
 
         extra_body = {}
@@ -122,7 +169,8 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
                 return self._make_error_response(
                     status="LLM_RESPONSE_INVALID",
                     summary="Empty model response received.",
-                    limitation="Provider returned response without content choices."
+                    limitation="Provider returned response without content choices.",
+                    target_language=target_language,
                 )
 
             content = response.choices[0].message.content
@@ -130,7 +178,8 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
                 return self._make_error_response(
                     status="LLM_RESPONSE_INVALID",
                     summary="Empty text content returned by AI provider.",
-                    limitation="Model output content was empty."
+                    limitation="Model output content was empty.",
+                    target_language=target_language,
                 )
 
             json_str = self._extract_json_block(content)
@@ -143,41 +192,49 @@ class NemotronIntelligenceProvider(FinancialIntelligenceProvider):
             return self._make_error_response(
                 status="LLM_RATE_LIMITED",
                 summary="Financial AI is temporarily busy. Please try again shortly.",
-                limitation="OpenRouter API rate limit reached (HTTP 429)."
+                limitation="OpenRouter API rate limit reached (HTTP 429).",
+                target_language=target_language,
             )
         except (APITimeoutError, APIConnectionError) as e:
             logger.error(f"OpenRouter connection/timeout error: {str(e)}")
             return self._make_error_response(
                 status="LLM_PROVIDER_ERROR",
                 summary="AI Intelligence provider network timeout.",
-                limitation="Network request timed out or connection failed."
+                limitation="Network request timed out or connection failed.",
+                target_language=target_language,
             )
         except APIError as e:
             logger.error(f"OpenRouter API error: {str(e)}")
             return self._make_error_response(
                 status="LLM_PROVIDER_ERROR",
                 summary="AI Service responded with an error.",
-                limitation=f"OpenRouter API error (code: {getattr(e, 'status_code', 'unknown')})."
+                limitation=f"OpenRouter API error (code: {getattr(e, 'status_code', 'unknown')}).",
+                target_language=target_language,
             )
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse JSON from model output: {str(e)}")
             return self._make_error_response(
                 status="LLM_RESPONSE_INVALID",
                 summary="Invalid structured JSON response from AI provider.",
-                limitation="Model response failed JSON parsing."
+                limitation="Model response failed JSON parsing.",
+                target_language=target_language,
             )
         except Exception as e:
             logger.error(f"Unexpected error calling OpenRouter Nemotron API: {str(e)}")
             return self._make_error_response(
                 status="LLM_PROVIDER_ERROR",
                 summary="AI Intelligence provider unavailable.",
-                limitation="Unexpected error encountered."
+                limitation="Unexpected error encountered.",
+                target_language=target_language,
             )
 
-    def generate_event_explanation(self, context_package: FinancialContextPackage) -> GroundedInsightResponse:
-        system_prompt = """You are the explanation layer of a financial intelligence system.
+    def generate_event_explanation(self, context_package: FinancialContextPackage, target_language: str = "en") -> GroundedInsightResponse:
+        lang_directive = self._build_language_instruction(target_language)
+        system_prompt = f"""You are the explanation layer of a financial intelligence system.
 You receive verified and deterministic financial context.
 You must only explain facts explicitly present in the supplied context.
+
+{lang_directive}
 
 You must not:
 - invent financial information
@@ -216,16 +273,19 @@ Return ONLY valid JSON matching this exact structure:
 CONTEXT PACKAGE:
 {json.dumps(context_package.model_dump(mode="json"), indent=2)}"""
 
-        insight = self._call_openrouter_completion(system_prompt, user_prompt)
+        insight = self._call_openrouter_completion(system_prompt, user_prompt, target_language=target_language)
         if insight.status == "CURRENT":
             insight = self._sanitize_provenance(insight, context_package)
-            insight = self._validate_amounts(insight, context_package)
+            insight = self._validate_amounts(insight, context_package, target_language=target_language)
         return insight
 
-    def answer_financial_question(self, context_package: FinancialContextPackage, question: str) -> GroundedInsightResponse:
-        system_prompt = """You are the explanation layer of a financial intelligence system.
+    def answer_financial_question(self, context_package: FinancialContextPackage, question: str, target_language: str = "en") -> GroundedInsightResponse:
+        lang_directive = self._build_language_instruction(target_language)
+        system_prompt = f"""You are the explanation layer of a financial intelligence system.
 You receive verified deterministic financial context and external market signals.
 You must only explain facts explicitly present in the supplied context.
+
+{lang_directive}
 
 You must not:
 - invent financial information or market claims
@@ -264,8 +324,8 @@ Return ONLY valid JSON matching this exact structure:
 CONTEXT PACKAGE:
 {json.dumps(context_package.model_dump(mode="json"), indent=2)}"""
 
-        insight = self._call_openrouter_completion(system_prompt, user_prompt)
+        insight = self._call_openrouter_completion(system_prompt, user_prompt, target_language=target_language)
         if insight.status == "CURRENT":
             insight = self._sanitize_provenance(insight, context_package)
-            insight = self._validate_amounts(insight, context_package)
+            insight = self._validate_amounts(insight, context_package, target_language=target_language)
         return insight

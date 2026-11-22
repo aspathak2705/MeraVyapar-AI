@@ -51,6 +51,7 @@ class FinancialQueryRequest(BaseModel):
     question: str
     focus_entity_id: Optional[UUID] = None
     sanitized_context: Optional[Dict[str, Any]] = None
+    target_language: Optional[str] = Field(default="en", description="Target response language: en, hi, mr")
 
 
 class FinancialQueryResponse(BaseModel):

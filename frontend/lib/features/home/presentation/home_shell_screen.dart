@@ -437,7 +437,12 @@ class HomeShellScreen extends ConsumerWidget {
                   color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
                   onTap: () => onNavigateToRoute?.call('/market/shortlist'),
                 ),
-                const SizedBox(width: 68),
+                MerchantActionTile(
+                  label: l10n != null ? l10n.intelligentReportsTitle.replaceAll(' & ', '\n').replaceAll(' और ', '\n').replaceAll(' आणि ', '\n') : 'Financial\nReports',
+                  icon: Icons.summarize_rounded,
+                  color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+                  onTap: () => onNavigateToRoute?.call('/reports'),
+                ),
                 const SizedBox(width: 68),
               ],
             ),

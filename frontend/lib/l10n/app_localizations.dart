@@ -1389,6 +1389,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reference'**
   String get reference;
+
+  /// No description provided for @intelligentReportsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Reports & History'**
+  String get intelligentReportsTitle;
+
+  /// No description provided for @generateReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Report'**
+  String get generateReport;
+
+  /// No description provided for @reportLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Language'**
+  String get reportLanguage;
+
+  /// No description provided for @reportType.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Type'**
+  String get reportType;
+
+  /// No description provided for @dailyFinancialDigest.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Financial Digest'**
+  String get dailyFinancialDigest;
+
+  /// No description provided for @cashFlowHealthReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash Flow Health Report'**
+  String get cashFlowHealthReport;
+
+  /// No description provided for @creditRecoveryReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit Recovery & Receivables'**
+  String get creditRecoveryReport;
+
+  /// No description provided for @noReportsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No Reports Generated Yet'**
+  String get noReportsYet;
+
+  /// No description provided for @noReportsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate localized intelligence reports from your private device records.'**
+  String get noReportsDesc;
+
+  /// No description provided for @reportDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Details'**
+  String get reportDetails;
+
+  /// No description provided for @deleteReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Report'**
+  String get deleteReport;
+
+  /// No description provided for @generatingReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating report with Nemotron AI...'**
+  String get generatingReport;
 }
 
 class _AppLocalizationsDelegate

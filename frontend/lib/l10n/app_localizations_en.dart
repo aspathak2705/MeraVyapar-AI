@@ -662,4 +662,41 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reference => 'Reference';
+
+  @override
+  String get intelligentReportsTitle => 'Financial Reports & History';
+
+  @override
+  String get generateReport => 'Generate Report';
+
+  @override
+  String get reportLanguage => 'Report Language';
+
+  @override
+  String get reportType => 'Report Type';
+
+  @override
+  String get dailyFinancialDigest => 'Daily Financial Digest';
+
+  @override
+  String get cashFlowHealthReport => 'Cash Flow Health Report';
+
+  @override
+  String get creditRecoveryReport => 'Credit Recovery & Receivables';
+
+  @override
+  String get noReportsYet => 'No Reports Generated Yet';
+
+  @override
+  String get noReportsDesc =>
+      'Generate localized intelligence reports from your private device records.';
+
+  @override
+  String get reportDetails => 'Report Details';
+
+  @override
+  String get deleteReport => 'Delete Report';
+
+  @override
+  String get generatingReport => 'Generating report with Nemotron AI...';
 }

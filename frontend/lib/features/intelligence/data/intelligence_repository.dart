@@ -17,6 +17,7 @@ class IntelligenceRepository {
     required String question,
     String? focusEntityId,
     Map<String, dynamic>? sanitizedContext,
+    String? targetLanguage,
   }) async {
     final res = await _apiClient.post(
       '/financial-intelligence/query',
@@ -24,6 +25,7 @@ class IntelligenceRepository {
         'question': question,
         if (focusEntityId != null) 'focus_entity_id': focusEntityId,
         if (sanitizedContext != null) 'sanitized_context': sanitizedContext,
+        if (targetLanguage != null) 'target_language': targetLanguage,
       },
     );
     return FinancialQueryResultModel.fromJson(res['data']);

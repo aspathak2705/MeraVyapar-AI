@@ -3,7 +3,7 @@
 /// Preserves financial precision using integer minor units (paise: 1 INR = 100 paise)
 /// and ISO-8601 UTC timestamp strings.
 class LocalDatabaseSchema {
-  static const int version = 6;
+  static const int version = 7;
   static const String databaseFileName = 'meravyapar_local.db';
 
   // Table Names
@@ -32,6 +32,9 @@ class LocalDatabaseSchema {
 
   // Local Supplier Discovery Shortlist Table (Additive V6)
   static const String tableSupplierShortlist = 'supplier_shortlist';
+
+  // Intelligent Local Reports History Table (Additive V7)
+  static const String tableGeneratedReports = 'generated_reports';
 
   // SQL DDL statements for version 3
   static const List<String> createStatementsV3 = [
@@ -433,5 +436,32 @@ class LocalDatabaseSchema {
   static List<String> get createStatementsV6 => [
         ...createStatementsV5,
         ...supplierShortlistStatementsV6,
+      ];
+
+  // SQL DDL statements for version 7 (Intelligent Local Reports Additions)
+  static const List<String> reportsStatementsV7 = [
+    '''
+    CREATE TABLE IF NOT EXISTS $tableGeneratedReports (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      report_type TEXT NOT NULL,
+      title TEXT NOT NULL,
+      summary TEXT NOT NULL,
+      language TEXT NOT NULL DEFAULT 'en',
+      payload_json TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE INDEX IF NOT EXISTS idx_generated_reports_merchant
+    ON $tableGeneratedReports(merchant_id, created_at DESC);
+    '''
+  ];
+
+  /// Combined creation statements for fresh installations (V7)
+  static List<String> get createStatementsV7 => [
+        ...createStatementsV6,
+        ...reportsStatementsV7,
       ];
 }

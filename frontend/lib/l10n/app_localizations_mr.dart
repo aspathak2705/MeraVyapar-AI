@@ -663,4 +663,41 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get reference => 'संदर्भ';
+
+  @override
+  String get intelligentReportsTitle => 'आर्थिक अहवाल आणि इतिहास';
+
+  @override
+  String get generateReport => 'अहवाल तयार करा';
+
+  @override
+  String get reportLanguage => 'अहवाल भाषा';
+
+  @override
+  String get reportType => 'अहवाल प्रकार';
+
+  @override
+  String get dailyFinancialDigest => 'दैनिक आर्थिक सारांश';
+
+  @override
+  String get cashFlowHealthReport => 'रोख प्रवाह आरोग्य अहवाल';
+
+  @override
+  String get creditRecoveryReport => 'येणे वसुली आणि बाकी';
+
+  @override
+  String get noReportsYet => 'अद्याप कोणताही अहवाल तयार केलेला नाही';
+
+  @override
+  String get noReportsDesc =>
+      'आपल्या खाजगी डिव्हाइस नोंदींमधून स्थानिक अहवाल तयार करा.';
+
+  @override
+  String get reportDetails => 'अहवाल तपशील';
+
+  @override
+  String get deleteReport => 'अहवाल हटवा';
+
+  @override
+  String get generatingReport => 'नेमोट्रॉन एआय सह अहवाल तयार होत आहे...';
 }

@@ -61,8 +61,8 @@ class LocalDatabaseService {
         : 0;
 
     if (currentDbVersion == 0) {
-      // Fresh install: execute full V6 schema atomically
-      for (final sql in LocalDatabaseSchema.createStatementsV6) {
+      // Fresh install: execute full V7 schema atomically
+      for (final sql in LocalDatabaseSchema.createStatementsV7) {
         await _activeDriver!.execute(sql);
       }
       await _activeDriver!.execute('PRAGMA user_version = ${LocalDatabaseSchema.version};');
@@ -92,6 +92,15 @@ class LocalDatabaseService {
             await txn.execute(sql);
           }
           await txn.execute('PRAGMA user_version = 6;');
+        });
+      }
+      if (currentDbVersion < 7) {
+        // Upgrade to V7 (generated intelligent reports)
+        await _activeDriver!.transaction((txn) async {
+          for (final sql in LocalDatabaseSchema.reportsStatementsV7) {
+            await txn.execute(sql);
+          }
+          await txn.execute('PRAGMA user_version = 7;');
         });
       }
     }
