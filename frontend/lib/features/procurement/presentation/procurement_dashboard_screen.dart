@@ -6,8 +6,6 @@ import '../data/local_procurement_repository.dart';
 import '../domain/procurement_models.dart';
 import '../domain/quotation_comparison_engine.dart';
 
-final localProcurementRepositoryProvider = Provider((ref) => LocalProcurementRepository());
-
 class ProcurementDashboardScreen extends ConsumerStatefulWidget {
   final String merchantId;
   final VoidCallback? onBack;

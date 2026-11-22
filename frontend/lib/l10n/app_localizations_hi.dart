@@ -701,4 +701,31 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get generatingReport =>
       'नेमोट्रॉन एआई के साथ रिपोर्ट तैयार हो रही है...';
+
+  @override
+  String get financialOverview => 'वित्तीय अवलोकन';
+
+  @override
+  String get priorityActions => 'प्राथमिकता कार्य व अंतर्दृष्टी';
+
+  @override
+  String get upcomingObligations => 'आगामी देयता व वचने';
+
+  @override
+  String get reviewAndSend => 'समीक्षा और भेजें';
+
+  @override
+  String get allObligationsSettled => 'सभी देयताएं चुकता हैं';
+
+  @override
+  String get viewAll => 'सभी देखें';
+
+  @override
+  String get manage => 'प्रबंधित करें';
+
+  @override
+  String get shortlistedSuppliers => 'शॉर्टलिस्ट किए गए आपूर्तिकर्ता';
+
+  @override
+  String get marketPulse => 'मार्केट पल्स';
 }

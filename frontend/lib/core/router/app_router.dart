@@ -57,14 +57,9 @@ import '../localization/locale_provider.dart';
 import '../../l10n/app_localizations.dart';
 
 // --- Local Repository Providers ---
-// Re-export single canonical localAuthRepositoryProvider from local_auth_repository.dart
-// (Do not declare a second localAuthRepositoryProvider instance here)
+// Re-export canonical providers from feature data repositories
 final localCanonicalTransactionRepositoryProvider =
     Provider((ref) => LocalCanonicalTransactionRepository());
-final localMemoryRepositoryProvider =
-    Provider((ref) => LocalMemoryRepository());
-final localActionRepositoryProvider =
-    Provider((ref) => LocalActionRepository());
 final localEvidenceCaptureServiceProvider =
     Provider((ref) => LocalEvidenceCaptureService());
 

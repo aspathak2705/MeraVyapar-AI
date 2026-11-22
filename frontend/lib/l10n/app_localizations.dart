@@ -1461,6 +1461,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Generating report with Nemotron AI...'**
   String get generatingReport;
+
+  /// No description provided for @financialOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Financial Overview'**
+  String get financialOverview;
+
+  /// No description provided for @priorityActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Priority Actions & Insights'**
+  String get priorityActions;
+
+  /// No description provided for @upcomingObligations.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Obligations & Promises'**
+  String get upcomingObligations;
+
+  /// No description provided for @reviewAndSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Review & Send'**
+  String get reviewAndSend;
+
+  /// No description provided for @allObligationsSettled.
+  ///
+  /// In en, this message translates to:
+  /// **'All obligations settled'**
+  String get allObligationsSettled;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// No description provided for @manage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage'**
+  String get manage;
+
+  /// No description provided for @shortlistedSuppliers.
+  ///
+  /// In en, this message translates to:
+  /// **'Shortlisted Suppliers'**
+  String get shortlistedSuppliers;
+
+  /// No description provided for @marketPulse.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Pulse'**
+  String get marketPulse;
 }
 
 class _AppLocalizationsDelegate

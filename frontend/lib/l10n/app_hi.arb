@@ -231,5 +231,14 @@
   "noReportsDesc": "अपने निजी डिवाइस रिकॉर्ड से स्थानीयकृत रिपोर्ट तैयार करें।",
   "reportDetails": "रिपोर्ट विवरण",
   "deleteReport": "रिपोर्ट हटाएं",
-  "generatingReport": "नेमोट्रॉन एआई के साथ रिपोर्ट तैयार हो रही है..."
+  "generatingReport": "नेमोट्रॉन एआई के साथ रिपोर्ट तैयार हो रही है...",
+  "financialOverview": "वित्तीय अवलोकन",
+  "priorityActions": "प्राथमिकता कार्य व अंतर्दृष्टी",
+  "upcomingObligations": "आगामी देयता व वचने",
+  "reviewAndSend": "समीक्षा और भेजें",
+  "allObligationsSettled": "सभी देयताएं चुकता हैं",
+  "viewAll": "सभी देखें",
+  "manage": "प्रबंधित करें",
+  "shortlistedSuppliers": "शॉर्टलिस्ट किए गए आपूर्तिकर्ता",
+  "marketPulse": "मार्केट पल्स"
 }

@@ -700,4 +700,31 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get generatingReport => 'नेमोट्रॉन एआय सह अहवाल तयार होत आहे...';
+
+  @override
+  String get financialOverview => 'आर्थिक आढावा';
+
+  @override
+  String get priorityActions => 'प्राधान्य कृती आणि अंतर्दृष्टी';
+
+  @override
+  String get upcomingObligations => 'आगामी दायित्वे आणि वचने';
+
+  @override
+  String get reviewAndSend => 'तपासा आणि पाठवा';
+
+  @override
+  String get allObligationsSettled => 'सर्व दायित्वे पूर्ण आहेत';
+
+  @override
+  String get viewAll => 'सर्व पहा';
+
+  @override
+  String get manage => 'व्यवस्थापित करा';
+
+  @override
+  String get shortlistedSuppliers => 'शॉर्टलिस्ट केलेले पुरवठादार';
+
+  @override
+  String get marketPulse => 'मार्केट पल्स';
 }

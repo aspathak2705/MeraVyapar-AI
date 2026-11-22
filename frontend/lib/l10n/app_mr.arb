@@ -231,5 +231,14 @@
   "noReportsDesc": "आपल्या खाजगी डिव्हाइस नोंदींमधून स्थानिक अहवाल तयार करा.",
   "reportDetails": "अहवाल तपशील",
   "deleteReport": "अहवाल हटवा",
-  "generatingReport": "नेमोट्रॉन एआय सह अहवाल तयार होत आहे..."
+  "generatingReport": "नेमोट्रॉन एआय सह अहवाल तयार होत आहे...",
+  "financialOverview": "आर्थिक आढावा",
+  "priorityActions": "प्राधान्य कृती आणि अंतर्दृष्टी",
+  "upcomingObligations": "आगामी दायित्वे आणि वचने",
+  "reviewAndSend": "तपासा आणि पाठवा",
+  "allObligationsSettled": "सर्व दायित्वे पूर्ण आहेत",
+  "viewAll": "सर्व पहा",
+  "manage": "व्यवस्थापित करा",
+  "shortlistedSuppliers": "शॉर्टलिस्ट केलेले पुरवठादार",
+  "marketPulse": "मार्केट पल्स"
 }

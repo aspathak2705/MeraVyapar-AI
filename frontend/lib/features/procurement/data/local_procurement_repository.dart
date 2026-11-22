@@ -1,7 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/database/local_database_service.dart';
 import '../../../core/database/local_database_schema.dart';
 import '../domain/procurement_models.dart';
+
+final localProcurementRepositoryProvider = Provider((ref) => LocalProcurementRepository());
 
 class LocalProcurementRepository {
   final LocalDatabaseService _dbService;

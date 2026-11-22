@@ -699,4 +699,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get generatingReport => 'Generating report with Nemotron AI...';
+
+  @override
+  String get financialOverview => 'Financial Overview';
+
+  @override
+  String get priorityActions => 'Priority Actions & Insights';
+
+  @override
+  String get upcomingObligations => 'Upcoming Obligations & Promises';
+
+  @override
+  String get reviewAndSend => 'Review & Send';
+
+  @override
+  String get allObligationsSettled => 'All obligations settled';
+
+  @override
+  String get viewAll => 'View All';
+
+  @override
+  String get manage => 'Manage';
+
+  @override
+  String get shortlistedSuppliers => 'Shortlisted Suppliers';
+
+  @override
+  String get marketPulse => 'Market Pulse';
 }

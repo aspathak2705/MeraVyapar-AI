@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../../core/database/local_database_service.dart';
 import '../../../../core/database/local_database_schema.dart';
 import '../domain/communication_action_model.dart';
 import '../domain/communication_audit_event_model.dart';
+
+final localActionRepositoryProvider = Provider((ref) => LocalActionRepository());
 
 /// Local-First Action Repository.
 /// All communication drafts and audit events are persisted in local SQLite.

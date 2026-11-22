@@ -231,5 +231,14 @@
   "noReportsDesc": "Generate localized intelligence reports from your private device records.",
   "reportDetails": "Report Details",
   "deleteReport": "Delete Report",
-  "generatingReport": "Generating report with Nemotron AI..."
+  "generatingReport": "Generating report with Nemotron AI...",
+  "financialOverview": "Financial Overview",
+  "priorityActions": "Priority Actions & Insights",
+  "upcomingObligations": "Upcoming Obligations & Promises",
+  "reviewAndSend": "Review & Send",
+  "allObligationsSettled": "All obligations settled",
+  "viewAll": "View All",
+  "manage": "Manage",
+  "shortlistedSuppliers": "Shortlisted Suppliers",
+  "marketPulse": "Market Pulse"
 }

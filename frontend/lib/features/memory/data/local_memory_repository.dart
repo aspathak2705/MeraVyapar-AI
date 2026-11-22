@@ -1,9 +1,12 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/money/money.dart';
 import '../../../../core/database/local_database_service.dart';
 import '../../../../core/database/local_database_schema.dart';
 import '../domain/counterparty_model.dart';
 import '../domain/payment_promise_model.dart';
+
+final localMemoryRepositoryProvider = Provider((ref) => LocalMemoryRepository());
 
 class LocalMemoryRepository {
   final LocalDatabaseService _dbService;
