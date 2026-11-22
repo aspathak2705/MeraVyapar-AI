@@ -726,4 +726,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketPulse => 'Market Pulse';
+
+  @override
+  String get observedPriceDisclaimer =>
+      'Observed Online Listing: Public web price. Not a negotiated commercial trade quote.';
+
+  @override
+  String get discoveredSupplierNotice =>
+      'Discovered Business • Unverified Supplier';
+
+  @override
+  String get observedPriceNotice => 'Observed Listing Price • Not Trade Quote';
+
+  @override
+  String get externalNewsNotice => 'External News Report';
+
+  @override
+  String get localMarketNotice => 'Local Market Location';
+
+  @override
+  String get noSignalsFound => 'No Relevant Market Signals Found';
+
+  @override
+  String get networkErrorTitle => 'Network Unavailable';
+
+  @override
+  String get providerKeyMissingTitle => 'Market Provider Key Missing';
+
+  @override
+  String get tradeNotes => 'Trade Notes';
+
+  @override
+  String get saveNotes => 'Save Notes';
+
+  @override
+  String get selectAtLeastTwoToCompare =>
+      'Select at least 2 suppliers to compare.';
+
+  @override
+  String get splitView => 'Split View';
+
+  @override
+  String get mapOnly => 'Map View';
+
+  @override
+  String get listOnly => 'List View';
 }

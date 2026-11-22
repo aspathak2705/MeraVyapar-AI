@@ -1515,6 +1515,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Market Pulse'**
   String get marketPulse;
+
+  /// No description provided for @observedPriceDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Observed Online Listing: Public web price. Not a negotiated commercial trade quote.'**
+  String get observedPriceDisclaimer;
+
+  /// No description provided for @discoveredSupplierNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Discovered Business • Unverified Supplier'**
+  String get discoveredSupplierNotice;
+
+  /// No description provided for @observedPriceNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Observed Listing Price • Not Trade Quote'**
+  String get observedPriceNotice;
+
+  /// No description provided for @externalNewsNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'External News Report'**
+  String get externalNewsNotice;
+
+  /// No description provided for @localMarketNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Local Market Location'**
+  String get localMarketNotice;
+
+  /// No description provided for @noSignalsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Relevant Market Signals Found'**
+  String get noSignalsFound;
+
+  /// No description provided for @networkErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Unavailable'**
+  String get networkErrorTitle;
+
+  /// No description provided for @providerKeyMissingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Provider Key Missing'**
+  String get providerKeyMissingTitle;
+
+  /// No description provided for @tradeNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Trade Notes'**
+  String get tradeNotes;
+
+  /// No description provided for @saveNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Notes'**
+  String get saveNotes;
+
+  /// No description provided for @selectAtLeastTwoToCompare.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least 2 suppliers to compare.'**
+  String get selectAtLeastTwoToCompare;
+
+  /// No description provided for @splitView.
+  ///
+  /// In en, this message translates to:
+  /// **'Split View'**
+  String get splitView;
+
+  /// No description provided for @mapOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Map View'**
+  String get mapOnly;
+
+  /// No description provided for @listOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'List View'**
+  String get listOnly;
 }
 
 class _AppLocalizationsDelegate

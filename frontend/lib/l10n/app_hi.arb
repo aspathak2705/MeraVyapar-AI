@@ -240,5 +240,19 @@
   "viewAll": "सभी देखें",
   "manage": "प्रबंधित करें",
   "shortlistedSuppliers": "शॉर्टलिस्ट किए गए आपूर्तिकर्ता",
-  "marketPulse": "मार्केट पल्स"
+  "marketPulse": "मार्केट पल्स",
+  "observedPriceDisclaimer": "देखी गई ऑनलाइन लिस्टिंग: सार्वजनिक वेब मूल्य। यह कोई व्यापारिक कोटेशन नहीं है।",
+  "discoveredSupplierNotice": "खोजा गया व्यवसाय • असत्यापित आपूर्तिकर्ता",
+  "observedPriceNotice": "देखी गई सूची कीमत • व्यापार कोटेशन नहीं",
+  "externalNewsNotice": "बाह्य समाचार रिपोर्ट",
+  "localMarketNotice": "स्थानीय बाजार स्थान",
+  "noSignalsFound": "कोई प्रासंगिक बाजार संकेत नहीं मिला",
+  "networkErrorTitle": "नेटवर्क उपलब्ध नहीं है",
+  "providerKeyMissingTitle": "मार्केट प्रदाता कुंजी गायब है",
+  "tradeNotes": "व्यापार नोट्स",
+  "saveNotes": "नोट्स सहेजें",
+  "selectAtLeastTwoToCompare": "तुलना करने के लिए कम से कम 2 आपूर्तिकर्ता चुनें।",
+  "splitView": "विभाजित दृश्य",
+  "mapOnly": "मानचित्र दृश्य",
+  "listOnly": "सूची दृश्य"
 }

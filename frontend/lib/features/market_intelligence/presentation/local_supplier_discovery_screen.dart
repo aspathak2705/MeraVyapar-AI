@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/market_event_model.dart';
 import '../domain/shortlisted_supplier_model.dart';
 import '../data/market_intelligence_repository.dart';
@@ -134,9 +135,10 @@ class _LocalSupplierDiscoveryScreenState
       await shortlistRepo.removeFromShortlist(found.id);
       _shortlistedNames.remove(business.title);
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         setState(() {});
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Removed "${business.title}" from shortlist.')),
+          SnackBar(content: Text(l10n?.removedFromShortlist ?? 'Removed "${business.title}" from shortlist.')),
         );
       }
     } else {
@@ -147,9 +149,10 @@ class _LocalSupplierDiscoveryScreenState
       await shortlistRepo.addToShortlist(supplier);
       _shortlistedNames.add(business.title);
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         setState(() {});
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Saved "${business.title}" to shortlist.')),
+          SnackBar(content: Text(l10n?.savedToShortlist ?? 'Saved "${business.title}" to shortlist.')),
         );
       }
     }
@@ -169,10 +172,11 @@ class _LocalSupplierDiscoveryScreenState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Local Supplier Discovery'),
+        title: Text(l10n?.localSupplierDiscovery ?? 'Local Supplier Discovery'),
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -207,7 +211,7 @@ class _LocalSupplierDiscoveryScreenState
                   ),
               ],
             ),
-            tooltip: 'Saved Shortlist',
+            tooltip: l10n?.savedSuppliers ?? 'Saved Shortlist',
             onPressed: widget.onOpenShortlist,
           ),
         ],
@@ -221,7 +225,7 @@ class _LocalSupplierDiscoveryScreenState
               color: isDark ? AppColors.darkCard : Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
+                  color: Colors.black.withValues(alpha: 0.04),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -237,7 +241,7 @@ class _LocalSupplierDiscoveryScreenState
                         controller: _queryController,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.search, size: 20),
-                          hintText: 'Search suppliers, wholesalers...',
+                          hintText: l10n?.searchMarkets ?? 'Search suppliers, wholesalers...',
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -252,7 +256,7 @@ class _LocalSupplierDiscoveryScreenState
                         controller: _locationController,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.location_on, size: 18, color: AppColors.primaryPurple),
-                          hintText: 'City / State',
+                          hintText: '${l10n?.city ?? "City"} / ${l10n?.state ?? "State"}',
                           isDense: true,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -280,8 +284,8 @@ class _LocalSupplierDiscoveryScreenState
                   children: [
                     Text(
                       _isLoading
-                          ? 'Searching nearby...'
-                          : '${_discoveredBusinesses.length} suppliers found',
+                          ? (l10n?.loading ?? 'Searching nearby...')
+                          : '${_discoveredBusinesses.length} ${l10n?.suppliersTitle ?? "suppliers"}',
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -289,21 +293,21 @@ class _LocalSupplierDiscoveryScreenState
                       ),
                     ),
                     SegmentedButton<DiscoveryViewMode>(
-                      segments: const [
+                      segments: [
                         ButtonSegment(
                           value: DiscoveryViewMode.split,
-                          icon: Icon(Icons.dashboard_outlined, size: 16),
-                          label: Text('Split', style: TextStyle(fontSize: 11)),
+                          icon: const Icon(Icons.dashboard_outlined, size: 16),
+                          label: Text(l10n?.splitView ?? 'Split', style: const TextStyle(fontSize: 11)),
                         ),
                         ButtonSegment(
                           value: DiscoveryViewMode.mapOnly,
-                          icon: Icon(Icons.map_outlined, size: 16),
-                          label: Text('Map', style: TextStyle(fontSize: 11)),
+                          icon: const Icon(Icons.map_outlined, size: 16),
+                          label: Text(l10n?.mapOnly ?? 'Map', style: const TextStyle(fontSize: 11)),
                         ),
                         ButtonSegment(
                           value: DiscoveryViewMode.listOnly,
-                          icon: Icon(Icons.view_list, size: 16),
-                          label: Text('List', style: TextStyle(fontSize: 11)),
+                          icon: const Icon(Icons.view_list, size: 16),
+                          label: Text(l10n?.listOnly ?? 'List', style: const TextStyle(fontSize: 11)),
                         ),
                       ],
                       selected: {_viewMode},
@@ -420,6 +424,7 @@ class _LocalSupplierDiscoveryScreenState
   }
 
   Widget _buildBusinessList(bool isDark) {
+    final l10n = AppLocalizations.of(context);
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemCount: _discoveredBusinesses.length,
@@ -470,7 +475,7 @@ class _LocalSupplierDiscoveryScreenState
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: AppColors.primaryPurple.withOpacity(0.1),
+                                  color: AppColors.primaryPurple.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -490,7 +495,9 @@ class _LocalSupplierDiscoveryScreenState
                           isShortlisted ? Icons.bookmark : Icons.bookmark_border,
                           color: isShortlisted ? AppColors.primaryPurple : Colors.grey,
                         ),
-                        tooltip: isShortlisted ? 'In Shortlist' : 'Add to Shortlist',
+                        tooltip: isShortlisted
+                            ? (l10n?.inShortlist ?? 'In Shortlist')
+                            : (l10n?.saveToShortlist ?? 'Add to Shortlist'),
                         onPressed: () => _toggleShortlist(b),
                       ),
                     ],
@@ -522,12 +529,12 @@ class _LocalSupplierDiscoveryScreenState
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.amber.withOpacity(0.15),
+                          color: Colors.amber.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: Colors.amber.shade700.withOpacity(0.4)),
+                          border: Border.all(color: Colors.amber.shade700.withValues(alpha: 0.4)),
                         ),
                         child: Text(
-                          'Unverified Discovery',
+                          l10n?.discoveredSupplierNotice ?? 'Unverified Discovery',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w600,
@@ -572,7 +579,7 @@ class _LocalSupplierDiscoveryScreenState
                       ],
                       TextButton.icon(
                         icon: const Icon(Icons.info_outline, size: 16),
-                        label: const Text('View Details', style: TextStyle(fontSize: 12)),
+                        label: Text(l10n?.viewDetails ?? 'View Details', style: const TextStyle(fontSize: 12)),
                         onPressed: () => _openDetail(b),
                       ),
                     ],

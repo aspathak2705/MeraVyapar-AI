@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/merchant_market_relevance_model.dart';
 
 class MarketSignalDetailScreen extends StatelessWidget {
@@ -20,17 +21,18 @@ class MarketSignalDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final ev = signal.marketEvent;
     final src = ev?.source;
     final nature = ev?.evidenceNature ?? src?.evidenceNature ?? '';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Market Signal Detail'),
+        title: Text(l10n?.marketSignals ?? 'Market Signal Detail'),
         leading: onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
-                tooltip: 'Back',
+                tooltip: l10n?.back ?? 'Back',
                 onPressed: onBack,
               )
             : null,
@@ -103,15 +105,16 @@ class MarketSignalDetailScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: const Color(0xFFBBF7D0)),
                   ),
-                  child: const Row(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.info_outline, color: Color(0xFF16A34A), size: 18),
-                      SizedBox(width: 8),
+                      const Icon(Icons.info_outline, color: Color(0xFF16A34A), size: 18),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Observed Online Listing: This price is observed from online retail listings. It is NOT a verified wholesale quotation. Wholesale rates typically require direct supplier negotiation.',
-                          style: TextStyle(fontSize: 12, color: Color(0xFF166534), height: 1.4),
+                          l10n?.observedPriceDisclaimer ??
+                              'Observed Online Listing: This price is observed from online retail listings. It is NOT a verified wholesale quotation. Wholesale rates typically require direct supplier negotiation.',
+                          style: const TextStyle(fontSize: 12, color: Color(0xFF166534), height: 1.4),
                         ),
                       ),
                     ],
@@ -125,15 +128,16 @@ class MarketSignalDetailScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: const Color(0xFFBFDBFE)),
                   ),
-                  child: const Row(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.travel_explore, color: Color(0xFF2563EB), size: 18),
-                      SizedBox(width: 8),
+                      const Icon(Icons.travel_explore, color: Color(0xFF2563EB), size: 18),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Discovered Online Business: Discovered via public search indexing. This business is not a verified trade counterparty. Perform trade due diligence before placing orders.',
-                          style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.4),
+                          l10n?.unverifiedDiscoveryDisclaimer ??
+                              'Discovered Online Business: Discovered via public search indexing. This business is not a verified trade counterparty. Perform trade due diligence before placing orders.',
+                          style: const TextStyle(fontSize: 12, color: Color(0xFF1E40AF), height: 1.4),
                         ),
                       ),
                     ],
@@ -232,7 +236,7 @@ class MarketSignalDetailScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.psychology_outlined),
-                  label: const Text('Analyze Impact on My Business'),
+                  label: Text(l10n?.analyzeImpact ?? 'Analyze Impact on My Business'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryPurple,
                     foregroundColor: Colors.white,

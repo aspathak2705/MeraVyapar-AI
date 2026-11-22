@@ -292,11 +292,12 @@ class _RelevantMarketSignalsScreenState
   }
 
   Widget _buildEngineFilterChips() {
+    final l10n = AppLocalizations.of(context);
     final engines = [
-      {'label': 'All Markets', 'engine': 'google', 'icon': Icons.public},
-      {'label': 'Wholesale Goods', 'engine': 'google_shopping', 'icon': Icons.shopping_bag_outlined},
-      {'label': 'Commodity News', 'engine': 'google_news', 'icon': Icons.newspaper},
-      {'label': 'Suppliers & Markets', 'engine': 'google_maps', 'icon': Icons.location_on_outlined},
+      {'label': l10n?.allMarkets ?? 'All Markets', 'engine': 'google', 'icon': Icons.public},
+      {'label': l10n?.wholesaleGoods ?? 'Wholesale Goods', 'engine': 'google_shopping', 'icon': Icons.shopping_bag_outlined},
+      {'label': l10n?.commodityNews ?? 'Commodity News', 'engine': 'google_news', 'icon': Icons.newspaper},
+      {'label': l10n?.suppliersAndMarkets ?? 'Suppliers & Markets', 'engine': 'google_maps', 'icon': Icons.location_on_outlined},
     ];
 
     return SizedBox(
@@ -344,16 +345,17 @@ class _RelevantMarketSignalsScreenState
   }
 
   Widget _buildBodyContent() {
+    final l10n = AppLocalizations.of(context);
     switch (_state) {
       case MarketSignalsState.loading:
-        return const Center(
+        return Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Retrieving market signals via SerpApi...',
-                  style: TextStyle(color: Color(0xFF64748B), fontSize: 13)),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(l10n?.loading ?? 'Retrieving market signals via SerpApi...',
+                  style: const TextStyle(color: Color(0xFF64748B), fontSize: 13)),
             ],
           ),
         );
@@ -367,9 +369,9 @@ class _RelevantMarketSignalsScreenState
               children: [
                 const Icon(Icons.key_off, size: 56, color: Color(0xFF94A3B8)),
                 const SizedBox(height: 16),
-                const Text(
-                  'Market Provider Key Missing',
-                  style: TextStyle(
+                Text(
+                  l10n?.providerKeyMissingTitle ?? 'Market Provider Key Missing',
+                  style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF0F172A)),
@@ -384,7 +386,7 @@ class _RelevantMarketSignalsScreenState
                 const SizedBox(height: 20),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.refresh),
-                  label: const Text('Retry Connection'),
+                  label: Text(l10n?.retry ?? 'Retry Connection'),
                   onPressed: () => _search(_activeQuery),
                 ),
               ],
@@ -401,9 +403,9 @@ class _RelevantMarketSignalsScreenState
               children: [
                 const Icon(Icons.wifi_off, size: 56, color: Color(0xFF94A3B8)),
                 const SizedBox(height: 16),
-                const Text(
-                  'Network Unavailable',
-                  style: TextStyle(
+                Text(
+                  l10n?.networkErrorTitle ?? 'Network Unavailable',
+                  style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF0F172A)),
@@ -418,7 +420,7 @@ class _RelevantMarketSignalsScreenState
                 const SizedBox(height: 20),
                 ElevatedButton.icon(
                   icon: const Icon(Icons.refresh),
-                  label: const Text('Try Again'),
+                  label: Text(l10n?.tryAgain ?? 'Try Again'),
                   onPressed: () => _search(_activeQuery),
                 ),
               ],
@@ -436,9 +438,9 @@ class _RelevantMarketSignalsScreenState
                 const Icon(Icons.travel_explore,
                     size: 56, color: Color(0xFF64748B)),
                 const SizedBox(height: 16),
-                const Text(
-                  'No Relevant Market Signals Found',
-                  style: TextStyle(
+                Text(
+                  l10n?.noSignalsFound ?? 'No Relevant Market Signals Found',
+                  style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF0F172A)),
@@ -587,16 +589,16 @@ class _RelevantMarketSignalsScreenState
                                   const SizedBox(height: 2),
                                   Builder(builder: (context) {
                                     final eng = ev?.engine ?? src.engine ?? '';
-                                    String label = 'Discovered Business • Unverified Supplier';
+                                    String label = l10n?.discoveredSupplierNotice ?? 'Discovered Business • Unverified Supplier';
                                     Color labelColor = const Color(0xFF1D4ED8);
                                     if (eng == 'google_shopping' || ev?.price != null) {
-                                      label = 'Observed Listing Price • Not Trade Quote';
+                                      label = l10n?.observedPriceNotice ?? 'Observed Listing Price • Not Trade Quote';
                                       labelColor = const Color(0xFF15803D);
                                     } else if (eng == 'google_news') {
-                                      label = 'External News Report';
+                                      label = l10n?.externalNewsNotice ?? 'External News Report';
                                       labelColor = const Color(0xFFB45309);
                                     } else if (eng == 'google_maps') {
-                                      label = 'Local Market Location';
+                                      label = l10n?.localMarketNotice ?? 'Local Market Location';
                                       labelColor = const Color(0xFF7E22CE);
                                     }
                                     return Text(

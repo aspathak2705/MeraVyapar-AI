@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/market_event_model.dart';
 import '../domain/shortlisted_supplier_model.dart';
 import '../data/local_supplier_shortlist_repository.dart';
@@ -55,9 +56,10 @@ class _BusinessDetailScreenState extends ConsumerState<BusinessDetailScreen> {
       );
       await repo.removeFromShortlist(item.id);
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         setState(() => _isShortlisted = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Removed supplier from shortlist.')),
+          SnackBar(content: Text(l10n?.removedFromShortlist ?? 'Removed supplier from shortlist.')),
         );
       }
     } else {
@@ -67,9 +69,10 @@ class _BusinessDetailScreenState extends ConsumerState<BusinessDetailScreen> {
       );
       await repo.addToShortlist(supplier);
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         setState(() => _isShortlisted = true);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Saved supplier to shortlist.')),
+          SnackBar(content: Text(l10n?.savedToShortlist ?? 'Saved supplier to shortlist.')),
         );
       }
     }
@@ -78,18 +81,19 @@ class _BusinessDetailScreenState extends ConsumerState<BusinessDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     final b = widget.business;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(b.title.isNotEmpty ? b.title : 'Supplier Details'),
+        title: Text(b.title.isNotEmpty ? b.title : (l10n?.suppliersTitle ?? 'Supplier Details')),
         actions: [
           IconButton(
             icon: Icon(
               _isShortlisted ? Icons.bookmark : Icons.bookmark_border,
               color: _isShortlisted ? AppColors.primaryPurple : null,
             ),
-            tooltip: _isShortlisted ? 'In Shortlist' : 'Save to Shortlist',
+            tooltip: _isShortlisted ? (l10n?.inShortlist ?? 'In Shortlist') : (l10n?.saveToShortlist ?? 'Save to Shortlist'),
             onPressed: _isChecking ? null : _toggleShortlist,
           ),
         ],
@@ -103,9 +107,9 @@ class _BusinessDetailScreenState extends ConsumerState<BusinessDetailScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.amber.withOpacity(isDark ? 0.15 : 0.1),
+                color: Colors.amber.withValues(alpha: isDark ? 0.15 : 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.amber.shade700.withOpacity(0.5)),
+                border: Border.all(color: Colors.amber.shade700.withValues(alpha: 0.5)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +121,7 @@ class _BusinessDetailScreenState extends ConsumerState<BusinessDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Unverified Online Supplier Discovery',
+                          l10n?.discoveredSupplierNotice ?? 'Unverified Online Supplier Discovery',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 13,
@@ -126,7 +130,8 @@ class _BusinessDetailScreenState extends ConsumerState<BusinessDetailScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Discovered via Google Maps search. This listing does not constitute a verified wholesale quote, formal quotation, or endorsed merchant partnership.',
+                          l10n?.unverifiedDiscoveryDisclaimer ??
+                              'Discovered via Google Maps search. This listing does not constitute a verified wholesale quote, formal quotation, or endorsed merchant partnership.',
                           style: TextStyle(
                             fontSize: 12,
                             color: isDark ? Colors.amber.shade100 : Colors.amber.shade900,
@@ -158,7 +163,7 @@ class _BusinessDetailScreenState extends ConsumerState<BusinessDetailScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
-                          color: AppColors.primaryPurple.withOpacity(0.12),
+                          color: AppColors.primaryPurple.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -282,7 +287,9 @@ class _BusinessDetailScreenState extends ConsumerState<BusinessDetailScreen> {
                 ),
                 icon: Icon(_isShortlisted ? Icons.bookmark_remove : Icons.bookmark_add),
                 label: Text(
-                  _isShortlisted ? 'Remove from Shortlist' : 'Save to Supplier Shortlist',
+                  _isShortlisted
+                      ? (l10n?.removedFromShortlist ?? 'Remove from Shortlist')
+                      : (l10n?.saveToShortlist ?? 'Save to Supplier Shortlist'),
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 onPressed: _isChecking ? null : _toggleShortlist,

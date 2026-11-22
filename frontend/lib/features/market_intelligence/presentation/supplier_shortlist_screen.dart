@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 import '../domain/shortlisted_supplier_model.dart';
 import '../data/local_supplier_shortlist_repository.dart';
 
@@ -60,34 +61,36 @@ class _SupplierShortlistScreenState
     _selectedForComparison.remove(id);
     await _loadShortlist();
     if (mounted) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Removed "$name" from shortlist.')),
+        SnackBar(content: Text(l10n?.removedFromShortlist ?? 'Removed "$name" from shortlist.')),
       );
     }
   }
 
   Future<void> _editNotes(ShortlistedSupplierModel item) async {
+    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController(text: item.notes ?? '');
     final saved = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Notes for ${item.businessName}'),
+        title: Text('${l10n?.tradeNotes ?? "Notes"} - ${item.businessName}'),
         content: TextField(
           controller: controller,
           maxLines: 4,
-          decoration: const InputDecoration(
-            hintText: 'Enter trade notes, pricing quotes, or procurement notes...',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: '${l10n?.tradeNotes ?? "Trade Notes"}...',
+            border: const OutlineInputBorder(),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n?.cancel ?? 'Cancel'),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-            child: const Text('Save Note'),
+            child: Text(l10n?.saveNotes ?? 'Save Note'),
           ),
         ],
       ),
@@ -103,10 +106,11 @@ class _SupplierShortlistScreenState
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Supplier Shortlist'),
+        title: Text(l10n?.supplierShortlist ?? 'Supplier Shortlist'),
         leading: widget.onBack != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
@@ -117,7 +121,7 @@ class _SupplierShortlistScreenState
           if (widget.onExploreSuppliers != null)
             IconButton(
               icon: const Icon(Icons.map_outlined),
-              tooltip: 'Explore Map',
+              tooltip: l10n?.localSupplierDiscovery ?? 'Explore Map',
               onPressed: widget.onExploreSuppliers,
             ),
         ],
@@ -144,7 +148,7 @@ class _SupplierShortlistScreenState
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        'Saved Suppliers (${_shortlist.length})',
+                        '${l10n?.savedSuppliers ?? "Saved Suppliers"} (${_shortlist.length})',
                         style: TextStyle(
                           fontWeight: _selectedTabIndex == 0
                               ? FontWeight.bold
@@ -174,7 +178,7 @@ class _SupplierShortlistScreenState
                       ),
                       alignment: Alignment.center,
                       child: Text(
-                        'Compare Selected (${_selectedForComparison.length})',
+                        '${l10n?.compareSelected ?? "Compare Selected"} (${_selectedForComparison.length})',
                         style: TextStyle(
                           fontWeight: _selectedTabIndex == 1
                               ? FontWeight.bold
@@ -203,6 +207,7 @@ class _SupplierShortlistScreenState
   }
 
   Widget _buildEmptyState(bool isDark) {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(28),
@@ -211,9 +216,9 @@ class _SupplierShortlistScreenState
           children: [
             Icon(Icons.bookmark_border, size: 64, color: Colors.grey.shade400),
             const SizedBox(height: 16),
-            const Text(
-              'No Saved Suppliers Yet',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+            Text(
+              l10n?.noSuppliersFound ?? 'No Saved Suppliers Yet',
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
@@ -230,7 +235,7 @@ class _SupplierShortlistScreenState
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
                 icon: const Icon(Icons.explore),
-                label: const Text('Discover Local Suppliers'),
+                label: Text(l10n?.localSupplierDiscovery ?? 'Discover Local Suppliers'),
                 onPressed: widget.onExploreSuppliers,
               ),
           ],
@@ -253,7 +258,7 @@ class _SupplierShortlistScreenState
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
               color: isSelectedForCompare
-                  ? AppColors.primaryPurple.withOpacity(0.6)
+                  ? AppColors.primaryPurple.withValues(alpha: 0.6)
                   : (isDark ? Colors.white12 : Colors.grey.shade300),
               width: isSelectedForCompare ? 1.5 : 1,
             ),
@@ -294,7 +299,7 @@ class _SupplierShortlistScreenState
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: AppColors.primaryPurple.withOpacity(0.1),
+                                color: AppColors.primaryPurple.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -417,6 +422,7 @@ class _SupplierShortlistScreenState
   }
 
   Widget _buildComparisonTab(bool isDark) {
+    final l10n = AppLocalizations.of(context);
     final selectedItems = _shortlist
         .where((item) => _selectedForComparison.contains(item.id))
         .toList();
@@ -430,20 +436,21 @@ class _SupplierShortlistScreenState
             children: [
               const Icon(Icons.compare_arrows, size: 48, color: Colors.grey),
               const SizedBox(height: 12),
-              const Text(
-                'No Suppliers Selected for Comparison',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              Text(
+                l10n?.supplierComparison ?? 'No Suppliers Selected for Comparison',
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 6),
-              const Text(
-                'Switch to the "Saved Suppliers" tab and select 2 or more businesses to compare them side-by-side.',
+              Text(
+                l10n?.selectAtLeastTwoToCompare ??
+                    'Switch to the "Saved Suppliers" tab and select 2 or more businesses to compare them side-by-side.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.grey),
+                style: const TextStyle(fontSize: 13, color: Colors.grey),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => setState(() => _selectedTabIndex = 0),
-                child: const Text('Go to Saved Suppliers'),
+                child: Text(l10n?.savedSuppliers ?? 'Go to Saved Suppliers'),
               ),
             ],
           ),
@@ -457,7 +464,7 @@ class _SupplierShortlistScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Comparing ${selectedItems.length} Suppliers Side-by-Side',
+            '${l10n?.compareSelected ?? "Comparing"} (${selectedItems.length})',
             style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 12),
@@ -468,7 +475,7 @@ class _SupplierShortlistScreenState
             child: DataTable(
               columnSpacing: 20,
               headingRowColor: WidgetStateProperty.all(
-                AppColors.primaryPurple.withOpacity(isDark ? 0.2 : 0.08),
+                AppColors.primaryPurple.withValues(alpha: isDark ? 0.2 : 0.08),
               ),
               columns: [
                 const DataColumn(

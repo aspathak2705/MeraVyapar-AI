@@ -727,4 +727,49 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get marketPulse => 'मार्केट पल्स';
+
+  @override
+  String get observedPriceDisclaimer =>
+      'निदर्शनास आलेली ऑनलाइन सूची: सार्वजनिक वेब किंमत. हे व्यापार कोटेशन नाही.';
+
+  @override
+  String get discoveredSupplierNotice => 'शोधलेला व्यवसाय • अपुष्ट पुरवठादार';
+
+  @override
+  String get observedPriceNotice =>
+      'निदर्शनास आलेली सूची किंमत • व्यापार कोटेशन नाही';
+
+  @override
+  String get externalNewsNotice => 'बाह्य वृत्त अहवाल';
+
+  @override
+  String get localMarketNotice => 'स्थानिक बाजार स्थान';
+
+  @override
+  String get noSignalsFound => 'कोणतेही संबंधित बाजार संकेत आढळले नाहीत';
+
+  @override
+  String get networkErrorTitle => 'नेटवर्क उपलब्ध नाही';
+
+  @override
+  String get providerKeyMissingTitle => 'मार्केट प्रदाता की गहाळ आहे';
+
+  @override
+  String get tradeNotes => 'व्यापार नोट्स';
+
+  @override
+  String get saveNotes => 'नोट्स जतन करा';
+
+  @override
+  String get selectAtLeastTwoToCompare =>
+      'तुलना करण्यासाठी किमान २ पुरवठादार निवडा.';
+
+  @override
+  String get splitView => 'विभाजित दृश्य';
+
+  @override
+  String get mapOnly => 'नकाशा दृश्य';
+
+  @override
+  String get listOnly => 'यादी दृश्य';
 }

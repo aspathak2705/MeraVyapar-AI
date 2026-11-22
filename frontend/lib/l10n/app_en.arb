@@ -240,5 +240,19 @@
   "viewAll": "View All",
   "manage": "Manage",
   "shortlistedSuppliers": "Shortlisted Suppliers",
-  "marketPulse": "Market Pulse"
+  "marketPulse": "Market Pulse",
+  "observedPriceDisclaimer": "Observed Online Listing: Public web price. Not a negotiated commercial trade quote.",
+  "discoveredSupplierNotice": "Discovered Business • Unverified Supplier",
+  "observedPriceNotice": "Observed Listing Price • Not Trade Quote",
+  "externalNewsNotice": "External News Report",
+  "localMarketNotice": "Local Market Location",
+  "noSignalsFound": "No Relevant Market Signals Found",
+  "networkErrorTitle": "Network Unavailable",
+  "providerKeyMissingTitle": "Market Provider Key Missing",
+  "tradeNotes": "Trade Notes",
+  "saveNotes": "Save Notes",
+  "selectAtLeastTwoToCompare": "Select at least 2 suppliers to compare.",
+  "splitView": "Split View",
+  "mapOnly": "Map View",
+  "listOnly": "List View"
 }
