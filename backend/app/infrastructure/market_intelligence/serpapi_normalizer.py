@@ -207,19 +207,36 @@ class SerpApiNormalizer:
                 if not isinstance(res, dict):
                     continue
                 title = res.get("title") or "Local Business / POI"
+                category = res.get("type") or res.get("category")
+                website = res.get("website") or res.get("link")
+                gps = res.get("gps_coordinates")
+                lat = None
+                lng = None
+                if isinstance(gps, dict):
+                    lat = SerpApiNormalizer._safe_float(gps.get("latitude"))
+                    lng = SerpApiNormalizer._safe_float(gps.get("longitude"))
+
                 items.append(ExternalEvidenceItem(
                     title=str(title)[:255],
-                    snippet=str(res.get("description") or res.get("type") or "") if (res.get("description") or res.get("type")) else None,
-                    url=str(res.get("website") or res.get("link") or "") if (res.get("website") or res.get("link")) else None,
-                    source_name=str(res.get("type")) if res.get("type") else None,
+                    snippet=str(res.get("description") or category or "") if (res.get("description") or category) else None,
+                    url=str(website) if website else None,
+                    source_name=str(category) if category else "Google Maps",
                     published_date=str(res.get("date")) if res.get("date") else None,
                     rating=SerpApiNormalizer._safe_float(res.get("rating")),
                     reviews=SerpApiNormalizer._safe_int(res.get("reviews")),
                     location=str(res.get("address")) if res.get("address") else None,
                     metrics={
-                        "gps_coordinates": res.get("gps_coordinates"),
+                        "gps_coordinates": gps,
+                        "latitude": lat,
+                        "longitude": lng,
                         "phone": res.get("phone"),
-                        "website": res.get("website"),
+                        "website": website,
+                        "data_id": res.get("data_id"),
+                        "place_id": res.get("place_id") or res.get("place_id_search"),
+                        "operating_hours": res.get("operating_hours"),
+                        "open_state": res.get("open_state"),
+                        "type": category,
+                        "thumbnail": res.get("thumbnail"),
                     },
                     raw_payload=res
                 ))

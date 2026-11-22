@@ -71,6 +71,7 @@ class MarketSourceModel {
   final String? engine;
   final String? evidenceNature;
   final String? verificationStatus;
+  final Map<String, dynamic>? metrics;
 
   const MarketSourceModel({
     required this.id,
@@ -87,10 +88,12 @@ class MarketSourceModel {
     this.engine,
     this.evidenceNature,
     this.verificationStatus,
+    this.metrics,
   });
 
   factory MarketSourceModel.fromJson(Map<String, dynamic> json) {
     final rawDate = json['published_at']?.toString();
+    final rawMetrics = json['metrics'];
     return MarketSourceModel(
       id: json['id']?.toString() ?? '',
       providerName: json['provider_name'] ?? 'External Feed',
@@ -106,8 +109,33 @@ class MarketSourceModel {
       engine: json['engine']?.toString(),
       evidenceNature: json['evidence_nature']?.toString(),
       verificationStatus: json['verification_status']?.toString(),
+      metrics: rawMetrics is Map ? Map<String, dynamic>.from(rawMetrics) : null,
     );
   }
+
+  double? get latitude {
+    if (metrics != null) {
+      if (metrics!['latitude'] != null) return (metrics!['latitude'] as num).toDouble();
+      final gps = metrics!['gps_coordinates'];
+      if (gps is Map && gps['latitude'] != null) return (gps['latitude'] as num).toDouble();
+    }
+    return null;
+  }
+
+  double? get longitude {
+    if (metrics != null) {
+      if (metrics!['longitude'] != null) return (metrics!['longitude'] as num).toDouble();
+      final gps = metrics!['gps_coordinates'];
+      if (gps is Map && gps['longitude'] != null) return (gps['longitude'] as num).toDouble();
+    }
+    return null;
+  }
+
+  String? get phone => metrics?['phone']?.toString();
+  String? get website => metrics?['website']?.toString() ?? (sourceUrl.isNotEmpty ? sourceUrl : null);
+  String? get placeId => metrics?['place_id']?.toString() ?? metrics?['data_id']?.toString();
+  dynamic get operatingHours => metrics?['operating_hours'];
+  String? get category => metrics?['type']?.toString();
 }
 
 class MarketEventModel {
@@ -127,6 +155,7 @@ class MarketEventModel {
   final String? location;
   final String? engine;
   final String? evidenceNature;
+  final Map<String, dynamic>? metrics;
 
   const MarketEventModel({
     required this.id,
@@ -145,11 +174,13 @@ class MarketEventModel {
     this.location,
     this.engine,
     this.evidenceNature,
+    this.metrics,
   });
 
   factory MarketEventModel.fromJson(Map<String, dynamic> json) {
     final domains = (json['affected_domains'] as List? ?? []).map((d) => d.toString()).toList();
     final rawDate = json['occurred_at']?.toString();
+    final rawMetrics = json['metrics'] ?? (json['source'] != null ? json['source']['metrics'] : null);
     return MarketEventModel(
       id: json['id']?.toString() ?? '',
       eventType: json['event_type'] ?? 'OTHER',
@@ -171,6 +202,15 @@ class MarketEventModel {
       location: json['location']?.toString() ?? (json['source'] != null ? json['source']['location']?.toString() : null),
       engine: json['engine']?.toString() ?? (json['source'] != null ? json['source']['engine']?.toString() : null),
       evidenceNature: json['evidence_nature']?.toString() ?? (json['source'] != null ? json['source']['evidence_nature']?.toString() : null),
+      metrics: rawMetrics is Map ? Map<String, dynamic>.from(rawMetrics) : null,
     );
   }
+
+  double? get latitude => source?.latitude ?? (metrics != null && metrics!['latitude'] != null ? (metrics!['latitude'] as num).toDouble() : null);
+  double? get longitude => source?.longitude ?? (metrics != null && metrics!['longitude'] != null ? (metrics!['longitude'] as num).toDouble() : null);
+  String? get phone => source?.phone ?? metrics?['phone']?.toString();
+  String? get website => source?.website ?? metrics?['website']?.toString();
+  String? get placeId => source?.placeId ?? metrics?['place_id']?.toString() ?? metrics?['data_id']?.toString();
+  dynamic get operatingHours => source?.operatingHours ?? metrics?['operating_hours'];
+  String? get category => source?.category ?? metrics?['type']?.toString();
 }

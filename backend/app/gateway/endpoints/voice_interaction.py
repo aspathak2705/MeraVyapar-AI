@@ -18,7 +18,7 @@ from app.features.financial_context.services.intent_router import DeterministicI
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/voice", tags=["Voice Interaction"])
+router = APIRouter(prefix="/voice", tags=["Voice Interaction (Deprecated)"], deprecated=True)
 
 
 @router.post("/interact", response_model=VoiceInteractionResponse)

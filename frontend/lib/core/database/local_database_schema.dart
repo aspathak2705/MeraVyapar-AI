@@ -3,7 +3,7 @@
 /// Preserves financial precision using integer minor units (paise: 1 INR = 100 paise)
 /// and ISO-8601 UTC timestamp strings.
 class LocalDatabaseSchema {
-  static const int version = 5;
+  static const int version = 6;
   static const String databaseFileName = 'meravyapar_local.db';
 
   // Table Names
@@ -29,6 +29,9 @@ class LocalDatabaseSchema {
   // Evidence Intelligence & Reconciliation Tables (Additive V5)
   static const String tableEvidenceTombstones = 'financial_evidence_tombstones';
   static const String tableCounterpartyOverrides = 'merchant_counterparty_overrides';
+
+  // Local Supplier Discovery Shortlist Table (Additive V6)
+  static const String tableSupplierShortlist = 'supplier_shortlist';
 
   // SQL DDL statements for version 3
   static const List<String> createStatementsV3 = [
@@ -391,10 +394,44 @@ class LocalDatabaseSchema {
     '''
   ];
 
-  /// Combined creation statements for fresh installations (V5)
+  // SQL DDL statements for version 6 (Supplier Discovery Shortlist Additions)
+  static const List<String> supplierShortlistStatementsV6 = [
+    '''
+    CREATE TABLE IF NOT EXISTS $tableSupplierShortlist (
+      id TEXT PRIMARY KEY,
+      merchant_id TEXT NOT NULL,
+      business_name TEXT NOT NULL,
+      business_category TEXT,
+      address TEXT,
+      latitude REAL,
+      longitude REAL,
+      phone TEXT,
+      website TEXT,
+      rating REAL,
+      review_count INTEGER,
+      operating_hours TEXT,
+      source_url TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY (merchant_id) REFERENCES $tableMerchantProfile(id) ON DELETE RESTRICT
+    );
+    ''',
+    '''
+    CREATE INDEX IF NOT EXISTS idx_supplier_shortlist_merchant
+    ON $tableSupplierShortlist(merchant_id, created_at);
+    '''
+  ];
+
+  /// Combined creation statements for V5 installations
   static List<String> get createStatementsV5 => [
         ...createStatementsV3,
         ...procurementStatementsV4,
         ...evidenceIntelligenceStatementsV5,
+      ];
+
+  /// Combined creation statements for fresh installations (V6)
+  static List<String> get createStatementsV6 => [
+        ...createStatementsV5,
+        ...supplierShortlistStatementsV6,
       ];
 }

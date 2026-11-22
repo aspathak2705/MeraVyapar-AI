@@ -213,13 +213,6 @@ class HomeShellScreen extends ConsumerWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
-        foregroundColor: isDark ? AppColors.darkBackground : Colors.white,
-        tooltip: 'Gnani Voice Autopilot',
-        onPressed: onOpenVoiceAssistant,
-        child: const Icon(AppIcons.voice, size: 28),
-      ),
     );
   }
 
@@ -427,12 +420,17 @@ class HomeShellScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 MerchantActionTile(
-                  label: 'AI Voice\nAutopilot',
-                  icon: AppIcons.voice,
+                  label: 'Local\nSuppliers',
+                  icon: Icons.location_on_rounded,
                   color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
-                  onTap: () => onOpenVoiceAssistant?.call(),
+                  onTap: () => onNavigateToRoute?.call('/market/suppliers'),
                 ),
-                const SizedBox(width: 68),
+                MerchantActionTile(
+                  label: 'Supplier\nShortlist',
+                  icon: Icons.bookmark_rounded,
+                  color: isDark ? AppColors.darkPrimaryPurple : AppColors.primaryPurple,
+                  onTap: () => onNavigateToRoute?.call('/market/shortlist'),
+                ),
                 const SizedBox(width: 68),
                 const SizedBox(width: 68),
               ],

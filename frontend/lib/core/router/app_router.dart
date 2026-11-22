@@ -21,7 +21,6 @@ import '../../features/voice/data/voice_repository.dart';
 import '../../features/voice/services/audio_recording_service.dart';
 import '../../features/voice/services/audio_playback_service.dart';
 import '../../features/voice/presentation/voice_interaction_controller.dart';
-import '../../features/voice/presentation/voice_assistant_sheet.dart';
 import '../../features/actions/data/action_repository.dart';
 import '../../features/home/presentation/home_shell_screen.dart';
 import '../../features/transactions/presentation/canonical_transactions_screen.dart';
@@ -32,6 +31,9 @@ import '../../features/events/presentation/receivables_screen.dart';
 import '../../features/events/presentation/receivable_detail_screen.dart';
 import '../../features/market_intelligence/presentation/relevant_market_signals_screen.dart';
 import '../../features/market_intelligence/presentation/market_signal_detail_screen.dart';
+import '../../features/market_intelligence/presentation/local_supplier_discovery_screen.dart';
+import '../../features/market_intelligence/presentation/supplier_shortlist_screen.dart';
+import '../../features/market_intelligence/domain/merchant_market_relevance_model.dart';
 import '../../features/actions/data/local_action_repository.dart';
 import '../../features/actions/presentation/action_center_screen.dart';
 import '../../features/voice/services/wake_word_detector_service.dart';
@@ -817,6 +819,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
                     placeId: placeId,
                   ),
               onBack: _popRoute,
+              onOpenLocalSuppliers: () => _navigateTo('/market/suppliers'),
               onSignalTap: (sig) =>
                   _navigateTo('/market/detail', {'signal': sig}),
             );
@@ -879,6 +882,33 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onBack: _popRoute,
         );
 
+      case '/market/suppliers':
+        final marketRepo = ref.read(marketIntelligenceRepositoryProvider);
+        final profileRepo = ref.read(localBusinessProfileRepositoryProvider);
+        final authRepo = ref.read(localAuthRepositoryProvider);
+        final fallbackName = authRepo.currentSession?.displayName;
+
+        return FutureBuilder<MerchantBusinessProfile?>(
+          future: profileRepo.getProfile(
+              merchantId: merchantId, fallbackName: fallbackName),
+          builder: (context, snapshot) {
+            return LocalSupplierDiscoveryScreen(
+              merchantId: merchantId,
+              merchantProfile: snapshot.data,
+              repository: marketRepo,
+              onBack: _popRoute,
+              onOpenShortlist: () => _navigateTo('/market/shortlist'),
+            );
+          },
+        );
+
+      case '/market/shortlist':
+        return SupplierShortlistScreen(
+          merchantId: merchantId,
+          onBack: _popRoute,
+          onExploreSuppliers: () => _navigateTo('/market/suppliers'),
+        );
+
       default:
         return HomeShellScreen(
           onAddPaymentReceived: () => _showManualEntryDialog(context,
@@ -891,18 +921,6 @@ class _AppRouterState extends ConsumerState<AppRouter> {
               context,
               merchantId,
               ref.read(localCanonicalTransactionRepositoryProvider)),
-          onOpenVoiceAssistant: () {
-            showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (ctx) => VoiceAssistantSheet(
-                autoDisposeControllerProvider: voiceControllerProvider,
-                wakeWordProvider: wakeWordControllerProvider,
-                onNavigateToRoute: _navigateTo,
-              ),
-            );
-          },
           onNavigateToRoute: _navigateTo,
         );
     }

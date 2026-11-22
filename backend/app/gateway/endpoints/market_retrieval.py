@@ -98,8 +98,9 @@ def get_relevant_market_signals_stateless(
             result: SerpApiResult = client.news(clean_query, num=10)
             items = result.normalized_items
         elif selected_engine == SerpApiEngine.MAPS.value:
+            query_arg = clean_query if clean_maps_type != "place" or (query and isinstance(query, str) and query.strip()) else None
             result: SerpApiResult = client.maps(
-                clean_query,
+                query_arg,
                 maps_type=clean_maps_type,
                 place_id=clean_place_id,
                 location=clean_city or None,

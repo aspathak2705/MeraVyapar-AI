@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # Max upload size: 10MB
 MAX_AUDIO_BYTES = 10 * 1024 * 1024
 
-router = APIRouter(prefix="/voice", tags=["Voice Intelligence"])
+router = APIRouter(prefix="/voice", tags=["Voice Intelligence (Deprecated)"], deprecated=True)
 
 
 @router.get("/status", response_model=VoiceProviderStatusResponse)

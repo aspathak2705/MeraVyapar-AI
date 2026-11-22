@@ -28,6 +28,7 @@ class RelevantMarketSignalsScreen extends StatefulWidget {
   }) onFetchSignals;
   final MerchantBusinessProfile? merchantProfile;
   final VoidCallback? onBack;
+  final VoidCallback? onOpenLocalSuppliers;
 
   const RelevantMarketSignalsScreen({
     super.key,
@@ -36,6 +37,7 @@ class RelevantMarketSignalsScreen extends StatefulWidget {
     required this.onFetchSignals,
     this.merchantProfile,
     this.onBack,
+    this.onOpenLocalSuppliers,
   });
 
   @override
@@ -184,6 +186,12 @@ class _RelevantMarketSignalsScreenState
               )
             : null,
         actions: [
+          if (widget.onOpenLocalSuppliers != null)
+            IconButton(
+              icon: const Icon(Icons.location_on_outlined),
+              tooltip: 'Local Suppliers Map',
+              onPressed: widget.onOpenLocalSuppliers,
+            ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh Signals',
