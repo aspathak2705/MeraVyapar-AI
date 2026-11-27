@@ -1,14 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:frontend/core/database/local_database_service.dart';
 import 'package:frontend/core/database/local_database_schema.dart';
-import 'package:frontend/features/intelligence/data/intelligence_repository.dart';
 import 'package:frontend/features/intelligence/data/local_report_repository.dart';
 import 'package:frontend/features/intelligence/domain/generated_report_model.dart';
 import 'package:frontend/features/intelligence/domain/local_report_generator_service.dart';
 import 'package:frontend/features/intelligence/domain/local_financial_intelligence_engine.dart';
 import 'package:frontend/features/onboarding/data/local_business_profile_repository.dart';
 import 'package:frontend/features/onboarding/domain/merchant_business_profile.dart';
-import 'package:frontend/features/intelligence/domain/grounded_insight_model.dart';
 
 class MockDatabaseDriver implements LocalDatabaseDriver {
   final Map<String, List<Map<String, dynamic>>> tables = {};
@@ -90,47 +88,6 @@ class MockDatabaseDriver implements LocalDatabaseDriver {
       }
     }
     return 'unknown';
-  }
-}
-
-class FakeIntelligenceRepository extends IntelligenceRepository {
-  String? lastTargetLanguage;
-  String? lastQuestion;
-
-  @override
-  Future<FinancialQueryResultModel> queryIntelligence({
-    required String question,
-    String? focusEntityId,
-    Map<String, dynamic>? sanitizedContext,
-    String? targetLanguage,
-  }) async {
-    lastTargetLanguage = targetLanguage;
-    lastQuestion = question;
-
-    final summary = targetLanguage == 'hi'
-        ? 'कुल ₹1,50,000 की प्राप्य राशि लंबित है।'
-        : (targetLanguage == 'mr'
-            ? 'एकूण ₹1,50,000 येणे बाकी प्रलंबित आहे.'
-            : 'Total receivables balance of ₹1,50,000 is pending.');
-
-    return FinancialQueryResultModel(
-      intentCategory: 'GENERAL_SUMMARY',
-      isAllowed: true,
-      insight: GroundedInsightModel(
-        summary: summary,
-        whyItMatters: 'Verified from local ledger records.',
-        keyFacts: [
-          KeyFactItemModel(label: 'Total Receivables', value: '₹1,50,000'),
-        ],
-        suggestedActions: [
-          'Send payment reminder to top overdue counterparty.',
-        ],
-        limitations: [],
-        sourceReferences: [],
-        isAiGenerated: true,
-        status: 'CURRENT',
-      ),
-    );
   }
 }
 
@@ -252,12 +209,10 @@ void main() {
       final dbService = LocalDatabaseService.instance;
       await dbService.initialize(customDriver: driver, customDbPath: ':memory:');
       final reportRepo = LocalReportRepository(dbService: dbService);
-      final fakeIntelligence = FakeIntelligenceRepository();
       final fakeProfile = FakeBusinessProfileRepository();
       final fakeEngine = FakeFinancialIntelligenceEngine();
 
       final generator = LocalReportGeneratorService(
-        intelligenceRepository: fakeIntelligence,
         reportRepository: reportRepo,
         businessProfileRepository: fakeProfile,
         finEngine: fakeEngine,
@@ -270,11 +225,9 @@ void main() {
         reportLanguage: 'hi',
       );
 
-      // Verify Nemotron pipeline was called with targetLanguage: 'hi'
-      expect(fakeIntelligence.lastTargetLanguage, equals('hi'));
       expect(reportHi.language, equals('hi'));
       expect(reportHi.title, equals('दैनिक वित्तीय सारांश'));
-      expect(reportHi.summary, contains('प्राप्य'));
+      expect(reportHi.summary, contains('Patel General Store'));
 
       // Verify deterministic financial metrics stored as integer paise
       final metrics = reportHi.payload['metrics'] as Map<String, dynamic>;
@@ -289,10 +242,9 @@ void main() {
         reportLanguage: 'mr',
       );
 
-      expect(fakeIntelligence.lastTargetLanguage, equals('mr'));
       expect(reportMr.language, equals('mr'));
       expect(reportMr.title, equals('रोख प्रवाह आरोग्य अहवाल'));
-      expect(reportMr.summary, contains('येणे बाकी'));
+      expect(reportMr.summary, contains('रोख'));
     });
   });
 }

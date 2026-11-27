@@ -1459,7 +1459,7 @@ abstract class AppLocalizations {
   /// No description provided for @generatingReport.
   ///
   /// In en, this message translates to:
-  /// **'Generating report with Nemotron AI...'**
+  /// **'Generating financial report...'**
   String get generatingReport;
 
   /// No description provided for @financialOverview.

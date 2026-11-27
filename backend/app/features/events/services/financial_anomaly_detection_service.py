@@ -10,8 +10,6 @@ from app.models.business_profile import BusinessProfile
 from app.repositories.canonical_transaction_repository import CanonicalTransactionRepository
 from app.repositories.financial_event_repository import FinancialEventRepository
 from app.repositories.counterparty_repository import CounterpartyRepository
-from app.features.market_intelligence.research_models import ResearchIntent, ResearchPlan
-from app.features.market_intelligence.research_planner import DeterministicResearchPlanner
 
 
 class FinancialAnomalyDetectionService:
@@ -198,39 +196,3 @@ class FinancialAnomalyDetectionService:
                     detected_events.append(ev)
 
         return detected_events
-
-    def build_research_intent_for_event(self, event: FinancialEvent) -> Optional[ResearchIntent]:
-        """
-        Constructs a minimal, privacy-safe ResearchIntent for an eligible financial event.
-        Extracts geographic context strictly from the merchant's BusinessProfile without fabrication.
-        """
-        # Look up merchant profile for safe business metadata
-        profile = self.db.query(BusinessProfile).filter(BusinessProfile.merchant_id == event.merchant_id).first()
-        city = profile.city if profile else None
-        state = profile.state if profile else None
-        b_type = profile.business_type if profile else None
-
-        meta = event.metadata_info or {}
-        subject = meta.get("subject") or meta.get("category") or event.title
-        time_window = meta.get("time_window") or "recent 14 days"
-        reason = f"Deterministic anomaly: {event.summary}"
-
-        return ResearchIntent(
-            event_id=event.id,
-            merchant_id=event.merchant_id,
-            event_type=event.event_type.value,
-            subject=subject,
-            category=meta.get("category"),
-            counterparty_name=meta.get("counterparty_name"),
-            operating_city=city,
-            operating_state=state,
-            business_type=b_type,
-            time_window=time_window,
-            reason=reason
-        )
-
-    def generate_research_plan_for_event(self, event: FinancialEvent) -> Optional[ResearchPlan]:
-        intent = self.build_research_intent_for_event(event)
-        if not intent:
-            return None
-        return DeterministicResearchPlanner.plan(intent)

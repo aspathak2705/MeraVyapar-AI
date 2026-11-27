@@ -120,7 +120,7 @@ class _IntelligentReportsScreenState extends ConsumerState<IntelligentReportsScr
                       ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                       : const Icon(Icons.auto_awesome),
                   label: Text(isGenerating
-                      ? (l10n?.generatingReport ?? 'Generating with Nemotron AI...')
+                      ? 'Generating Financial Report...'
                       : (l10n?.generateReport ?? 'Generate Report')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryPurple,

@@ -126,10 +126,6 @@ class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
                   error: (_, __) => const SizedBox.shrink(),
                   data: (cps) => _buildCounterpartyList(cps),
                 ),
-                const SizedBox(height: 20),
-
-                // 4. Grounded AI Financial Explanation Section
-                _buildGroundedExplanationCard(context, ref),
               ],
             ),
           ),
@@ -266,13 +262,20 @@ class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Projected 14-Day Net Movement', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                const Expanded(
+                  child: Text(
+                    'Projected 14-Day Net Movement',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(4)),
-                  child: const Text('Deterministic Forecast', style: TextStyle(fontSize: 10, color: Colors.blue)),
+                  child: const Text('Deterministic Forecast', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.blue)),
                 ),
               ],
             ),
@@ -341,61 +344,6 @@ class UnifiedFinancialIntelligenceScreen extends ConsumerWidget {
             trailing: Text('₹${(cp.totalVolumePaise / 100.0).toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildGroundedExplanationCard(BuildContext context, WidgetRef ref) {
-    return Card(
-      elevation: 2,
-      color: const Color(0xFFF8FAFC),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: const [
-                Icon(Icons.auto_awesome, color: Color(0xFF4F46E5), size: 20),
-                SizedBox(width: 8),
-                Text(
-                  'Grounded Intelligence Explanations',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Nemotron AI provides factual explanations grounded directly in your verified SQLite data snapshot. Zero hallucinations or ledger mutations.',
-              style: TextStyle(fontSize: 13, color: Color(0xFF64748B), height: 1.4),
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    icon: const Icon(Icons.psychology, size: 16),
-                    label: const Text('Ask Assistant', style: TextStyle(fontSize: 13)),
-                    onPressed: () => onNavigate?.call('/assistant'),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.public, size: 16),
-                    label: const Text('Market Signals', style: TextStyle(fontSize: 13)),
-                    style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0284C7)),
-                    onPressed: () => onNavigate?.call('/market'),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }

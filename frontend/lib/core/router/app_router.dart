@@ -14,13 +14,6 @@ import '../../features/events/data/event_repository.dart';
 import '../../features/evidence/data/evidence_repository.dart';
 import '../../features/capture/data/capture_repository.dart';
 import '../../features/intelligence/data/intelligence_repository.dart';
-import '../../features/intelligence/domain/grounded_insight_model.dart';
-import '../../features/intelligence/presentation/merchant_assistant_screen.dart';
-import '../../features/market_intelligence/data/market_intelligence_repository.dart';
-import '../../features/voice/data/voice_repository.dart';
-import '../../features/voice/services/audio_recording_service.dart';
-import '../../features/voice/services/audio_playback_service.dart';
-import '../../features/voice/presentation/voice_interaction_controller.dart';
 import '../../features/actions/data/action_repository.dart';
 import '../../features/home/presentation/home_shell_screen.dart';
 import '../../features/transactions/presentation/canonical_transactions_screen.dart';
@@ -31,15 +24,9 @@ import '../../features/memory/presentation/counterparty_detail_screen.dart';
 import '../../features/memory/presentation/payment_promises_screen.dart';
 import '../../features/events/presentation/receivables_screen.dart';
 import '../../features/events/presentation/receivable_detail_screen.dart';
-import '../../features/market_intelligence/presentation/relevant_market_signals_screen.dart';
-import '../../features/market_intelligence/presentation/market_signal_detail_screen.dart';
-import '../../features/market_intelligence/presentation/local_supplier_discovery_screen.dart';
 import '../../features/market_intelligence/presentation/supplier_shortlist_screen.dart';
-import '../../features/market_intelligence/domain/merchant_market_relevance_model.dart';
 import '../../features/actions/data/local_action_repository.dart';
 import '../../features/actions/presentation/action_center_screen.dart';
-import '../../features/voice/services/wake_word_detector_service.dart';
-import '../../features/voice/presentation/wake_word_controller.dart';
 import '../../features/actions/presentation/action_detail_screen.dart';
 import '../../features/actions/presentation/reminder_draft_screen.dart';
 import '../../features/intelligence/presentation/unified_financial_intelligence_screen.dart';
@@ -47,15 +34,11 @@ import '../../features/capture/presentation/permission_settings_screen.dart';
 import '../../features/procurement/presentation/procurement_dashboard_screen.dart';
 import '../../features/intelligence/presentation/intelligent_reports_screen.dart';
 import '../../features/onboarding/presentation/business_profile_screen.dart';
-import '../../features/onboarding/data/local_business_profile_repository.dart';
-import '../../features/onboarding/domain/merchant_business_profile.dart';
 import '../../features/transactions/domain/statement_import_service.dart';
 import '../../features/capture/data/device_evidence_capture.dart';
 import '../../features/capture/domain/local_evidence_capture_service.dart';
 import '../../core/database/local_database_service.dart';
 import '../../core/money/money.dart';
-import '../../features/intelligence/domain/local_financial_intelligence_engine.dart';
-import '../localization/locale_provider.dart';
 import '../../l10n/app_localizations.dart';
 
 // --- Local Repository Providers ---
@@ -71,41 +54,8 @@ final captureRepositoryProvider = Provider((ref) => CaptureRepository());
 final eventRepositoryProvider = Provider((ref) => EventRepository());
 final intelligenceRepositoryProvider =
     Provider((ref) => IntelligenceRepository());
-final marketIntelligenceRepositoryProvider =
-    Provider((ref) => MarketIntelligenceRepository());
-final voiceRepositoryProvider =
-    Provider((ref) => VoiceRepository(baseUrl: Env.apiBaseUrl));
 final actionRepositoryProvider =
     Provider((ref) => ActionRepository(baseUrl: Env.apiBaseUrl));
-final audioRecordingServiceProvider =
-    Provider<AudioRecordingService>((ref) => DeviceAudioRecordingService());
-final audioPlaybackServiceProvider =
-    Provider<AudioPlaybackService>((ref) => DeviceAudioPlaybackService());
-
-final voiceControllerProvider = StateNotifierProvider.autoDispose<
-    VoiceInteractionController, VoiceInteractionState>((ref) {
-  final authRepo = ref.watch(localAuthRepositoryProvider);
-  final token = authRepo.activeMerchantId ?? '';
-  return VoiceInteractionController(
-    voiceRepository: ref.watch(voiceRepositoryProvider),
-    recordingService: ref.watch(audioRecordingServiceProvider),
-    playbackService: ref.watch(audioPlaybackServiceProvider),
-    actionRepository: ref.watch(localActionRepositoryProvider),
-    authToken: token,
-  );
-});
-
-final wakeWordEngineProvider =
-    Provider<WakeWordDetectorEngine>((ref) => LocalAcousticWakeWordEngine());
-
-final wakeWordControllerProvider =
-    StateNotifierProvider<WakeWordController, WakeWordStateData>((ref) {
-  return WakeWordController(
-    detectorEngine: ref.watch(wakeWordEngineProvider),
-    recordingService: ref.watch(audioRecordingServiceProvider),
-    voiceController: ref.watch(voiceControllerProvider.notifier),
-  );
-});
 
 class AppRouter extends ConsumerStatefulWidget {
   const AppRouter({super.key});
@@ -125,9 +75,6 @@ class _AppRouterState extends ConsumerState<AppRouter> {
   String _currentRoute = '/';
   final List<String> _navigationStack = ['/'];
   final Map<String, dynamic> _routeArgs = {};
-  bool _isAssistantLoading = false;
-  FinancialQueryResultModel? _lastAssistantResult;
-  String? _assistantErrorMessage;
   Timer? _renderKeepAliveTimer;
 
   @override
@@ -583,106 +530,6 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onBack: _popRoute,
         );
 
-      case '/assistant':
-        final intelligenceRepo = ref.read(intelligenceRepositoryProvider);
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Nemotron AI Assistant'),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: _popRoute,
-            ),
-          ),
-          body: MerchantAssistantScreen(
-            isLoading: _isAssistantLoading,
-            lastResult: _lastAssistantResult,
-            initialQuery: _routeArgs['initial_question'],
-            marketSignalTitle: _routeArgs['market_signal_title'],
-            errorMessage: _assistantErrorMessage,
-            onQuerySubmit: (question) async {
-              setState(() {
-                _isAssistantLoading = true;
-                _assistantErrorMessage = null;
-              });
-              try {
-                // Compute deterministic aggregates from local SQLite financial records
-                final localFinEngine = LocalFinancialIntelligenceEngine();
-                final pos = await localFinEngine.calculatePosition(merchantId: merchantId);
-                final profileRepo = ref.read(localBusinessProfileRepositoryProvider);
-                final authRepo = ref.read(localAuthRepositoryProvider);
-                final profile = await profileRepo.getProfile(
-                  merchantId: merchantId,
-                  fallbackName: authRepo.currentSession?.displayName,
-                );
-
-                final attachedSignal = _routeArgs['signal'] as MerchantMarketRelevanceModel?;
-                final marketSignalsList = <Map<String, dynamic>>[];
-                if (attachedSignal != null) {
-                  marketSignalsList.add({
-                    'id': attachedSignal.id,
-                    'title': attachedSignal.marketEvent?.title,
-                    'summary': attachedSignal.marketEvent?.summary,
-                    'price': attachedSignal.marketEvent?.price,
-                    'rating': attachedSignal.marketEvent?.rating,
-                    'location': attachedSignal.marketEvent?.location,
-                    'source_name': attachedSignal.marketEvent?.source?.sourceName,
-                    'source_url': attachedSignal.marketEvent?.source?.sourceUrl,
-                    'relevance_explanation': attachedSignal.explanation,
-                  });
-                }
-
-                final sanitizedContext = <String, dynamic>{
-                  'business_name': profile.businessName,
-                  'business_type': profile.businessType,
-                  'business_category': profile.businessCategory,
-                  'city': profile.city,
-                  'state': profile.state,
-                  'market_signals': marketSignalsList,
-                  'computed_metrics': {
-                    'total_inflows_paise': pos.totalInflowsPaise,
-                    'total_outflows_paise': pos.totalOutflowsPaise,
-                    'net_cash_movement_paise': pos.netCashMovementPaise,
-                    'total_receivables_paise': pos.totalReceivablesPaise,
-                    'total_overdue_receivables_paise': pos.totalOverdueReceivablesPaise,
-                    'total_payables_paise': pos.totalPayablesPaise,
-                    'open_promise_count': pos.openPromiseCount,
-                    'overdue_promise_count': pos.overduePromiseCount,
-                    'total_inflows_rupees': pos.totalInflowsPaise / 100,
-                    'total_outflows_rupees': pos.totalOutflowsPaise / 100,
-                    'net_cash_movement_rupees': pos.netCashMovementPaise / 100,
-                    'total_receivables_rupees': pos.totalReceivablesPaise / 100,
-                    'total_overdue_receivables_rupees': pos.totalOverdueReceivablesPaise / 100,
-                    'total_payables_rupees': pos.totalPayablesPaise / 100,
-                  },
-                };
-
-                final appLocale = ref.read(localeProvider);
-                final result = await intelligenceRepo.queryIntelligence(
-                  question: question,
-                  sanitizedContext: sanitizedContext,
-                  targetLanguage: appLocale.languageCode,
-                );
-                if (mounted) {
-                  setState(() {
-                    _lastAssistantResult = result;
-                    _assistantErrorMessage = null;
-                    _isAssistantLoading = false;
-                  });
-                }
-              } catch (e) {
-                if (mounted) {
-                  setState(() {
-                    _assistantErrorMessage = e.toString()
-                        .replaceFirst('Exception: ', '')
-                        .replaceFirst('Failure: ', '');
-                    _isAssistantLoading = false;
-                  });
-                }
-              }
-            },
-          ),
-        );
-
       case '/receivables':
         final eventRepo = ref.read(eventRepositoryProvider);
         return FutureBuilder(
@@ -838,63 +685,6 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           },
         );
 
-      case '/market':
-        final marketRepo = ref.read(marketIntelligenceRepositoryProvider);
-        final profileRepo = ref.read(localBusinessProfileRepositoryProvider);
-        final authRepo = ref.read(localAuthRepositoryProvider);
-        final fallbackName = authRepo.currentSession?.displayName;
-
-        return FutureBuilder<MerchantBusinessProfile?>(
-          future: profileRepo.getProfile(
-              merchantId: merchantId, fallbackName: fallbackName),
-          builder: (context, snapshot) {
-            final profile = snapshot.data;
-
-            return RelevantMarketSignalsScreen(
-              initialSignals: const [],
-              merchantProfile: profile,
-              onFetchSignals: ({
-                String? query,
-                String? category,
-                String? businessType,
-                String? city,
-                String? state,
-                String? engine,
-                String? mapsType,
-                String? placeId,
-              }) =>
-                  marketRepo.getRelevantSignals(
-                    query: query,
-                    category: category,
-                    businessType: businessType,
-                    city: city,
-                    state: state,
-                    engine: engine,
-                    mapsType: mapsType,
-                    placeId: placeId,
-                  ),
-              onBack: _popRoute,
-              onOpenLocalSuppliers: () => _navigateTo('/market/suppliers'),
-              onSignalTap: (sig) =>
-                  _navigateTo('/market/detail', {'signal': sig}),
-            );
-          },
-        );
-
-      case '/market/detail':
-        return MarketSignalDetailScreen(
-          signal: _routeArgs['signal'],
-          onBack: _popRoute,
-          onAnalyzeWithFinancials: (sig) {
-            final evTitle = sig.marketEvent?.title ?? 'Market Signal';
-            _navigateTo('/assistant', {
-              'signal': sig,
-              'initial_question': 'How does "$evTitle" impact my business cashflow and payables?',
-              'market_signal_title': evTitle,
-            });
-          },
-        );
-
       case '/actions':
         final localActionRepo = ref.read(localActionRepositoryProvider);
         return ActionCenterScreen(
@@ -938,31 +728,10 @@ class _AppRouterState extends ConsumerState<AppRouter> {
           onBack: _popRoute,
         );
 
-      case '/market/suppliers':
-        final marketRepo = ref.read(marketIntelligenceRepositoryProvider);
-        final profileRepo = ref.read(localBusinessProfileRepositoryProvider);
-        final authRepo = ref.read(localAuthRepositoryProvider);
-        final fallbackName = authRepo.currentSession?.displayName;
-
-        return FutureBuilder<MerchantBusinessProfile?>(
-          future: profileRepo.getProfile(
-              merchantId: merchantId, fallbackName: fallbackName),
-          builder: (context, snapshot) {
-            return LocalSupplierDiscoveryScreen(
-              merchantId: merchantId,
-              merchantProfile: snapshot.data,
-              repository: marketRepo,
-              onBack: _popRoute,
-              onOpenShortlist: () => _navigateTo('/market/shortlist'),
-            );
-          },
-        );
-
       case '/market/shortlist':
         return SupplierShortlistScreen(
           merchantId: merchantId,
           onBack: _popRoute,
-          onExploreSuppliers: () => _navigateTo('/market/suppliers'),
         );
 
       default:

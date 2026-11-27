@@ -12,14 +12,11 @@ from app.api.v1.endpoints import (
     payment_promises,
     events,
     receivables,
-    financial_intelligence,
-    market_intelligence,
     communication_actions,
     cashflow,
     reference_intelligence,
     insights,
-    voice,
-    demo
+    demo,
 )
 
 api_router = APIRouter()
@@ -35,13 +32,8 @@ api_router.include_router(counterparties.router, tags=["counterparties"])
 api_router.include_router(payment_promises.router, tags=["payment-promises"])
 api_router.include_router(events.router, tags=["events"])
 api_router.include_router(receivables.router, tags=["receivables"])
-api_router.include_router(financial_intelligence.router, tags=["financial-intelligence"])
-api_router.include_router(market_intelligence.router, tags=["market-intelligence"])
 api_router.include_router(communication_actions.router, tags=["communication-actions"])
 api_router.include_router(cashflow.router, tags=["cashflow"])
 api_router.include_router(reference_intelligence.router, tags=["reference-intelligence"])
 api_router.include_router(insights.router, tags=["insights"])
-api_router.include_router(voice.router, tags=["voice"])
 api_router.include_router(demo.router, tags=["demo"])
-
-

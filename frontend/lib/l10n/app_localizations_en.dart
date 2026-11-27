@@ -698,7 +698,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteReport => 'Delete Report';
 
   @override
-  String get generatingReport => 'Generating report with Nemotron AI...';
+  String get generatingReport => 'Generating financial report...';
 
   @override
   String get financialOverview => 'Financial Overview';

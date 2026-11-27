@@ -19,11 +19,6 @@ class GatewayRateLimiter:
         self._history: Dict[str, list] = defaultdict(list)
         # Default limits: (max_requests, window_seconds)
         self._limits: Dict[str, Tuple[int, int]] = {
-            "/api/v1/voice/interact": (15, 60),      # 15 voice interactions per minute
-            "/api/v1/voice/synthesize": (30, 60),    # 30 TTS syntheses per minute
-            "/api/v1/financial-intelligence/query": (20, 60), # 20 Nemotron queries per minute
-            "/api/v1/financial-events/explain": (20, 60),
-            "/api/v1/market-intelligence": (40, 60), # 40 market queries per minute
             "default": (100, 60)                     # 100 general requests per minute
         }
 

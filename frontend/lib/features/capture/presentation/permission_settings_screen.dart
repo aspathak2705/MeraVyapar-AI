@@ -159,7 +159,7 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
                     _buildConnectivityTile(
                       icon: Icons.wifi,
                       title: 'Internet Connectivity',
-                      description: 'Used solely for optional cloud services (Gnani STT/TTS proxy, SerpApi market signals). Offline core ledger works 100% without internet.',
+                      description: 'Used solely for optional cloud gateway sync. Offline core ledger works 100% without internet.',
                       status: _statuses['INTERNET'] ?? PermissionLifecycleStatus.denied,
                     ),
 
@@ -575,7 +575,7 @@ class _BackendDiagnosticCardState extends State<_BackendDiagnosticCard> {
             ),
             const SizedBox(height: 6),
             const Text(
-              'Connects to the deployed Render gateway for optional cloud services (Gnani Speech, SerpApi Market Research, and NVIDIA Nemotron). Core ledger remains 100% private and offline.',
+              'Connects to the deployed Render gateway for optional cloud services. Core ledger remains 100% private and offline.',
               style: TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.35),
             ),
             if (_details != null) ...[

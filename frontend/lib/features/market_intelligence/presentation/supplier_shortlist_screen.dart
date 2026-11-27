@@ -8,13 +8,11 @@ import '../data/local_supplier_shortlist_repository.dart';
 class SupplierShortlistScreen extends ConsumerStatefulWidget {
   final String merchantId;
   final VoidCallback? onBack;
-  final VoidCallback? onExploreSuppliers;
 
   const SupplierShortlistScreen({
     super.key,
     required this.merchantId,
     this.onBack,
-    this.onExploreSuppliers,
   });
 
   @override
@@ -117,14 +115,6 @@ class _SupplierShortlistScreenState
                 onPressed: widget.onBack,
               )
             : null,
-        actions: [
-          if (widget.onExploreSuppliers != null)
-            IconButton(
-              icon: const Icon(Icons.map_outlined),
-              tooltip: l10n?.localSupplierDiscovery ?? 'Explore Map',
-              onPressed: widget.onExploreSuppliers,
-            ),
-        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(48),
           child: Container(
@@ -222,22 +212,10 @@ class _SupplierShortlistScreenState
             ),
             const SizedBox(height: 8),
             Text(
-              'Discover local wholesalers and suppliers on Google Maps and bookmark them to compare ratings, phone numbers, and locations offline.',
+              'Save and compare local suppliers and wholesalers offline with notes, ratings, and contact info.',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 13, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
             ),
-            const SizedBox(height: 20),
-            if (widget.onExploreSuppliers != null)
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primaryPurple,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                icon: const Icon(Icons.explore),
-                label: Text(l10n?.localSupplierDiscovery ?? 'Discover Local Suppliers'),
-                onPressed: widget.onExploreSuppliers,
-              ),
           ],
         ),
       ),

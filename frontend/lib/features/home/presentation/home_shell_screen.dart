@@ -15,7 +15,6 @@ import '../../memory/data/local_memory_repository.dart';
 import '../../procurement/data/local_procurement_repository.dart';
 import '../../actions/data/local_action_repository.dart';
 import '../../actions/domain/communication_action_model.dart';
-import '../../market_intelligence/data/local_supplier_shortlist_repository.dart';
 
 // --- Dashboard Riverpod Providers ---
 
@@ -104,42 +103,8 @@ final dashboardPriorityActionsProvider =
       merchantId: merchantId, statusFilter: 'DRAFT');
 });
 
-class DashboardMarketSummary {
-  final int shortlistedCount;
-  final String? category;
-  final String? city;
-
-  const DashboardMarketSummary({
-    required this.shortlistedCount,
-    this.category,
-    this.city,
-  });
-}
-
-final dashboardMarketSummaryProvider =
-    FutureProvider.autoDispose<DashboardMarketSummary>((ref) async {
-  final authRepo = ref.watch(localAuthRepositoryProvider);
-  final merchantId = authRepo.activeMerchantId;
-  if (merchantId == null) {
-    return const DashboardMarketSummary(shortlistedCount: 0);
-  }
-
-  final shortlistRepo = ref.watch(localSupplierShortlistRepositoryProvider);
-  final shortlist = await shortlistRepo.getShortlist(merchantId: merchantId);
-
-  final profileRepo = ref.watch(localBusinessProfileRepositoryProvider);
-  final profile = await profileRepo.getProfile(merchantId: merchantId);
-
-  return DashboardMarketSummary(
-    shortlistedCount: shortlist.length,
-    category:
-        profile.businessCategory.isNotEmpty ? profile.businessCategory : null,
-    city: profile.city.isNotEmpty ? profile.city : null,
-  );
-});
-
 /// Unified Merchant Dashboard combining profile context, financial overview,
-/// money movements, payment obligations, market intelligence, and priority actions.
+/// money movements, payment obligations, and priority actions.
 class HomeShellScreen extends ConsumerWidget {
   final VoidCallback? onSignOut;
   final VoidCallback? onAddPaymentReceived;
@@ -152,9 +117,6 @@ class HomeShellScreen extends ConsumerWidget {
   final VoidCallback? onOpenPromises;
   final VoidCallback? onOpenEvents;
   final VoidCallback? onOpenReceivables;
-  final VoidCallback? onOpenAssistant;
-  final VoidCallback? onOpenVoiceAssistant;
-  final VoidCallback? onOpenMarketSignals;
   final VoidCallback? onOpenActionCenter;
   final VoidCallback? onOpenFinancialIntelligence;
   final VoidCallback? onImportStatement;
@@ -173,9 +135,6 @@ class HomeShellScreen extends ConsumerWidget {
     this.onOpenPromises,
     this.onOpenEvents,
     this.onOpenReceivables,
-    this.onOpenAssistant,
-    this.onOpenVoiceAssistant,
-    this.onOpenMarketSignals,
     this.onOpenActionCenter,
     this.onOpenFinancialIntelligence,
     this.onImportStatement,
@@ -189,7 +148,6 @@ class HomeShellScreen extends ConsumerWidget {
     final profileAsync = ref.watch(dashboardBusinessProfileProvider);
     final obligationsAsync = ref.watch(dashboardObligationsSummaryProvider);
     final actionsAsync = ref.watch(dashboardPriorityActionsProvider);
-    final marketAsync = ref.watch(dashboardMarketSummaryProvider);
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -314,13 +272,7 @@ class HomeShellScreen extends ConsumerWidget {
 
               const SizedBox(height: 20),
 
-              // 6. VyaparPulse Market Intelligence Summary
-              _buildMarketIntelligenceCard(
-                  context, isDark, marketAsync, l10n),
-
-              const SizedBox(height: 20),
-
-              // 7. Financial Services & Tools Grid
+              // 6. Financial Services & Tools Grid
               Row(
                 children: [
                   Icon(
@@ -1581,189 +1533,7 @@ class HomeShellScreen extends ConsumerWidget {
     );
   }
 
-  // --- 6. VyaparPulse Market Intelligence Summary ---
-  Widget _buildMarketIntelligenceCard(
-    BuildContext context,
-    bool isDark,
-    AsyncValue<DashboardMarketSummary> marketAsync,
-    AppLocalizations? l10n,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.travel_explore_rounded,
-                  size: 18,
-                  color: isDark
-                      ? AppColors.darkPrimaryPurple
-                      : AppColors.primaryPurple,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  l10n?.marketIntelligenceTitle ??
-                      'VyaparPulse Market Intelligence',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.2,
-                    color: isDark
-                        ? AppColors.darkTextPrimary
-                        : AppColors.lightTextPrimary,
-                  ),
-                ),
-              ],
-            ),
-            InkWell(
-              onTap: () => (onOpenMarketSignals ??
-                  () => onNavigateToRoute?.call('/market'))(),
-              borderRadius: BorderRadius.circular(6),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                child: Text(
-                  l10n?.search ?? 'Explore',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? AppColors.darkPrimaryPurple
-                        : AppColors.primaryPurple,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        marketAsync.maybeWhen(
-          data: (market) {
-            final categoryText = market.category ?? 'Retail & Wholesale';
-            final cityText = market.city ?? 'Local Market';
-
-            return Card(
-              elevation: 0,
-              color: isDark ? AppColors.darkCard : Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-                side: BorderSide(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : Colors.black.withValues(alpha: 0.06),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: isDark
-                                ? AppColors.darkLavenderSurface
-                                : AppColors.lightLavender,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Icon(
-                            AppIcons.market,
-                            size: 20,
-                            color: isDark
-                                ? AppColors.darkPrimaryPurple
-                                : AppColors.primaryPurple,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '$categoryText · $cityText',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: isDark
-                                      ? AppColors.darkTextPrimary
-                                      : AppColors.lightTextPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${market.shortlistedCount} ${l10n?.shortlistedSuppliers ?? "Saved Suppliers in Shortlist"}',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: isDark
-                                      ? AppColors.darkTextMuted
-                                      : AppColors.lightTextMuted,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            icon:
-                                const Icon(Icons.location_on_rounded, size: 14),
-                            label: Text(
-                              l10n?.localSuppliers ?? 'Local Suppliers',
-                              style: const TextStyle(fontSize: 11),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onPressed: () =>
-                                onNavigateToRoute?.call('/market/suppliers'),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            icon: const Icon(Icons.bookmark_rounded, size: 14),
-                            label: Text(
-                              '${l10n?.supplierShortlist ?? "Shortlist"} (${market.shortlistedCount})',
-                              style: const TextStyle(fontSize: 11),
-                            ),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            onPressed: () =>
-                                onNavigateToRoute?.call('/market/shortlist'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-          orElse: () => const SizedBox.shrink(),
-        ),
-      ],
-    );
-  }
-
-  // --- 7. Financial Services & Tools Grid ---
+  // --- 6. Financial Services & Tools Grid ---
   Widget _buildQuickActionGrid(BuildContext context, bool isDark,
       [AppLocalizations? l10n]) {
     return Card(
@@ -1832,13 +1602,10 @@ class HomeShellScreen extends ConsumerWidget {
                 ),
                 MerchantActionTile(
                   label: l10n != null
-                      ? (l10n.marketIntelligenceTitle.contains(' ')
-                          ? '${l10n.marketIntelligenceTitle.split(' ').first}\nMarket'
-                          : l10n.marketIntelligenceTitle)
-                      : 'Market\nSignals',
-                  icon: Icons.travel_explore_rounded,
-                  onTap: () => (onOpenMarketSignals ??
-                      () => onNavigateToRoute?.call('/market'))(),
+                      ? l10n.supplierShortlist.replaceAll(' ', '\n')
+                      : 'Supplier\nShortlist',
+                  icon: Icons.bookmark_added_rounded,
+                  onTap: () => onNavigateToRoute?.call('/market/shortlist'),
                 ),
                 MerchantActionTile(
                   label: l10n != null
