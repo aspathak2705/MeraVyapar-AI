@@ -30,7 +30,6 @@ class Settings(BaseSettings):
 
     # External Provider Configuration & Modes
     EXTERNAL_PROVIDER_MODE: str = "simulation"  # Options: simulation, production, disabled
-    ENABLE_DEMO_ENDPOINTS: bool = True
     WHATSAPP_PROVIDER: str = "simulation"
     WHATSAPP_PROVIDER_KEY: Optional[str] = None
     SMS_PROVIDER: str = "simulation"

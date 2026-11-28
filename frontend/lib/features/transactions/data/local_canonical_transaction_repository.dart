@@ -238,59 +238,15 @@ class LocalCanonicalTransactionRepository {
     });
   }
 
-  /// Clear all synthetic demo transactions for merchant while preserving genuine records.
-  Future<int> clearDemoTransactions({required String merchantId}) async {
-    final driver = _dbService.driver;
-    if (driver == null) throw StateError('Database not initialized');
-
-    final countRows = await driver.query(
-      '''
-      SELECT COUNT(*) as count FROM ${LocalDatabaseSchema.tableCanonicalTransactions}
-      WHERE merchant_id = ? AND (source_type = 'SYNTHETIC_DEMO' OR is_simulated = 1 OR idempotency_key LIKE 'demo_30d_%')
-      ''',
-      [merchantId],
-    );
-    final count =
-        countRows.isNotEmpty ? (countRows.first['count'] as int? ?? 0) : 0;
-
-    if (count > 0) {
-      await driver.execute(
-        '''
-        DELETE FROM ${LocalDatabaseSchema.tableCanonicalTransactions}
-        WHERE merchant_id = ? AND (source_type = 'SYNTHETIC_DEMO' OR is_simulated = 1 OR idempotency_key LIKE 'demo_30d_%')
-        ''',
-        [merchantId],
-      );
-    }
-
-    return count;
-  }
-
-  /// Get count of synthetic demo transactions for merchant.
-  Future<int> getDemoTransactionCount({required String merchantId}) async {
+  /// Get total count of canonical transactions for merchant.
+  Future<int> getTransactionCount({required String merchantId}) async {
     final driver = _dbService.driver;
     if (driver == null) return 0;
 
     final rows = await driver.query(
       '''
       SELECT COUNT(*) as count FROM ${LocalDatabaseSchema.tableCanonicalTransactions}
-      WHERE merchant_id = ? AND (source_type = 'SYNTHETIC_DEMO' OR is_simulated = 1 OR idempotency_key LIKE 'demo_30d_%')
-      ''',
-      [merchantId],
-    );
-
-    return rows.isNotEmpty ? (rows.first['count'] as int? ?? 0) : 0;
-  }
-
-  /// Get count of genuine (non-demo) transactions for merchant.
-  Future<int> getGenuineTransactionCount({required String merchantId}) async {
-    final driver = _dbService.driver;
-    if (driver == null) return 0;
-
-    final rows = await driver.query(
-      '''
-      SELECT COUNT(*) as count FROM ${LocalDatabaseSchema.tableCanonicalTransactions}
-      WHERE merchant_id = ? AND (source_type != 'SYNTHETIC_DEMO' OR source_type IS NULL) AND (is_simulated = 0 OR is_simulated IS NULL) AND (idempotency_key NOT LIKE 'demo_30d_%' OR idempotency_key IS NULL)
+      WHERE merchant_id = ?
       ''',
       [merchantId],
     );

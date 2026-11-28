@@ -91,12 +91,6 @@ void main() {
         createdAt: DateTime.now(),
       );
 
-      final testMarket = const DashboardMarketSummary(
-        shortlistedCount: 4,
-        category: 'RETAIL',
-        city: 'Pune',
-      );
-
       bool incomeTapped = false;
       bool expenseTapped = false;
       bool statementTapped = false;
@@ -109,7 +103,6 @@ void main() {
             financialPositionMetricsProvider.overrideWith((ref) => Future.value(testPosition)),
             dashboardObligationsSummaryProvider.overrideWith((ref) => Future.value(testObligations)),
             dashboardPriorityActionsProvider.overrideWith((ref) => Future.value([testDraft])),
-            dashboardMarketSummaryProvider.overrideWith((ref) => Future.value(testMarket)),
           ],
           child: MaterialApp(
             localizationsDelegates: const [
@@ -171,20 +164,15 @@ void main() {
       expect(find.text('2 Pending Obligations'), findsOneWidget);
       expect(find.text('₹8,000'), findsOneWidget); // Payables total
 
-      // 6. Verify VyaparPulse Market Intelligence Card
-      expect(find.text('VyaparPulse Market Intelligence'), findsOneWidget);
-      expect(find.text('RETAIL · Pune'), findsOneWidget);
-      expect(find.text('4 Shortlisted Suppliers'), findsOneWidget);
-      expect(find.text('Supplier Shortlist (4)'), findsOneWidget);
-
-      // 7. Verify Financial Services Grid
+      // 6. Verify Financial Services Grid
       expect(find.text('Financial Services'), findsOneWidget);
       expect(find.text('KharidSaathi\nProcurement'), findsOneWidget);
+      expect(find.text('Supplier\nShortlist'), findsOneWidget);
 
       // Tap on Shortlist button to check navigation callback
-      await tester.ensureVisible(find.text('Supplier Shortlist (4)'));
+      await tester.ensureVisible(find.text('Supplier\nShortlist'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Supplier Shortlist (4)'));
+      await tester.tap(find.text('Supplier\nShortlist'));
       expect(navigatedRoute, equals('/market/shortlist'));
     });
 
@@ -219,10 +207,6 @@ void main() {
         pendingPayableTotalPaise: 0,
       );
 
-      final emptyMarket = const DashboardMarketSummary(
-        shortlistedCount: 0,
-      );
-
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
@@ -230,7 +214,6 @@ void main() {
             financialPositionMetricsProvider.overrideWith((ref) => Future.value(zeroPosition)),
             dashboardObligationsSummaryProvider.overrideWith((ref) => Future.value(settledObligations)),
             dashboardPriorityActionsProvider.overrideWith((ref) => Future.value([])),
-            dashboardMarketSummaryProvider.overrideWith((ref) => Future.value(emptyMarket)),
           ],
           child: const MaterialApp(
             localizationsDelegates: [

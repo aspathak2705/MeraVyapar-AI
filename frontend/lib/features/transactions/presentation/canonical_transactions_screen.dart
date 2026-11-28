@@ -13,8 +13,6 @@ class CanonicalTransactionsScreen extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onAddTransaction;
   final VoidCallback? onImportStatement;
-  final VoidCallback? onLoadDemoData;
-  final VoidCallback? onClearDemoData;
 
   const CanonicalTransactionsScreen({
     super.key,
@@ -25,16 +23,11 @@ class CanonicalTransactionsScreen extends StatelessWidget {
     this.onBack,
     this.onAddTransaction,
     this.onImportStatement,
-    this.onLoadDemoData,
-    this.onClearDemoData,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final demoCount = transactions
-        .where((t) => t.isSimulated || t.sourceType == 'SYNTHETIC_DEMO')
-        .length;
 
     return Scaffold(
       appBar: AppBar(
@@ -55,39 +48,6 @@ class CanonicalTransactionsScreen extends StatelessWidget {
             icon: const Icon(AppIcons.refresh),
             tooltip: l10n?.runReconciliationPass ?? 'Run Reconciliation Pass',
             onPressed: onRunReconciliation,
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert),
-            tooltip: 'Demo Data Options',
-            onSelected: (val) {
-              if (val == 'load') onLoadDemoData?.call();
-              if (val == 'clear') onClearDemoData?.call();
-            },
-            itemBuilder: (ctx) => [
-              const PopupMenuItem(
-                value: 'load',
-                child: Row(
-                  children: [
-                    Icon(Icons.science_outlined, size: 18),
-                    SizedBox(width: 8),
-                    Text('Load 30-Day Demo Data'),
-                  ],
-                ),
-              ),
-              if (demoCount > 0)
-                const PopupMenuItem(
-                  value: 'clear',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete_sweep_outlined,
-                          size: 18, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Clear Demo Data',
-                          style: TextStyle(color: Colors.red)),
-                    ],
-                  ),
-                ),
-            ],
           ),
         ],
       ),
@@ -145,12 +105,6 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                                     label: Text(l10n?.importStatement ?? 'Import Statement'),
                                     onPressed: onImportStatement,
                                   ),
-                                if (onLoadDemoData != null)
-                                  OutlinedButton.icon(
-                                    icon: const Icon(Icons.science_outlined),
-                                    label: const Text('Load 30-Day Demo Data'),
-                                    onPressed: onLoadDemoData,
-                                  ),
                                 TextButton.icon(
                                   icon: const Icon(AppIcons.refresh),
                                   label: Text(l10n?.runReconciliationPass ?? 'Run Reconciliation'),
@@ -164,72 +118,11 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                     ),
                   ),
                 )
-              : Column(
-                  children: [
-                    if (demoCount > 0)
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.amber.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                              color: Colors.amber.shade400, width: 1),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.science_rounded,
-                                size: 20, color: Colors.amber.shade800),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Synthetic Demo Data Active ($demoCount Records)',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.amber.shade900,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '30-day realistic financial records for Ramesh Store. Real merchant data remains untouched.',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Colors.amber.shade800,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (onClearDemoData != null)
-                              TextButton(
-                                onPressed: onClearDemoData,
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  minimumSize: Size.zero,
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                                child: const Text('Clear',
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.red)),
-                              ),
-                          ],
-                        ),
-                      ),
-                    Expanded(
-                      child: ListView.separated(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: transactions.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
+              : ListView.separated(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: transactions.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
                           final tx = transactions[index];
                           final isCredit = tx.transactionType == 'MONEY_IN' ||
                               tx.transactionType == 'CREDIT';
@@ -273,43 +166,13 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                                   size: 20,
                                 ),
                               ),
-                              title: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      tx.counterpartyName ??
-                                          tx.description ??
-                                          'Canonical Transaction',
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 14),
-                                    ),
-                                  ),
-                                  if (tx.isSimulated ||
-                                      tx.sourceProvider ==
-                                          'SIMULATED_RAZORPAY' ||
-                                      tx.sourceType == 'SYNTHETIC_DEMO') ...[
-                                    const SizedBox(width: 6),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(
-                                        color: Colors.amber.withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(
-                                            color: Colors.amber.shade700,
-                                            width: 0.8),
-                                      ),
-                                      child: const Text(
-                                        'DEMO',
-                                        style: TextStyle(
-                                            fontSize: 9,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.orange),
-                                      ),
-                                    ),
-                                  ],
-                                ],
+                              title: Text(
+                                tx.counterpartyName ??
+                                    tx.description ??
+                                    'Canonical Transaction',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14),
                               ),
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 4.0),
@@ -336,9 +199,6 @@ class CanonicalTransactionsScreen extends StatelessWidget {
                           );
                         },
                       ),
-                    ),
-                  ],
-                ),
       floatingActionButton: onAddTransaction != null
           ? FloatingActionButton(
               tooltip: l10n?.addEntry ?? 'Add Entry',

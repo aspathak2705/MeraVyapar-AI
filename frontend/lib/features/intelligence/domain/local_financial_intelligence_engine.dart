@@ -94,9 +94,9 @@ class LocalFinancialIntelligenceEngine {
       if (i == 0) oldestTx = occurred;
       newestTx = occurred;
 
-      if (type == 'CREDIT') {
+      if (type == 'CREDIT' || type == 'MONEY_IN') {
         totalInflows += paise;
-      } else if (type == 'DEBIT') {
+      } else if (type == 'DEBIT' || type == 'MONEY_OUT') {
         totalOutflows += paise;
       }
     }
