@@ -15,7 +15,7 @@ String smsIdentity(SmsMessage message, {bool receiptTime = false}) {
   final timestamp = !receiptTime && (message.dateSent ?? 0) > 0
       ? message.dateSent
       : message.date;
-  return 'sms:${message.address}:${timestamp}:${message.body}';
+  return 'sms:${message.address}:$timestamp:${message.body}';
 }
 
 /// Must be a top-level function for telephony background isolate execution.

@@ -62,6 +62,12 @@ def verify_installation_request(
     Rejects arbitrary or unsigned merchant ID strings.
     """
     server_secret = getattr(settings, "INTERNAL_INGEST_API_KEY", None) or settings.SUPABASE_JWT_SECRET
+    if settings.ENVIRONMENT.lower() == "production":
+        if not server_secret or server_secret == "dev-secret-change-in-production-min-32-chars!!":
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Gateway signing secret is not configured in production."
+            )
 
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(

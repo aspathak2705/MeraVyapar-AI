@@ -92,6 +92,40 @@ class LocalCanonicalTransactionRepository {
     final txOccurred = occurredAt ?? nowIso;
     final finalIdempotency = idempotencyKey ?? 'idemp_${const Uuid().v4()}';
 
+    // Cross-source reference check (prevent duplicate entry with identical UTR/ref)
+    if (transactionReference != null && transactionReference.trim().isNotEmpty) {
+      final existingByRef = await driver.query(
+        '''
+        SELECT * FROM ${LocalDatabaseSchema.tableCanonicalTransactions}
+        WHERE merchant_id = ? AND transaction_reference = ?
+        ''',
+        [merchantId, transactionReference.trim()],
+      );
+      if (existingByRef.isNotEmpty) {
+        final row = existingByRef.first;
+        final existingMinor = row['amount_minor_units'] as int?;
+        return CanonicalTransactionModel(
+          id: row['id'] as String,
+          merchantId: row['merchant_id'] as String,
+          amount:
+              existingMinor != null ? Money.formatPaise(existingMinor) : null,
+          currency: row['currency'] as String? ?? 'INR',
+          transactionType: row['transaction_type'] as String,
+          paymentMode: row['payment_mode'] as String,
+          counterpartyName: row['counterparty_name'] as String?,
+          transactionReference: row['transaction_reference'] as String?,
+          description: row['description'] as String?,
+          occurredAt: row['occurred_at'] as String?,
+          reconciliationStatus:
+              row['reconciliation_status'] as String? ?? 'UNRESOLVED',
+          sourceType: row['source_type'] as String?,
+          sourceProvider: row['source_provider'] as String?,
+          isSimulated: false,
+          candidateLinks: const [],
+        );
+      }
+    }
+
     // Duplicate idempotency check
     final existing = await driver.query(
       '''
