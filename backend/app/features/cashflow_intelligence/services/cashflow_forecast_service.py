@@ -163,17 +163,6 @@ class CashFlowForecastService:
             )
         )
 
-        # Dataset 3 Optionality Check
-        from app.infrastructure.datasets.dataset_registry import dataset_registry
-        ds3_available = dataset_registry.is_available("dataset_3_metadata")
-        if ds3_available:
-            reference_patterns = [
-                "Cash flow benchmarks from synthetic reference data show recurring expense spikes during week-end cycles.",
-                "Delayed customer payments are the primary driver of temporary cash flow pressure for retail archetypes."
-            ]
-        else:
-            reference_patterns = []
-
         return CashFlowForecastResponse(
             status="SUFFICIENT",
             data_source="REAL_MERCHANT_HISTORY",
@@ -187,7 +176,7 @@ class CashFlowForecastService:
             limitations=[
                 "Forecast does not predict unrecorded cash sales or unexpected external disruptions.",
                 "All figures derived strictly from canonical merchant transactions and explicit promises."
-            ] + ([] if ds3_available else ["Dataset 3 reference benchmarks currently unavailable; using real merchant history only."]),
-            reference_context_used=ds3_available,
-            reference_patterns=reference_patterns
+            ],
+            reference_context_used=False,
+            reference_patterns=[]
         )
