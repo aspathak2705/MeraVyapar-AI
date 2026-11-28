@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import model_validator
 from typing import Optional
 
 
@@ -44,6 +45,13 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore"
     )
+
+    @model_validator(mode="after")
+    def validate_production_secrets(self) -> "Settings":
+        if self.ENVIRONMENT.lower() == "production":
+            if not self.SUPABASE_JWT_SECRET or self.SUPABASE_JWT_SECRET == "dev-secret-change-in-production-min-32-chars!!":
+                raise ValueError("SUPABASE_JWT_SECRET must be explicitly configured in production environment.")
+        return self
 
 
 
