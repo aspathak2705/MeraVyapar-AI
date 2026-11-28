@@ -355,7 +355,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unverifiedDiscoveryDisclaimer =>
-      'Unverified Online Supplier Discovery: Discovered via public online sources and Google Maps. Not an established trade quote or endorsed partner.';
+      'Unverified Online Supplier Discovery: Discovered via public online sources. Not an established trade quote or endorsed partner.';
 
   @override
   String get savedToShortlist => 'Saved to shortlist.';

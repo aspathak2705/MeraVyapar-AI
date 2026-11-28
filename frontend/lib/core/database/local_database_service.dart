@@ -46,7 +46,8 @@ class LocalDatabaseService {
   Future<void> initialize({LocalDatabaseDriver? customDriver, String? customDbPath}) async {
     if (_isInitialized) return;
 
-    _databaseFilePath = customDbPath ?? await getDatabasePath();
+    _databaseFilePath = customDbPath ??
+        (customDriver != null ? 'test_db.db' : await getDatabasePath());
     _activeDriver = customDriver ?? SqfliteDatabaseDriver();
 
     await _activeDriver!.open(_databaseFilePath!);

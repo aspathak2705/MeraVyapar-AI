@@ -793,7 +793,7 @@ abstract class AppLocalizations {
   /// No description provided for @unverifiedDiscoveryDisclaimer.
   ///
   /// In en, this message translates to:
-  /// **'Unverified Online Supplier Discovery: Discovered via public online sources and Google Maps. Not an established trade quote or endorsed partner.'**
+  /// **'Unverified Online Supplier Discovery: Discovered via public online sources. Not an established trade quote or endorsed partner.'**
   String get unverifiedDiscoveryDisclaimer;
 
   /// No description provided for @savedToShortlist.

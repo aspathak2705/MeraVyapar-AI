@@ -21,6 +21,9 @@ dependencies:
   crypto: ^3.0.7
   path: ^1.9.1
   convert: ^3.1.2
+  telephony: ^0.2.0
+  permission_handler: ^13.0.2
+  shared_preferences: ^2.5.6
 
 dev_dependencies:
   flutter_test:

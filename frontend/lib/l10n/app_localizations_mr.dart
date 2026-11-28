@@ -355,7 +355,7 @@ class AppLocalizationsMr extends AppLocalizations {
 
   @override
   String get unverifiedDiscoveryDisclaimer =>
-      'अपुष्ट ऑनलाइन पुरवठादार शोध: सार्वजनिक ऑनलाइन स्रोत आणि Google Maps वरून शोधले. हे सत्यापित घाऊक कोटेशन नाही.';
+      'अपुष्ट ऑनलाइन पुरवठादार शोध: सार्वजनिक ऑनलाइन स्रोत वरून शोधले. हे सत्यापित घाऊक कोटेशन नाही.';
 
   @override
   String get savedToShortlist => 'शॉर्टलिस्टमध्ये जतन केले.';

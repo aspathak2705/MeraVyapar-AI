@@ -19,6 +19,23 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+subprojects {
+    // Automatically assign a namespace to older plugins (like telephony) if they lack one
+    project.pluginManager.withPlugin("com.android.library") {
+        val androidExt = project.extensions.findByName("android") as? com.android.build.gradle.LibraryExtension
+        if (androidExt != null && androidExt.namespace == null) {
+            val manifestFile = project.file("src/main/AndroidManifest.xml")
+            if (manifestFile.exists()) {
+                val content = manifestFile.readText()
+                val match = Regex("""package=["']([^"']+)["']""").find(content)
+                if (match != null) {
+                    androidExt.namespace = match.groupValues[1]
+                }
+            }
+        }
+    }
+}
+
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }

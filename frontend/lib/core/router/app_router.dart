@@ -28,6 +28,7 @@ import '../../features/actions/data/local_action_repository.dart';
 import '../../features/actions/presentation/action_center_screen.dart';
 import '../../features/actions/presentation/action_detail_screen.dart';
 import '../../features/actions/presentation/reminder_draft_screen.dart';
+import '../../features/capture/domain/sms_service.dart';
 import '../../features/intelligence/presentation/unified_financial_intelligence_screen.dart';
 import '../../features/capture/presentation/permission_settings_screen.dart';
 import '../../features/procurement/presentation/procurement_dashboard_screen.dart';
@@ -63,7 +64,8 @@ class AppRouter extends ConsumerStatefulWidget {
   ConsumerState<AppRouter> createState() => _AppRouterState();
 }
 
-class _AppRouterState extends ConsumerState<AppRouter> {
+class _AppRouterState extends ConsumerState<AppRouter>
+    with WidgetsBindingObserver {
   LocalAuthStatus _authStatus = LocalAuthStatus.uninitialized;
   bool _isLoading = false;
   String? _errorMessage;
@@ -79,9 +81,17 @@ class _AppRouterState extends ConsumerState<AppRouter> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _initLocalSession();
     _setupCaptureListeners();
     _startRenderKeepAlive();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      SmsService().resume();
+    }
   }
 
   void _startRenderKeepAlive() {
@@ -249,6 +259,7 @@ class _AppRouterState extends ConsumerState<AppRouter> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _renderKeepAliveTimer?.cancel();
     _pinController.dispose();
     _nameController.dispose();

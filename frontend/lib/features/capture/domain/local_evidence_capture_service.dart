@@ -233,11 +233,64 @@ class LocalEvidenceCaptureService {
         effectiveCounterparty.isNotEmpty ? effectiveCounterparty : null,
         extraction.paymentMode,
         effectiveCategory != null ? '$candidateDescription [Category: $effectiveCategory]' : candidateDescription,
-        lifecycleStatus,
+        extraction.isEligibleTransaction && !extraction.needsReview ? 'PROMOTED' : lifecycleStatus,
         nowIso,
         nowIso,
       ],
     );
+
+    // 6. Direct Canonical Ledger Promotion: If eligible financial transaction, persist into canonical_transactions
+    if (extraction.isEligibleTransaction && !extraction.needsReview) {
+      final canonicalType = extraction.transactionType == 'CREDIT'
+          ? 'MONEY_IN'
+          : (extraction.transactionType == 'DEBIT' ? 'MONEY_OUT' : extraction.transactionType);
+      final idempotencyKey = 'ev_${extraction.fingerprint}';
+
+      final existingCanonical = await driver.query(
+        '''
+        SELECT id FROM ${LocalDatabaseSchema.tableCanonicalTransactions}
+        WHERE merchant_id = ? AND (
+          idempotency_key = ? OR
+          (transaction_reference IS NOT NULL AND transaction_reference != '' AND transaction_reference = ?)
+        )
+        ''',
+        [merchantId, idempotencyKey, extraction.referenceNumber ?? ''],
+      );
+
+      if (existingCanonical.isEmpty) {
+        final txId = const Uuid().v4();
+        await driver.execute(
+          '''
+          INSERT INTO ${LocalDatabaseSchema.tableCanonicalTransactions} (
+            id, merchant_id, amount_minor_units, currency, transaction_type,
+            payment_mode, counterparty_name, counterparty_id, transaction_reference,
+            description, occurred_at, reconciliation_status, source_type,
+            source_provider, is_simulated, idempotency_key, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ''',
+          [
+            txId,
+            merchantId,
+            extraction.amountPaise,
+            'INR',
+            canonicalType,
+            extraction.paymentMode,
+            effectiveCounterparty.isNotEmpty ? effectiveCounterparty : null,
+            null,
+            extraction.referenceNumber,
+            effectiveCategory != null ? '$candidateDescription [Category: $effectiveCategory]' : candidateDescription,
+            nowIso,
+            'SETTLED',
+            sourceType,
+            filename,
+            0,
+            idempotencyKey,
+            nowIso,
+            nowIso,
+          ],
+        );
+      }
+    }
 
     return TransactionCandidateModel(
       id: candidateId,
@@ -379,15 +432,27 @@ class LocalEvidenceCaptureService {
     String? extractedAmount = declaredAmount;
 
     if (extractedAmount == null && text.isNotEmpty) {
-      // Priority 1: Amount directly preceded by transaction verbs
-      final verbAmtRegex = RegExp(
-        r'(?:debited(?:\s+by)?|credited(?:\s+with)?|paid\s+you|sent\s+you|paid|received|sent|transferred|spent|refunded)\s+(?:Rs\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?)',
-        caseSensitive: false,
-      );
-      final verbMatch = verbAmtRegex.firstMatch(text);
-      if (verbMatch != null) {
-        extractedAmount = verbMatch.group(1)!.replaceAll(',', '');
-      } else {
+      // Priority 1: Paired transaction patterns (verb-first and amount-first)
+      final pairedPatterns = [
+        RegExp(
+          r'(?:debited(?:\s+by)?|credited(?:\s+with)?|paid\s+you|sent\s+you|paid|received|sent|transferred|spent|refunded|deposited).{0,25}?(?:Rs\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?)',
+          caseSensitive: false,
+        ),
+        RegExp(
+          r'(?:Rs\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?).{0,50}?(?:debited|deducted|spent|paid|credited|received|deposited)',
+          caseSensitive: false,
+        ),
+      ];
+
+      for (final p in pairedPatterns) {
+        final match = p.firstMatch(text);
+        if (match != null) {
+          extractedAmount = match.group(1)!.replaceAll(',', '');
+          break;
+        }
+      }
+
+      if (extractedAmount == null) {
         // Priority 2: Standard currency amount ignoring balance prefixes
         final generalAmtRegex = RegExp(
           r'(?<!(?:bal|balance|avail|available)[\s\:\.\=]*)(?:Rs\.?|INR|₹)\s*([\d,]+(?:\.\d{1,2})?)',

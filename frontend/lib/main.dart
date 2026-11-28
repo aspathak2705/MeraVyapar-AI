@@ -3,10 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 import 'core/router/app_router.dart';
 import 'core/localization/locale_provider.dart';
+import 'features/capture/domain/sms_service.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  final smsService = SmsService();
+  if (await smsService.checkSmsPermissions()) {
+    smsService.startListening();
+  }
 
   runApp(const ProviderScope(child: MeraVyaparApp()));
 }

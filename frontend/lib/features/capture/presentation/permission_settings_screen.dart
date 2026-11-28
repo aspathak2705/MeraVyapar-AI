@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../../core/config/env.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../capture/data/device_evidence_capture.dart';
+import '../domain/sms_service.dart';
 
 class PermissionSettingsScreen extends StatefulWidget {
   final VoidCallback? onBack;
@@ -16,7 +17,10 @@ class PermissionSettingsScreen extends StatefulWidget {
 
 class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
   final DeviceEvidenceCapture _capture = AndroidDeviceEvidenceCapture();
+  final SmsService _smsService = SmsService();
   Map<String, PermissionLifecycleStatus> _statuses = {};
+  bool _smsGranted = false;
+  bool _isSyncingSms = false;
   bool _isLoading = true;
 
   @override
@@ -28,9 +32,11 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
   Future<void> _refreshStatuses() async {
     setState(() => _isLoading = true);
     final statusMap = await _capture.getDetailedPermissionStatus();
+    final smsStatus = await _smsService.checkSmsPermissions();
     if (mounted) {
       setState(() {
         _statuses = statusMap;
+        _smsGranted = smsStatus;
         _isLoading = false;
       });
     }
@@ -430,26 +436,30 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.sms_outlined, color: Color(0xFFD97706), size: 22),
+                Icon(
+                  Icons.sms_outlined,
+                  color: _smsGranted ? const Color(0xFF16A34A) : const Color(0xFFD97706),
+                  size: 22,
+                ),
                 const SizedBox(width: 10),
                 const Expanded(
                   child: Text(
-                    'SMS Ingestion & Google Play Policy',
+                    'SMS Reading & Inbox Sync',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFEF3C7),
+                    color: _smsGranted ? const Color(0xFFDCFCE7) : const Color(0xFFFEF3C7),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Text(
-                    'Play Policy Gated',
+                  child: Text(
+                    _smsGranted ? 'Active & Listening' : 'Permission Required',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF92400E),
+                      color: _smsGranted ? const Color(0xFF166534) : const Color(0xFF92400E),
                     ),
                   ),
                 ),
@@ -457,8 +467,70 @@ class _PermissionSettingsScreenState extends State<PermissionSettingsScreen> {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Under Google Play Store Permissions Policy, general financial/expense tracking apps are not eligible for broad READ_SMS or RECEIVE_SMS permissions unless registered as default SMS handler. Passive capture operates strictly via authorized Notification Listener, user-selected Statement Import, and Quick Entry shade.',
+              'Reads incoming transactional bank and UPI SMS messages and recovers missed transactions from the past 30 days. Stored strictly in local SQLite as canonical cash flow.',
               style: TextStyle(fontSize: 12, color: Color(0xFF64748B), height: 1.35),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (!_smsGranted)
+                  ElevatedButton.icon(
+                    icon: const Icon(Icons.check, size: 14),
+                    label: const Text('Enable SMS Reading'),
+                    style: ElevatedButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                      backgroundColor: const Color(0xFF4338CA),
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () async {
+                      final granted = await _smsService.requestSmsPermissions();
+                      if (granted) {
+                        _smsService.startListening();
+                      }
+                      await _refreshStatuses();
+                    },
+                  )
+                else
+                  OutlinedButton.icon(
+                    icon: _isSyncingSms
+                        ? const SizedBox(
+                            width: 12,
+                            height: 12,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.sync, size: 14),
+                    label: Text(_isSyncingSms ? 'Syncing...' : 'Sync Missed SMS (30 Days)'),
+                    style: OutlinedButton.styleFrom(
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    onPressed: _isSyncingSms
+                        ? null
+                        : () async {
+                            setState(() => _isSyncingSms = true);
+                            try {
+                              await _smsService.syncInbox();
+                              if (mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('SMS Inbox Sync Complete. Ledger updated.'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() => _isSyncingSms = false);
+                              }
+                            }
+                          },
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Google Play Notice: Public distribution on Google Play Store requires compliance with SMS Permissions Policy. Private APK and sideloaded builds retain full SMS functionality.',
+              style: TextStyle(fontSize: 10, color: Color(0xFF94A3B8), fontStyle: FontStyle.italic),
             ),
           ],
         ),
