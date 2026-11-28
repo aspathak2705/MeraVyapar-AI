@@ -451,4 +451,164 @@ class LocalProcurementRepository {
       ],
     );
   }
+
+  // -------------------------------------------------------------
+  // Purchase Orders & Outcome Recording
+  // -------------------------------------------------------------
+  Future<List<PurchaseOrderModel>> getPurchaseOrders({
+    required String merchantId,
+    String? supplierId,
+  }) async {
+    final driver = _dbService.driver;
+    if (driver == null) throw StateError('Local database driver not initialized');
+
+    final sql = supplierId != null
+        ? '''
+          SELECT * FROM ${LocalDatabaseSchema.tablePurchaseOrders}
+          WHERE merchant_id = ? AND supplier_id = ?
+          ORDER BY created_at DESC
+          '''
+        : '''
+          SELECT * FROM ${LocalDatabaseSchema.tablePurchaseOrders}
+          WHERE merchant_id = ?
+          ORDER BY created_at DESC
+          ''';
+    final args = supplierId != null ? [merchantId, supplierId] : [merchantId];
+    final rows = await driver.query(sql, args);
+    return rows.map((r) => PurchaseOrderModel.fromMap(r)).toList();
+  }
+
+  Future<void> recordPurchaseOutcome({
+    required String merchantId,
+    required String purchaseOrderId,
+    required String deliveryStatus,
+    required String qualityStatus,
+    DateTime? deliveredAt,
+  }) async {
+    final driver = _dbService.driver;
+    if (driver == null) throw StateError('Local database driver not initialized');
+
+    final now = (deliveredAt ?? DateTime.now()).toUtc();
+    await driver.execute(
+      '''
+      UPDATE ${LocalDatabaseSchema.tablePurchaseOrders}
+      SET delivery_status = ?, quality_status = ?, delivered_at = ?
+      WHERE id = ? AND merchant_id = ?
+      ''',
+      [
+        deliveryStatus,
+        qualityStatus,
+        now.toIso8601String(),
+        purchaseOrderId,
+        merchantId,
+      ],
+    );
+  }
+
+  // -------------------------------------------------------------
+  // Supplier Memory (Intelligence Engine 2)
+  // -------------------------------------------------------------
+  Future<SupplierMemoryModel> getSupplierMemory({
+    required String merchantId,
+    required String supplierId,
+  }) async {
+    final driver = _dbService.driver;
+    if (driver == null) throw StateError('Local database driver not initialized');
+
+    // Fetch supplier info
+    final supRows = await driver.query(
+      '''
+      SELECT * FROM ${LocalDatabaseSchema.tableSuppliers}
+      WHERE id = ? AND merchant_id = ?
+      ''',
+      [supplierId, merchantId],
+    );
+    final supplierName = supRows.isNotEmpty ? (supRows.first['name'] as String) : 'Supplier';
+
+    // Fetch completed purchase orders for this supplier
+    final poRows = await driver.query(
+      '''
+      SELECT po.*, q.unit_price_minor_units, q.specification, q.payment_terms
+      FROM ${LocalDatabaseSchema.tablePurchaseOrders} po
+      LEFT JOIN ${LocalDatabaseSchema.tableSupplierQuotations} q ON po.quotation_id = q.id
+      WHERE po.merchant_id = ? AND po.supplier_id = ?
+      ORDER BY po.created_at DESC
+      ''',
+      [merchantId, supplierId],
+    );
+
+    if (poRows.isEmpty) {
+      return SupplierMemoryModel(
+        supplierId: supplierId,
+        supplierName: supplierName,
+        hasHistory: false,
+      );
+    }
+
+    int totalCompleted = 0;
+    int onTime = 0;
+    int delayed = 0;
+    int defects = 0;
+    final recentPurchases = <HistoricalItemPrice>[];
+    String? lastPaymentTerms;
+
+    for (final row in poRows) {
+      final delStatus = row['delivery_status'] as String? ?? 'PENDING';
+      final qualStatus = row['quality_status'] as String? ?? 'PENDING';
+
+      if (delStatus != 'PENDING') {
+        totalCompleted++;
+        if (delStatus == 'DELIVERED_ON_TIME') onTime++;
+        if (delStatus == 'DELIVERED_LATE') delayed++;
+        if (qualStatus == 'PARTIAL_REJECT' || qualStatus == 'DEFECT_REPORTED') defects++;
+
+        final unitPrice = (row['unit_price_minor_units'] as int?) ??
+            ((row['quantity'] as num).toDouble() > 0
+                ? ((row['total_amount_minor_units'] as int) / (row['quantity'] as num).toDouble()).round()
+                : 0);
+
+        recentPurchases.add(
+          HistoricalItemPrice(
+            itemName: row['item_name'] as String,
+            specification: row['specification'] as String?,
+            quantity: (row['quantity'] as num).toDouble(),
+            unit: row['unit'] as String,
+            unitPriceMinorUnits: unitPrice,
+            purchaseDate: DateTime.parse(row['created_at'] as String),
+          ),
+        );
+      }
+
+      if (lastPaymentTerms == null && row['payment_terms'] != null) {
+        lastPaymentTerms = row['payment_terms'] as String;
+      }
+    }
+
+    return SupplierMemoryModel(
+      supplierId: supplierId,
+      supplierName: supplierName,
+      hasHistory: totalCompleted > 0,
+      totalOrdersCompleted: totalCompleted,
+      onTimeDeliveries: onTime,
+      delayedDeliveries: delayed,
+      defectIncidents: defects,
+      recentPurchases: recentPurchases,
+      lastPaymentTerms: lastPaymentTerms,
+    );
+  }
+
+  Future<Map<String, SupplierMemoryModel>> getSupplierMemoriesForQuotes({
+    required String merchantId,
+    required List<SupplierQuotationModel> quotes,
+  }) async {
+    final memories = <String, SupplierMemoryModel>{};
+    final distinctSupplierIds = quotes.map((q) => q.supplierId).toSet();
+    for (final supId in distinctSupplierIds) {
+      memories[supId] = await getSupplierMemory(
+        merchantId: merchantId,
+        supplierId: supId,
+      );
+    }
+    return memories;
+  }
 }

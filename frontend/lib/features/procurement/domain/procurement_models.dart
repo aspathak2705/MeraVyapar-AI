@@ -369,3 +369,131 @@ class SupplierObligationModel {
     );
   }
 }
+
+/// Representation of an Approved Purchase Order
+class PurchaseOrderModel {
+  final String id;
+  final String merchantId;
+  final String? purchaseRequestId;
+  final String quotationId;
+  final String supplierId;
+  final String supplierName;
+  final String itemName;
+  final double quantity;
+  final String unit;
+  final int totalAmountMinorUnits;
+  final String status; // CONFIRMED, CANCELLED
+  final String deliveryStatus; // PENDING, DELIVERED_ON_TIME, DELIVERED_LATE, FAILED
+  final String qualityStatus; // PENDING, ACCEPTED_GOOD, PARTIAL_REJECT, DEFECT_REPORTED
+  final DateTime createdAt;
+  final DateTime? deliveredAt;
+
+  const PurchaseOrderModel({
+    required this.id,
+    required this.merchantId,
+    this.purchaseRequestId,
+    required this.quotationId,
+    required this.supplierId,
+    required this.supplierName,
+    required this.itemName,
+    required this.quantity,
+    required this.unit,
+    required this.totalAmountMinorUnits,
+    this.status = 'CONFIRMED',
+    this.deliveryStatus = 'PENDING',
+    this.qualityStatus = 'PENDING',
+    required this.createdAt,
+    this.deliveredAt,
+  });
+
+  double get totalAmountInr => totalAmountMinorUnits / 100.0;
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'merchant_id': merchantId,
+        'purchase_request_id': purchaseRequestId,
+        'quotation_id': quotationId,
+        'supplier_id': supplierId,
+        'supplier_name': supplierName,
+        'item_name': itemName,
+        'quantity': quantity,
+        'unit': unit,
+        'total_amount_minor_units': totalAmountMinorUnits,
+        'status': status,
+        'delivery_status': deliveryStatus,
+        'quality_status': qualityStatus,
+        'created_at': createdAt.toUtc().toIso8601String(),
+        'delivered_at': deliveredAt?.toUtc().toIso8601String(),
+      };
+
+  factory PurchaseOrderModel.fromMap(Map<String, dynamic> map) {
+    return PurchaseOrderModel(
+      id: map['id'] as String,
+      merchantId: map['merchant_id'] as String,
+      purchaseRequestId: map['purchase_request_id'] as String?,
+      quotationId: map['quotation_id'] as String,
+      supplierId: map['supplier_id'] as String,
+      supplierName: map['supplier_name'] as String,
+      itemName: map['item_name'] as String,
+      quantity: (map['quantity'] as num).toDouble(),
+      unit: map['unit'] as String,
+      totalAmountMinorUnits: map['total_amount_minor_units'] as int,
+      status: map['status'] as String? ?? 'CONFIRMED',
+      deliveryStatus: map['delivery_status'] as String? ?? 'PENDING',
+      qualityStatus: map['quality_status'] as String? ?? 'PENDING',
+      createdAt: DateTime.parse(map['created_at'] as String),
+      deliveredAt: map['delivered_at'] != null ? DateTime.parse(map['delivered_at'] as String) : null,
+    );
+  }
+}
+
+/// Historical Item Purchase Record in Supplier Memory
+class HistoricalItemPrice {
+  final String itemName;
+  final String? specification;
+  final double quantity;
+  final String unit;
+  final int unitPriceMinorUnits;
+  final DateTime purchaseDate;
+
+  const HistoricalItemPrice({
+    required this.itemName,
+    this.specification,
+    required this.quantity,
+    required this.unit,
+    required this.unitPriceMinorUnits,
+    required this.purchaseDate,
+  });
+
+  double get unitPriceInr => unitPriceMinorUnits / 100.0;
+}
+
+/// Verified Supplier Memory aggregated from actual purchase outcomes
+class SupplierMemoryModel {
+  final String supplierId;
+  final String supplierName;
+  final bool hasHistory;
+  final int totalOrdersCompleted;
+  final int onTimeDeliveries;
+  final int delayedDeliveries;
+  final int defectIncidents;
+  final List<HistoricalItemPrice> recentPurchases;
+  final String? lastPaymentTerms;
+
+  const SupplierMemoryModel({
+    required this.supplierId,
+    required this.supplierName,
+    required this.hasHistory,
+    this.totalOrdersCompleted = 0,
+    this.onTimeDeliveries = 0,
+    this.delayedDeliveries = 0,
+    this.defectIncidents = 0,
+    this.recentPurchases = const [],
+    this.lastPaymentTerms,
+  });
+
+  double get onTimeRatePercent =>
+      totalOrdersCompleted > 0 ? (onTimeDeliveries / totalOrdersCompleted) * 100.0 : 0.0;
+
+  bool get hasQualityIssues => defectIncidents > 0;
+}

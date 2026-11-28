@@ -49,6 +49,7 @@ class QuotationComparisonEngine {
     List<SupplierQuotationModel> quotes, {
     String? requiredUnit,
     String? requiredSpecification,
+    Map<String, SupplierMemoryModel>? supplierMemories,
   }) {
     if (quotes.isEmpty) {
       return const QuotationComparisonResult(
@@ -73,6 +74,18 @@ class QuotationComparisonEngine {
     if (quotes.length == 1) {
       final q = quotes.first;
       final warnings = <String>[];
+      final advantages = <String>['Single available quotation'];
+
+      final mem = supplierMemories?[q.supplierId];
+      if (mem != null && mem.hasHistory) {
+        advantages.add('Verified track record: ${mem.totalOrdersCompleted} completed orders');
+        if (mem.hasQualityIssues) {
+          warnings.add('Supplier Memory: ${mem.defectIncidents} past defect/rejection reported');
+        }
+      } else {
+        warnings.add('No purchase history available with this supplier');
+      }
+
       if (q.freightMinorUnits == 0) warnings.add('Freight charges not explicitly itemized');
       if (q.validUntil == null || q.validUntil!.isEmpty) warnings.add('Validity period unstated');
       if (q.specification == null || q.specification!.isEmpty) warnings.add('Specification details unverified');
@@ -88,7 +101,7 @@ class QuotationComparisonEngine {
             isSpecificationMatch: true,
             isUnitCompatible: true,
             isIncomplete: isIncomplete,
-            advantages: ['Single available quotation'],
+            advantages: advantages,
             warnings: warnings,
           ),
         ],
@@ -126,6 +139,22 @@ class QuotationComparisonEngine {
 
       final advantages = <String>[];
       final warnings = <String>[];
+
+      // Supplier Memory integration
+      final mem = supplierMemories?[q.supplierId];
+      if (mem != null && mem.hasHistory) {
+        if (mem.onTimeDeliveries > 0) {
+          advantages.add('Verified Supplier: ${mem.onTimeRatePercent.toInt()}% on-time across ${mem.totalOrdersCompleted} past orders');
+        }
+        if (mem.delayedDeliveries > 0) {
+          warnings.add('Historical delay: ${mem.delayedDeliveries} of ${mem.totalOrdersCompleted} orders arrived late');
+        }
+        if (mem.hasQualityIssues) {
+          warnings.add('Quality alert: ${mem.defectIncidents} past defect/rejection reported');
+        }
+      } else {
+        warnings.add('No purchase history available');
+      }
 
       if (isLowest) {
         advantages.add('Lowest total landed cost (₹${q.totalLandedCostInr.toStringAsFixed(2)})');
@@ -198,8 +227,14 @@ class QuotationComparisonEngine {
           ? (eligibleQuotes[1].quotation.totalLandedCostInr - eligibleQuotes[0].quotation.totalLandedCostInr).abs()
           : 0.0;
 
+      final recMem = supplierMemories?[recommended.quotation.supplierId];
+      final memNote = recMem != null && recMem.hasHistory
+          ? ' Verified supplier (${recMem.totalOrdersCompleted} past orders, ${recMem.onTimeRatePercent.toInt()}% on-time).'
+          : ' (Note: No prior purchase history with this vendor).';
+
       reason = '${recommended.quotation.supplierName} offers best commercial value with verified landed cost of ₹${recommended.quotation.totalLandedCostInr.toStringAsFixed(2)}.' +
           (diffToNext > 0 ? ' Saves ₹${diffToNext.toStringAsFixed(2)} vs next alternative.' : '') +
+          memNote +
           (recommended.isIncomplete ? ' (Note: Incomplete details flagged for verification).' : '');
     }
 
